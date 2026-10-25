@@ -1,0 +1,8612 @@
+// Snapshot of Film Lab web 59d7fedb3a5b5a57d27f08c0fe4e310a58c78a15; attribution and source settings retained.
+export default {
+  "schemaVersion": 1,
+  "sourceRepository": "marianoarias1/film-lab",
+  "sourceCommit": "59d7fedb3a5b5a57d27f08c0fe4e310a58c78a15",
+  "retrievedAt": "2026-10-24",
+  "visibleCount": 30,
+  "recipes": [
+    {
+      "id": "neutral",
+      "name": "Original",
+      "creator": "Film Lab",
+      "description": "Una base limpia, sin tratamiento.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 0,
+        "highlights": 0,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 0,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#b1c6cc",
+        "#c3bb9d"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 0,
+        "highlights": 0,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 0,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "versatile"
+        ],
+        "looks": [
+          "neutral"
+        ],
+        "curated": true
+      },
+      "sky": "#b1c6cc",
+      "earth": "#c3bb9d",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "gold",
+      "name": "Golden Hour",
+      "creator": "Film Lab",
+      "description": "Luz tibia, sombras suaves y un aire de verano.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": -8,
+        "highlights": -22,
+        "shadows": 15,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 18,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 12,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 12,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0162
+          ],
+          [
+            0.0625,
+            0.0772825
+          ],
+          [
+            0.125,
+            0.138365
+          ],
+          [
+            0.1875,
+            0.1994475
+          ],
+          [
+            0.25,
+            0.26053
+          ],
+          [
+            0.3125,
+            0.32161249999999997
+          ],
+          [
+            0.375,
+            0.382695
+          ],
+          [
+            0.4375,
+            0.4437775
+          ],
+          [
+            0.5,
+            0.50486
+          ],
+          [
+            0.5625,
+            0.5659425
+          ],
+          [
+            0.625,
+            0.6270249999999999
+          ],
+          [
+            0.6875,
+            0.6881075
+          ],
+          [
+            0.75,
+            0.74919
+          ],
+          [
+            0.8125,
+            0.8102725
+          ],
+          [
+            0.875,
+            0.871355
+          ],
+          [
+            0.9375,
+            0.9324374999999999
+          ],
+          [
+            1,
+            0.99352
+          ]
+        ]
+      },
+      "palette": [
+        "#ecc477",
+        "#788473"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": -8,
+        "highlights": -22,
+        "shadows": 15,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 18,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 12,
+        "fade": 9,
+        "gamma": 0,
+        "grain": 12,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "landscape"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#ecc477",
+      "earth": "#788473",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "chrome",
+      "name": "Muted Chrome",
+      "creator": "Film Lab",
+      "description": "Color contenido, azules profundos y contraste equilibrado.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 15,
+        "highlights": -14,
+        "shadows": -8,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": -22,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 10,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            -3.5999999999999996
+          ],
+          [
+            0,
+            0,
+            -3.5999999999999996
+          ],
+          [
+            0,
+            0,
+            -3.5999999999999996
+          ],
+          [
+            0,
+            0,
+            -3.5999999999999996
+          ],
+          [
+            0,
+            0,
+            -5.1
+          ],
+          [
+            0,
+            0,
+            -9
+          ],
+          [
+            0,
+            0,
+            -3.5999999999999996
+          ],
+          [
+            0,
+            0,
+            -3.5999999999999996
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#829783",
+        "#d6bd99"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 15,
+        "highlights": -14,
+        "shadows": -8,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": -22,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 10,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 30,
+        "blueChrome": 30,
+        "mono": 0,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "city",
+          "landscape"
+        ],
+        "looks": [
+          "neutral",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#829783",
+      "earth": "#d6bd99",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "soft",
+      "name": "Soft Portrait",
+      "creator": "Film Lab",
+      "description": "Pieles suaves, color delicado y luz envolvente.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": -13,
+        "highlights": -18,
+        "shadows": 16,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 5,
+        "tint": 0,
+        "saturation": -6,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 9,
+        "vignette": 0,
+        "grain": 0,
+        "mono": false,
+        "sharpness": 0,
+        "texture": -4.5,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0072
+          ],
+          [
+            0.0625,
+            0.06907
+          ],
+          [
+            0.125,
+            0.13094
+          ],
+          [
+            0.1875,
+            0.19281
+          ],
+          [
+            0.25,
+            0.25468
+          ],
+          [
+            0.3125,
+            0.31655
+          ],
+          [
+            0.375,
+            0.37842
+          ],
+          [
+            0.4375,
+            0.44029
+          ],
+          [
+            0.5,
+            0.50216
+          ],
+          [
+            0.5625,
+            0.56403
+          ],
+          [
+            0.625,
+            0.6259
+          ],
+          [
+            0.6875,
+            0.68777
+          ],
+          [
+            0.75,
+            0.74964
+          ],
+          [
+            0.8125,
+            0.81151
+          ],
+          [
+            0.875,
+            0.87338
+          ],
+          [
+            0.9375,
+            0.93525
+          ],
+          [
+            1,
+            0.99712
+          ]
+        ]
+      },
+      "palette": [
+        "#d8ac99",
+        "#baa4b8"
+      ],
+      "hiddenFromCatalog": true,
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": -13,
+        "highlights": -18,
+        "shadows": 16,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 5,
+        "tint": 0,
+        "saturation": -6,
+        "vibrance": 0,
+        "fade": 4,
+        "gamma": 0,
+        "grain": 0,
+        "grainSize": 1,
+        "sharpness": -18,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "replacementId": "piel-seda",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "neutral",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#d8ac99",
+      "earth": "#baa4b8",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "negative",
+      "name": "Urban Negative",
+      "creator": "Film Lab",
+      "description": "Sombras frías, negros levantados y calidez en el color.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 21,
+        "highlights": 0,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": -5,
+        "tint": 6,
+        "saturation": -12,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 12,
+        "grain": 24,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            -40,
+            -10,
+            0
+          ],
+          [
+            33.333333333333336,
+            -20,
+            -5
+          ],
+          [
+            0,
+            -10,
+            0
+          ],
+          [
+            -26.666666666666668,
+            -15,
+            -8
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.021599999999999998
+          ],
+          [
+            0.0625,
+            0.08220999999999999
+          ],
+          [
+            0.125,
+            0.14282
+          ],
+          [
+            0.1875,
+            0.20343
+          ],
+          [
+            0.25,
+            0.26404
+          ],
+          [
+            0.3125,
+            0.32465
+          ],
+          [
+            0.375,
+            0.38526
+          ],
+          [
+            0.4375,
+            0.44587
+          ],
+          [
+            0.5,
+            0.5064799999999999
+          ],
+          [
+            0.5625,
+            0.56709
+          ],
+          [
+            0.625,
+            0.6276999999999999
+          ],
+          [
+            0.6875,
+            0.6883099999999999
+          ],
+          [
+            0.75,
+            0.7489199999999999
+          ],
+          [
+            0.8125,
+            0.80953
+          ],
+          [
+            0.875,
+            0.8701399999999999
+          ],
+          [
+            0.9375,
+            0.9307499999999999
+          ],
+          [
+            1,
+            0.9913599999999999
+          ]
+        ]
+      },
+      "palette": [
+        "#687f88",
+        "#d49f79"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 21,
+        "highlights": 0,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": -5,
+        "tint": 6,
+        "saturation": -12,
+        "vibrance": 0,
+        "fade": 12,
+        "gamma": 0,
+        "grain": 24,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 12,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 5,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": -12,
+            "s": -10,
+            "l": 0
+          },
+          {
+            "h": 10,
+            "s": -20,
+            "l": -5
+          },
+          {
+            "h": 0,
+            "s": -10,
+            "l": 0
+          },
+          {
+            "h": -8,
+            "s": -15,
+            "l": -8
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "city",
+          "night"
+        ],
+        "looks": [
+          "cool",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#687f88",
+      "earth": "#d49f79",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "mono",
+      "name": "Silver Mono",
+      "creator": "Film Lab",
+      "description": "Blanco y negro con textura y contraste suave.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 22,
+        "highlights": -10,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 23,
+        "mono": true,
+        "sharpness": 12,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.010799999999999999
+          ],
+          [
+            0.0625,
+            0.072355
+          ],
+          [
+            0.125,
+            0.13391
+          ],
+          [
+            0.1875,
+            0.195465
+          ],
+          [
+            0.25,
+            0.25701999999999997
+          ],
+          [
+            0.3125,
+            0.318575
+          ],
+          [
+            0.375,
+            0.38012999999999997
+          ],
+          [
+            0.4375,
+            0.44168499999999994
+          ],
+          [
+            0.5,
+            0.50324
+          ],
+          [
+            0.5625,
+            0.564795
+          ],
+          [
+            0.625,
+            0.6263500000000001
+          ],
+          [
+            0.6875,
+            0.687905
+          ],
+          [
+            0.75,
+            0.74946
+          ],
+          [
+            0.8125,
+            0.811015
+          ],
+          [
+            0.875,
+            0.87257
+          ],
+          [
+            0.9375,
+            0.934125
+          ],
+          [
+            1,
+            0.99568
+          ]
+        ]
+      },
+      "palette": [
+        "#939391",
+        "#303d39"
+      ],
+      "hiddenFromCatalog": true,
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 22,
+        "highlights": -10,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 6,
+        "gamma": 0,
+        "grain": 23,
+        "grainSize": 1,
+        "sharpness": 12,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 1,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "replacementId": "plata-editorial",
+      "recommendation": {
+        "scenes": [
+          "city",
+          "portrait"
+        ],
+        "looks": [
+          "mono",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#939391",
+      "earth": "#303d39",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "nostalgic-summer",
+      "name": "Nostalgic Summer",
+      "creator": "Josh Edgoose · Fujifilm",
+      "description": "Color cálido y vivo, luces suaves y grano fino.",
+      "type": "adapted",
+      "settings": {
+        "exposure": 0,
+        "contrast": 0,
+        "highlights": 1,
+        "shadows": 10,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 26,
+        "tint": -6,
+        "saturation": 24,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 26,
+        "vignette": 0,
+        "grain": 14,
+        "mono": false,
+        "sharpness": 0,
+        "texture": -3,
+        "grainSize": 55,
+        "hsl": [
+          [
+            0,
+            0,
+            -3
+          ],
+          [
+            0,
+            0,
+            -3
+          ],
+          [
+            0,
+            0,
+            -3
+          ],
+          [
+            0,
+            0,
+            -3
+          ],
+          [
+            0,
+            0,
+            -4.25
+          ],
+          [
+            0,
+            0,
+            -7.5
+          ],
+          [
+            0,
+            0,
+            -3
+          ],
+          [
+            0,
+            0,
+            -3
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0144
+          ],
+          [
+            0.0625,
+            0.07564
+          ],
+          [
+            0.125,
+            0.13688
+          ],
+          [
+            0.1875,
+            0.19812
+          ],
+          [
+            0.25,
+            0.25936000000000003
+          ],
+          [
+            0.3125,
+            0.32060000000000005
+          ],
+          [
+            0.375,
+            0.38184
+          ],
+          [
+            0.4375,
+            0.44308000000000003
+          ],
+          [
+            0.5,
+            0.50432
+          ],
+          [
+            0.5625,
+            0.56556
+          ],
+          [
+            0.625,
+            0.6268
+          ],
+          [
+            0.6875,
+            0.68804
+          ],
+          [
+            0.75,
+            0.74928
+          ],
+          [
+            0.8125,
+            0.81052
+          ],
+          [
+            0.875,
+            0.87176
+          ],
+          [
+            0.9375,
+            0.933
+          ],
+          [
+            1,
+            0.99424
+          ]
+        ]
+      },
+      "original": {
+        "name": "Nostalgic Summer",
+        "source_attribution": "Josh Edgoose · Fujifilm",
+        "source_url": "https://www.fujifilm-x.com/en-gb/learning-centre/make-your-own-film-simulation-recipe/",
+        "film_simulation": "Nostalgic Neg.",
+        "dynamic_range": "DR400",
+        "grain_roughness": "Weak",
+        "grain_size": "Large",
+        "color_chrome_effect": "Weak",
+        "color_chrome_fx_blue": "Weak",
+        "white_balance": "Kelvin",
+        "wb_kelvin": 5600,
+        "white_balance_red": 0,
+        "white_balance_blue": -3,
+        "highlight": -1.5,
+        "shadow": -1,
+        "color": 3,
+        "sharpness": -1,
+        "high_iso_nr": 0,
+        "clarity": 0
+      },
+      "source": "https://www.fujifilm-x.com/en-gb/learning-centre/make-your-own-film-simulation-recipe/",
+      "palette": [
+        "#d7b175",
+        "#8a9b78"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 0,
+        "highlights": 1,
+        "shadows": 10,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 26,
+        "tint": -6,
+        "saturation": 24,
+        "vibrance": 0,
+        "fade": 8,
+        "gamma": 0,
+        "grain": 14,
+        "grainSize": 3,
+        "sharpness": -12,
+        "clarity": 0,
+        "denoise": 20,
+        "vignette": 0,
+        "colorChrome": 25,
+        "blueChrome": 25,
+        "mono": 0,
+        "curve": [
+          0,
+          0.25,
+          0.5,
+          0.75,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "everyday",
+          "portrait"
+        ],
+        "looks": [
+          "warm"
+        ],
+        "curated": true
+      },
+      "sky": "#d7b175",
+      "earth": "#8a9b78",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-0",
+      "name": "Café Editorial",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Marrones cálidos, verdes discretos y negros suaves.",
+      "settings": {
+        "contrast": 12,
+        "highlights": -25,
+        "temperature": 20,
+        "saturation": -24,
+        "grain": 14,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.021599999999999998
+          ],
+          [
+            0.0625,
+            0.08220999999999999
+          ],
+          [
+            0.125,
+            0.14282
+          ],
+          [
+            0.1875,
+            0.20343
+          ],
+          [
+            0.25,
+            0.26404
+          ],
+          [
+            0.3125,
+            0.32465
+          ],
+          [
+            0.375,
+            0.38526
+          ],
+          [
+            0.4375,
+            0.44587
+          ],
+          [
+            0.5,
+            0.5064799999999999
+          ],
+          [
+            0.5625,
+            0.56709
+          ],
+          [
+            0.625,
+            0.6276999999999999
+          ],
+          [
+            0.6875,
+            0.6883099999999999
+          ],
+          [
+            0.75,
+            0.7489199999999999
+          ],
+          [
+            0.8125,
+            0.80953
+          ],
+          [
+            0.875,
+            0.8701399999999999
+          ],
+          [
+            0.9375,
+            0.9307499999999999
+          ],
+          [
+            1,
+            0.9913599999999999
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "temperature": 20,
+        "saturation": -24,
+        "contrast": 12,
+        "fade": 12,
+        "highlights": -25,
+        "grain": 14
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "everyday"
+        ],
+        "looks": [
+          "warm",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-1",
+      "name": "Crema 90",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Luz cremosa y color suave de los noventa.",
+      "settings": {
+        "contrast": -16,
+        "highlights": -30,
+        "shadows": 22,
+        "temperature": 14,
+        "grain": 18,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0252
+          ],
+          [
+            0.0625,
+            0.085495
+          ],
+          [
+            0.125,
+            0.14579
+          ],
+          [
+            0.1875,
+            0.20608500000000002
+          ],
+          [
+            0.25,
+            0.26638
+          ],
+          [
+            0.3125,
+            0.326675
+          ],
+          [
+            0.375,
+            0.38697000000000004
+          ],
+          [
+            0.4375,
+            0.447265
+          ],
+          [
+            0.5,
+            0.50756
+          ],
+          [
+            0.5625,
+            0.567855
+          ],
+          [
+            0.625,
+            0.62815
+          ],
+          [
+            0.6875,
+            0.688445
+          ],
+          [
+            0.75,
+            0.7487400000000001
+          ],
+          [
+            0.8125,
+            0.8090350000000001
+          ],
+          [
+            0.875,
+            0.86933
+          ],
+          [
+            0.9375,
+            0.929625
+          ],
+          [
+            1,
+            0.98992
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "hiddenFromCatalog": true,
+      "webSettings": {
+        "temperature": 14,
+        "contrast": -16,
+        "shadows": 22,
+        "highlights": -30,
+        "fade": 14,
+        "grain": 18
+      },
+      "replacementId": "piel-seda",
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "everyday"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-2",
+      "name": "Indie Flash",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Color vivo y contraste de una cámara compacta.",
+      "settings": {
+        "contrast": 24,
+        "shadows": -12,
+        "saturation": 12,
+        "vibrance": 32,
+        "grain": 17,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "contrast": 24,
+        "vibrance": 32,
+        "saturation": 12,
+        "grain": 17,
+        "shadows": -12
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "flash-diario",
+      "recommendation": {
+        "scenes": [
+          "everyday",
+          "portrait"
+        ],
+        "looks": [
+          "neutral",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-3",
+      "name": "Rose Diary",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Rosa suave y nostalgia romántica.",
+      "settings": {
+        "contrast": -14,
+        "temperature": 7,
+        "tint": 17,
+        "saturation": -12,
+        "grain": 20,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.036
+          ],
+          [
+            0.0625,
+            0.09534999999999999
+          ],
+          [
+            0.125,
+            0.1547
+          ],
+          [
+            0.1875,
+            0.21405
+          ],
+          [
+            0.25,
+            0.2734
+          ],
+          [
+            0.3125,
+            0.33275
+          ],
+          [
+            0.375,
+            0.39209999999999995
+          ],
+          [
+            0.4375,
+            0.45144999999999996
+          ],
+          [
+            0.5,
+            0.5108
+          ],
+          [
+            0.5625,
+            0.57015
+          ],
+          [
+            0.625,
+            0.6295000000000001
+          ],
+          [
+            0.6875,
+            0.6888500000000001
+          ],
+          [
+            0.75,
+            0.7482
+          ],
+          [
+            0.8125,
+            0.80755
+          ],
+          [
+            0.875,
+            0.8669
+          ],
+          [
+            0.9375,
+            0.92625
+          ],
+          [
+            1,
+            0.9856
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "tint": 17,
+        "temperature": 7,
+        "contrast": -14,
+        "saturation": -12,
+        "fade": 20,
+        "grain": 20
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-4",
+      "name": "Blue Motel",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Azules apagados y atmósfera cinematográfica.",
+      "settings": {
+        "contrast": 20,
+        "temperature": -18,
+        "saturation": -20,
+        "vignette": 12,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1.9000000000000001
+          ],
+          [
+            0,
+            0,
+            -6.84
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0144
+          ],
+          [
+            0.0625,
+            0.07564
+          ],
+          [
+            0.125,
+            0.13688
+          ],
+          [
+            0.1875,
+            0.19812
+          ],
+          [
+            0.25,
+            0.25936000000000003
+          ],
+          [
+            0.3125,
+            0.32060000000000005
+          ],
+          [
+            0.375,
+            0.38184
+          ],
+          [
+            0.4375,
+            0.44308000000000003
+          ],
+          [
+            0.5,
+            0.50432
+          ],
+          [
+            0.5625,
+            0.56556
+          ],
+          [
+            0.625,
+            0.6268
+          ],
+          [
+            0.6875,
+            0.68804
+          ],
+          [
+            0.75,
+            0.74928
+          ],
+          [
+            0.8125,
+            0.81052
+          ],
+          [
+            0.875,
+            0.87176
+          ],
+          [
+            0.9375,
+            0.933
+          ],
+          [
+            1,
+            0.99424
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "temperature": -18,
+        "blueChrome": 38,
+        "saturation": -20,
+        "contrast": 20,
+        "vignette": 12,
+        "fade": 8
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "negative",
+      "recommendation": {
+        "scenes": [
+          "city",
+          "night",
+          "landscape"
+        ],
+        "looks": [
+          "cool",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-5",
+      "name": "Cinema Honey",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Ámbar, sombras densas y textura analógica.",
+      "settings": {
+        "contrast": 24,
+        "highlights": -28,
+        "shadows": -15,
+        "temperature": 25,
+        "vignette": 18,
+        "grain": 28,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "temperature": 25,
+        "contrast": 24,
+        "highlights": -28,
+        "shadows": -15,
+        "grain": 28,
+        "vignette": 18
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "night",
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "dark",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-6",
+      "name": "Y2K Pop",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Color brillante y medios tonos luminosos.",
+      "settings": {
+        "contrast": 10,
+        "tint": 9,
+        "saturation": 18,
+        "vibrance": 36,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.0625,
+            0.07083634500107677
+          ],
+          [
+            0.125,
+            0.1373068197659972
+          ],
+          [
+            0.1875,
+            0.20222338166821463
+          ],
+          [
+            0.25,
+            0.2661509815895421
+          ],
+          [
+            0.3125,
+            0.32935312194679056
+          ],
+          [
+            0.375,
+            0.39198309030153844
+          ],
+          [
+            0.4375,
+            0.45414120969213745
+          ],
+          [
+            0.5,
+            0.5158982279379744
+          ],
+          [
+            0.5625,
+            0.5773066932336328
+          ],
+          [
+            0.625,
+            0.638407158836739
+          ],
+          [
+            0.6875,
+            0.6992318565583858
+          ],
+          [
+            0.75,
+            0.759807010518877
+          ],
+          [
+            0.8125,
+            0.8201543669198559
+          ],
+          [
+            0.875,
+            0.880292245831746
+          ],
+          [
+            0.9375,
+            0.9402362880531376
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "vibrance": 36,
+        "saturation": 18,
+        "gamma": 10,
+        "tint": 9,
+        "contrast": 10
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "everyday"
+        ],
+        "looks": [
+          "neutral"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-7",
+      "name": "Muted Muse",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Tonos contenidos y retrato editorial.",
+      "settings": {
+        "contrast": -8,
+        "highlights": -18,
+        "shadows": 16,
+        "saturation": -30,
+        "mono": false,
+        "sharpness": 0,
+        "denoise": 6,
+        "texture": -3,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0162
+          ],
+          [
+            0.0625,
+            0.0772825
+          ],
+          [
+            0.125,
+            0.138365
+          ],
+          [
+            0.1875,
+            0.1994475
+          ],
+          [
+            0.25,
+            0.26053
+          ],
+          [
+            0.3125,
+            0.32161249999999997
+          ],
+          [
+            0.375,
+            0.382695
+          ],
+          [
+            0.4375,
+            0.4437775
+          ],
+          [
+            0.5,
+            0.50486
+          ],
+          [
+            0.5625,
+            0.5659425
+          ],
+          [
+            0.625,
+            0.6270249999999999
+          ],
+          [
+            0.6875,
+            0.6881075
+          ],
+          [
+            0.75,
+            0.74919
+          ],
+          [
+            0.8125,
+            0.8102725
+          ],
+          [
+            0.875,
+            0.871355
+          ],
+          [
+            0.9375,
+            0.9324374999999999
+          ],
+          [
+            1,
+            0.99352
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "hiddenFromCatalog": true,
+      "webSettings": {
+        "saturation": -30,
+        "contrast": -8,
+        "highlights": -18,
+        "shadows": 16,
+        "sharpness": -12,
+        "fade": 9
+      },
+      "replacementId": "piel-seda",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "neutral",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-8",
+      "name": "Retro Riviera",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Verano retro con azules profundos.",
+      "settings": {
+        "temperature": 12,
+        "vibrance": 18,
+        "grain": 24,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -2.2
+          ],
+          [
+            0,
+            0,
+            -7.92
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0288
+          ],
+          [
+            0.0625,
+            0.08878
+          ],
+          [
+            0.125,
+            0.14876
+          ],
+          [
+            0.1875,
+            0.20873999999999998
+          ],
+          [
+            0.25,
+            0.26872
+          ],
+          [
+            0.3125,
+            0.3287
+          ],
+          [
+            0.375,
+            0.38867999999999997
+          ],
+          [
+            0.4375,
+            0.44866
+          ],
+          [
+            0.5,
+            0.50864
+          ],
+          [
+            0.5625,
+            0.56862
+          ],
+          [
+            0.625,
+            0.6286
+          ],
+          [
+            0.6875,
+            0.6885800000000001
+          ],
+          [
+            0.75,
+            0.74856
+          ],
+          [
+            0.8125,
+            0.80854
+          ],
+          [
+            0.875,
+            0.8685200000000001
+          ],
+          [
+            0.9375,
+            0.9285
+          ],
+          [
+            1,
+            0.98848
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "temperature": 12,
+        "vibrance": 18,
+        "blueChrome": 44,
+        "fade": 16,
+        "grain": 24
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "nostalgic-summer",
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "everyday"
+        ],
+        "looks": [
+          "warm",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-9",
+      "name": "Late Night Film",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Oscuro, frío y con grano de película.",
+      "settings": {
+        "exposure": -0.15,
+        "contrast": 30,
+        "temperature": -12,
+        "saturation": -18,
+        "vignette": 25,
+        "grain": 34,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "exposure": -0.15,
+        "contrast": 30,
+        "temperature": -12,
+        "saturation": -18,
+        "grain": 34,
+        "vignette": 25
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "night",
+          "city"
+        ],
+        "looks": [
+          "cool",
+          "dark",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-10",
+      "name": "Peach Weekend",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Pieles cálidas y color melocotón.",
+      "settings": {
+        "contrast": -10,
+        "highlights": -22,
+        "temperature": 15,
+        "tint": 8,
+        "vibrance": 10,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0144
+          ],
+          [
+            0.0625,
+            0.07564
+          ],
+          [
+            0.125,
+            0.13688
+          ],
+          [
+            0.1875,
+            0.19812
+          ],
+          [
+            0.25,
+            0.25936000000000003
+          ],
+          [
+            0.3125,
+            0.32060000000000005
+          ],
+          [
+            0.375,
+            0.38184
+          ],
+          [
+            0.4375,
+            0.44308000000000003
+          ],
+          [
+            0.5,
+            0.50432
+          ],
+          [
+            0.5625,
+            0.56556
+          ],
+          [
+            0.625,
+            0.6268
+          ],
+          [
+            0.6875,
+            0.68804
+          ],
+          [
+            0.75,
+            0.74928
+          ],
+          [
+            0.8125,
+            0.81052
+          ],
+          [
+            0.875,
+            0.87176
+          ],
+          [
+            0.9375,
+            0.933
+          ],
+          [
+            1,
+            0.99424
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "hiddenFromCatalog": true,
+      "webSettings": {
+        "temperature": 15,
+        "tint": 8,
+        "highlights": -22,
+        "contrast": -10,
+        "vibrance": 10,
+        "fade": 8
+      },
+      "replacementId": "piel-seda",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "editorial-11",
+      "name": "Monochrome Diary",
+      "creator": "Film Lab",
+      "type": "original",
+      "description": "Blanco y negro nostálgico con negros lavados.",
+      "settings": {
+        "contrast": 18,
+        "highlights": -20,
+        "grain": 30,
+        "mono": true,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.039599999999999996
+          ],
+          [
+            0.0625,
+            0.098635
+          ],
+          [
+            0.125,
+            0.15767
+          ],
+          [
+            0.1875,
+            0.216705
+          ],
+          [
+            0.25,
+            0.27574
+          ],
+          [
+            0.3125,
+            0.33477500000000004
+          ],
+          [
+            0.375,
+            0.39381
+          ],
+          [
+            0.4375,
+            0.45284500000000005
+          ],
+          [
+            0.5,
+            0.51188
+          ],
+          [
+            0.5625,
+            0.570915
+          ],
+          [
+            0.625,
+            0.62995
+          ],
+          [
+            0.6875,
+            0.6889850000000001
+          ],
+          [
+            0.75,
+            0.74802
+          ],
+          [
+            0.8125,
+            0.807055
+          ],
+          [
+            0.875,
+            0.86609
+          ],
+          [
+            0.9375,
+            0.9251250000000001
+          ],
+          [
+            1,
+            0.98416
+          ]
+        ]
+      },
+      "palette": [
+        "#c5b28f",
+        "#8a8d76"
+      ],
+      "webSettings": {
+        "mono": 1,
+        "contrast": 18,
+        "fade": 22,
+        "grain": 30,
+        "highlights": -20
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "everyday",
+          "portrait"
+        ],
+        "looks": [
+          "mono",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#c5b28f",
+      "earth": "#8a8d76",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "botanica",
+      "name": "Botánica",
+      "creator": "Film Lab",
+      "description": "Piel cálida, verdes profundos y textura fina.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 5,
+        "highlights": -15,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 6,
+        "tint": 2,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 10,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            -5,
+            0
+          ],
+          [
+            0,
+            -4,
+            4
+          ],
+          [
+            26.666666666666668,
+            -22,
+            -2
+          ],
+          [
+            20,
+            -24,
+            -10
+          ],
+          [
+            0,
+            -12,
+            0
+          ],
+          [
+            0,
+            -10,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.02
+          ],
+          [
+            0.25,
+            0.2
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.8
+          ],
+          [
+            1,
+            0.98
+          ]
+        ]
+      },
+      "palette": [
+        "#71856a",
+        "#cfaa88"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 5,
+        "highlights": -15,
+        "shadows": 0,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 6,
+        "tint": 2,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 10,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0.02,
+          0.2,
+          0.5,
+          0.8,
+          0.98
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": -5,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -4,
+            "l": 4
+          },
+          {
+            "h": 8,
+            "s": -22,
+            "l": -2
+          },
+          {
+            "h": 6,
+            "s": -24,
+            "l": -10
+          },
+          {
+            "h": 0,
+            "s": -12,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -10,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "landscape"
+        ],
+        "looks": [
+          "warm",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#71856a",
+      "earth": "#cfaa88",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "flash-diario",
+      "name": "Flash de Diario",
+      "creator": "Film Lab",
+      "description": "Color directo, rojos presentes y negros firmes.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 17,
+        "highlights": -6,
+        "shadows": -7,
+        "whites": 8,
+        "blacks": 0,
+        "temperature": 2,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 14,
+        "mono": false,
+        "sharpness": 3,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            14,
+            1
+          ],
+          [
+            0,
+            -5,
+            3
+          ],
+          [
+            0,
+            -8,
+            0
+          ],
+          [
+            0,
+            -6,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            8,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.19
+          ],
+          [
+            0.5,
+            0.51
+          ],
+          [
+            0.75,
+            0.82
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#c85845",
+        "#e7d5bd"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 17,
+        "highlights": -6,
+        "shadows": -7,
+        "whites": 8,
+        "blacks": 0,
+        "temperature": 2,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 14,
+        "grainSize": 1,
+        "sharpness": 3,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0,
+          0.19,
+          0.51,
+          0.82,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 14,
+            "l": 1
+          },
+          {
+            "h": 0,
+            "s": -5,
+            "l": 3
+          },
+          {
+            "h": 0,
+            "s": -8,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -6,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 8,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "everyday",
+          "portrait"
+        ],
+        "looks": [
+          "neutral",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c85845",
+      "earth": "#e7d5bd",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "plata-editorial",
+      "name": "Plata Editorial",
+      "creator": "Film Lab",
+      "description": "Blanco y negro limpio, medios definidos y grano fino.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 10,
+        "highlights": -10,
+        "shadows": 0,
+        "whites": 7,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 13,
+        "mono": true,
+        "sharpness": 5,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.008
+          ],
+          [
+            0.25,
+            0.2
+          ],
+          [
+            0.5,
+            0.51
+          ],
+          [
+            0.75,
+            0.81
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#c4c3bd",
+        "#303a34"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 10,
+        "highlights": -10,
+        "shadows": 0,
+        "whites": 7,
+        "blacks": 0,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 13,
+        "grainSize": 1,
+        "sharpness": 5,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 1,
+        "curve": [
+          0.008,
+          0.2,
+          0.51,
+          0.81,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "city"
+        ],
+        "looks": [
+          "mono",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c4c3bd",
+      "earth": "#303a34",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "bronce-salino",
+      "name": "Bronce Salino",
+      "creator": "Film Lab",
+      "description": "Piel dorada, marrones densos y fondos discretos.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 12,
+        "highlights": -15,
+        "shadows": -11,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 9,
+        "tint": 1,
+        "saturation": -5,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 17,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            10,
+            -8,
+            0
+          ],
+          [
+            10,
+            -5,
+            -2
+          ],
+          [
+            -20,
+            -27,
+            -4
+          ],
+          [
+            0,
+            -32,
+            -12
+          ],
+          [
+            0,
+            -20,
+            -3
+          ],
+          [
+            0,
+            -25,
+            -5
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.012
+          ],
+          [
+            0.25,
+            0.18
+          ],
+          [
+            0.5,
+            0.47
+          ],
+          [
+            0.75,
+            0.77
+          ],
+          [
+            1,
+            0.98
+          ]
+        ]
+      },
+      "palette": [
+        "#c9a173",
+        "#3e4d43"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 12,
+        "highlights": -15,
+        "shadows": -11,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 9,
+        "tint": 1,
+        "saturation": -5,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 17,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0.012,
+          0.18,
+          0.47,
+          0.77,
+          0.98
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 3,
+            "s": -8,
+            "l": 0
+          },
+          {
+            "h": 3,
+            "s": -5,
+            "l": -2
+          },
+          {
+            "h": -6,
+            "s": -27,
+            "l": -4
+          },
+          {
+            "h": 0,
+            "s": -32,
+            "l": -12
+          },
+          {
+            "h": 0,
+            "s": -20,
+            "l": -3
+          },
+          {
+            "h": 0,
+            "s": -25,
+            "l": -5
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "landscape"
+        ],
+        "looks": [
+          "warm",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#c9a173",
+      "earth": "#3e4d43",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "piel-seda",
+      "name": "Piel de Seda",
+      "creator": "Film Lab",
+      "description": "Luz cremosa, labios contenidos y textura natural.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": -6,
+        "highlights": -19,
+        "shadows": 6,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 5,
+        "tint": -3,
+        "saturation": -4,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 5,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            -12,
+            3
+          ],
+          [
+            3.3333333333333335,
+            -10,
+            5
+          ],
+          [
+            -10,
+            -23,
+            3
+          ],
+          [
+            0,
+            -24,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            -18,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.025
+          ],
+          [
+            0.25,
+            0.26
+          ],
+          [
+            0.5,
+            0.54
+          ],
+          [
+            0.75,
+            0.79
+          ],
+          [
+            1,
+            0.98
+          ]
+        ]
+      },
+      "palette": [
+        "#dfc6a0",
+        "#748273"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": -6,
+        "highlights": -19,
+        "shadows": 6,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 5,
+        "tint": -3,
+        "saturation": -4,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 5,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0.025,
+          0.26,
+          0.54,
+          0.79,
+          0.98
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": -12,
+            "l": 3
+          },
+          {
+            "h": 1,
+            "s": -10,
+            "l": 5
+          },
+          {
+            "h": -3,
+            "s": -23,
+            "l": 3
+          },
+          {
+            "h": 0,
+            "s": -24,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -18,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#dfc6a0",
+      "earth": "#748273",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "plata-marina",
+      "name": "Plata Marina",
+      "creator": "Film Lab",
+      "description": "Azules grisáceos, sombras profundas y reflejos vivos.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 11,
+        "highlights": 0,
+        "shadows": -16,
+        "whites": 12,
+        "blacks": 0,
+        "temperature": -5,
+        "tint": -2,
+        "saturation": -13,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 12,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            -8,
+            0
+          ],
+          [
+            0,
+            -8,
+            -2
+          ],
+          [
+            0,
+            -27,
+            0
+          ],
+          [
+            0,
+            -35,
+            -5
+          ],
+          [
+            0,
+            -25,
+            5
+          ],
+          [
+            -26.666666666666668,
+            -32,
+            7
+          ],
+          [
+            0,
+            -25,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.008
+          ],
+          [
+            0.25,
+            0.17
+          ],
+          [
+            0.5,
+            0.46
+          ],
+          [
+            0.75,
+            0.79
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9baeb2",
+        "#374e52"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 11,
+        "highlights": 0,
+        "shadows": -16,
+        "whites": 12,
+        "blacks": 0,
+        "temperature": -5,
+        "tint": -2,
+        "saturation": -13,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 12,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0.008,
+          0.17,
+          0.46,
+          0.79,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": -8,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -8,
+            "l": -2
+          },
+          {
+            "h": 0,
+            "s": -27,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -35,
+            "l": -5
+          },
+          {
+            "h": 0,
+            "s": -25,
+            "l": 5
+          },
+          {
+            "h": -8,
+            "s": -32,
+            "l": 7
+          },
+          {
+            "h": 0,
+            "s": -25,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "portrait"
+        ],
+        "looks": [
+          "cool",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#9baeb2",
+      "earth": "#374e52",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "costa-editorial",
+      "name": "Costa Editorial",
+      "creator": "Film Lab",
+      "description": "Piel cálida, agua cian y blancos luminosos.",
+      "type": "original",
+      "settings": {
+        "exposure": 0,
+        "contrast": 9,
+        "highlights": -10,
+        "shadows": 0,
+        "whites": 9,
+        "blacks": 0,
+        "temperature": 3,
+        "tint": 2,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 8,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            5,
+            0
+          ],
+          [
+            3.3333333333333335,
+            4,
+            4
+          ],
+          [
+            0,
+            -18,
+            0
+          ],
+          [
+            0,
+            -20,
+            0
+          ],
+          [
+            10,
+            10,
+            3
+          ],
+          [
+            -40,
+            -8,
+            3
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.005
+          ],
+          [
+            0.25,
+            0.21
+          ],
+          [
+            0.5,
+            0.52
+          ],
+          [
+            0.75,
+            0.81
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#58a4b0",
+        "#d2a077"
+      ],
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 9,
+        "highlights": -10,
+        "shadows": 0,
+        "whites": 9,
+        "blacks": 0,
+        "temperature": 3,
+        "tint": 2,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 8,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": 0,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0.005,
+          0.21,
+          0.52,
+          0.81,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 5,
+            "l": 0
+          },
+          {
+            "h": 1,
+            "s": 4,
+            "l": 4
+          },
+          {
+            "h": 0,
+            "s": -18,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -20,
+            "l": 0
+          },
+          {
+            "h": 3,
+            "s": 10,
+            "l": 3
+          },
+          {
+            "h": -12,
+            "s": -8,
+            "l": 3
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "portrait"
+        ],
+        "looks": [
+          "cool",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#58a4b0",
+      "earth": "#d2a077",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "shado-classic-mystical",
+      "name": "ClassicMystical",
+      "creator": "@shadovisuals · Fujifilm",
+      "type": "adapted",
+      "description": "Verdes oliva, rojos profundos y luces suaves.",
+      "source": "https://www.instagram.com/shadovisuals/",
+      "sourceLabel": "Ver creador ↗",
+      "palette": [
+        "#57624e",
+        "#d8c6b0",
+        "#aa9e7a"
+      ],
+      "original": {
+        "name": "ClassicMystical",
+        "source_attribution": "@shadovisuals",
+        "source_url": "https://www.instagram.com/shadovisuals/",
+        "reference_origin": "Captura FUJISTYLE aportada por el usuario",
+        "exposure_compensation": 0,
+        "iso": null,
+        "film_simulation": "CLASSIC Neg.",
+        "white_balance": "Auto",
+        "white_balance_red": 3,
+        "white_balance_blue": -2,
+        "dynamic_range": "DR200",
+        "grain_roughness": "Weak",
+        "grain_size": "Small",
+        "color_chrome_effect": "Strong",
+        "color_chrome_fx_blue": "Strong",
+        "color": 4,
+        "sharpness": -2,
+        "highlight": -1,
+        "shadow": -0.5,
+        "high_iso_nr": -4,
+        "clarity": -1
+      },
+      "adaptation": {
+        "version": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "limitations": "El balance Auto depende de la toma. DR200/DR400 no recuperan luces recortadas en un JPEG. Las simulaciones Fuji, el grano, la nitidez y la reducción de ruido no tienen equivalencia exacta en este motor.",
+        "professionalVersion": 1,
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      },
+      "settings": {
+        "exposure": 0,
+        "contrast": 14,
+        "highlights": -14,
+        "shadows": 6,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 15,
+        "tint": 2,
+        "saturation": 15,
+        "vibrance": 8,
+        "clarity": -6,
+        "denoise": 8,
+        "vignette": 0,
+        "grain": 14,
+        "mono": false,
+        "sharpness": 0,
+        "texture": -4,
+        "grainSize": 25,
+        "hsl": [
+          [
+            -10,
+            7,
+            -11.8
+          ],
+          [
+            -6.666666666666667,
+            -3,
+            -5.8
+          ],
+          [
+            26.666666666666668,
+            -15,
+            -9.8
+          ],
+          [
+            -33.333333333333336,
+            -18,
+            -15.8
+          ],
+          [
+            10,
+            -12,
+            -11.05
+          ],
+          [
+            -13.333333333333334,
+            -12,
+            -17.5
+          ],
+          [
+            0,
+            0,
+            -7.8
+          ],
+          [
+            0,
+            0,
+            -7.8
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.008
+          ],
+          [
+            0.25,
+            0.21
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.79
+          ],
+          [
+            1,
+            0.985
+          ]
+        ]
+      },
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 14,
+        "highlights": -14,
+        "shadows": 6,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 15,
+        "tint": 2,
+        "saturation": 15,
+        "vibrance": 8,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 14,
+        "grainSize": 1,
+        "sharpness": -16,
+        "clarity": -6,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 65,
+        "blueChrome": 65,
+        "mono": 0,
+        "curve": [
+          0.008,
+          0.21,
+          0.5,
+          0.79,
+          0.985
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": -3,
+            "s": 7,
+            "l": -4
+          },
+          {
+            "h": -2,
+            "s": -3,
+            "l": 2
+          },
+          {
+            "h": 8,
+            "s": -15,
+            "l": -2
+          },
+          {
+            "h": -10,
+            "s": -18,
+            "l": -8
+          },
+          {
+            "h": 3,
+            "s": -12,
+            "l": 0
+          },
+          {
+            "h": -4,
+            "s": -12,
+            "l": 2
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "everyday"
+        ],
+        "looks": [
+          "warm",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#57624e",
+      "earth": "#d8c6b0"
+    },
+    {
+      "id": "shado-chrome-baby",
+      "name": "Chrome for me Baby",
+      "creator": "@shadovisuals · Fujifilm",
+      "type": "adapted",
+      "description": "Calidez de piedra, color contenido y sombras abiertas.",
+      "source": "https://www.instagram.com/shadovisuals/",
+      "sourceLabel": "Ver creador ↗",
+      "palette": [
+        "#ac9972",
+        "#50392b",
+        "#d7c0a6"
+      ],
+      "original": {
+        "name": "Chrome for me Baby",
+        "source_attribution": "@shadovisuals",
+        "source_url": "https://www.instagram.com/shadovisuals/",
+        "reference_origin": "Captura FUJISTYLE aportada por el usuario",
+        "exposure_compensation": 0,
+        "iso": null,
+        "film_simulation": "CLASSIC CHROME",
+        "white_balance": "Auto",
+        "white_balance_red": 5,
+        "white_balance_blue": -6,
+        "dynamic_range": "DR200",
+        "grain_roughness": "Weak",
+        "grain_size": "Small",
+        "color_chrome_effect": "Strong",
+        "color_chrome_fx_blue": "Strong",
+        "color": 3,
+        "sharpness": 0,
+        "highlight": -2,
+        "shadow": -1.5,
+        "high_iso_nr": -4,
+        "clarity": -4
+      },
+      "adaptation": {
+        "version": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "limitations": "El balance Auto depende de la toma. DR200/DR400 no recuperan luces recortadas en un JPEG. Las simulaciones Fuji, el grano, la nitidez y la reducción de ruido no tienen equivalencia exacta en este motor.",
+        "professionalVersion": 1,
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      },
+      "settings": {
+        "exposure": 0,
+        "contrast": 6,
+        "highlights": -27,
+        "shadows": 19,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 27,
+        "tint": -2,
+        "saturation": 2,
+        "vibrance": 4,
+        "clarity": -24,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 14,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            -6,
+            -7.8
+          ],
+          [
+            6.666666666666667,
+            -7,
+            -5.8
+          ],
+          [
+            -23.333333333333332,
+            -18,
+            -6.8
+          ],
+          [
+            -40,
+            -28,
+            -10.8
+          ],
+          [
+            16.666666666666668,
+            -22,
+            -11.05
+          ],
+          [
+            -16.666666666666668,
+            -24,
+            -14.5
+          ],
+          [
+            0,
+            0,
+            -7.8
+          ],
+          [
+            0,
+            0,
+            -7.8
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.008
+          ],
+          [
+            0.25,
+            0.22
+          ],
+          [
+            0.5,
+            0.49
+          ],
+          [
+            0.75,
+            0.77
+          ],
+          [
+            1,
+            0.975
+          ]
+        ]
+      },
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 6,
+        "highlights": -27,
+        "shadows": 19,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 27,
+        "tint": -2,
+        "saturation": 2,
+        "vibrance": 4,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 14,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": -24,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 65,
+        "blueChrome": 65,
+        "mono": 0,
+        "curve": [
+          0.008,
+          0.22,
+          0.49,
+          0.77,
+          0.975
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": -6,
+            "l": 0
+          },
+          {
+            "h": 2,
+            "s": -7,
+            "l": 2
+          },
+          {
+            "h": -7,
+            "s": -18,
+            "l": 1
+          },
+          {
+            "h": -12,
+            "s": -28,
+            "l": -3
+          },
+          {
+            "h": 5,
+            "s": -22,
+            "l": 0
+          },
+          {
+            "h": -5,
+            "s": -24,
+            "l": 5
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "city",
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#ac9972",
+      "earth": "#50392b"
+    },
+    {
+      "id": "shado-albuquerque-35",
+      "name": "Albuquerque 35",
+      "creator": "@shadovisuals · Fujifilm",
+      "type": "adapted",
+      "description": "Luces ámbar, tierra dorada y sombras densas.",
+      "source": "https://www.instagram.com/shadovisuals/",
+      "sourceLabel": "Ver creador ↗",
+      "palette": [
+        "#b79b64",
+        "#d7b269",
+        "#93a9b0"
+      ],
+      "original": {
+        "name": "Albuquerque 35",
+        "source_attribution": "@shadovisuals",
+        "source_url": "https://www.instagram.com/shadovisuals/",
+        "reference_origin": "Captura FUJISTYLE aportada por el usuario",
+        "exposure_compensation": 0,
+        "iso": null,
+        "film_simulation": "NOSTALGIC Neg.",
+        "white_balance": "Fluorescent 1",
+        "white_balance_red": -4,
+        "white_balance_blue": -2,
+        "dynamic_range": "DR400",
+        "grain_roughness": "Weak",
+        "grain_size": "Small",
+        "color_chrome_effect": "Strong",
+        "color_chrome_fx_blue": "Off",
+        "color": 4,
+        "sharpness": 0,
+        "highlight": -2,
+        "shadow": 1,
+        "high_iso_nr": -4,
+        "clarity": -2
+      },
+      "adaptation": {
+        "version": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "limitations": "El balance Auto depende de la toma. DR200/DR400 no recuperan luces recortadas en un JPEG. Las simulaciones Fuji, el grano, la nitidez y la reducción de ruido no tienen equivalencia exacta en este motor.",
+        "professionalVersion": 1,
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      },
+      "settings": {
+        "exposure": 0,
+        "contrast": 12,
+        "highlights": -24,
+        "shadows": -13,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 9,
+        "tint": -9,
+        "saturation": 14,
+        "vibrance": 8,
+        "clarity": -12,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 14,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            10,
+            -3,
+            -10.8
+          ],
+          [
+            13.333333333333334,
+            8,
+            -5.8
+          ],
+          [
+            -33.333333333333336,
+            7,
+            -9.8
+          ],
+          [
+            -53.333333333333336,
+            -24,
+            -16.8
+          ],
+          [
+            16.666666666666668,
+            -12,
+            -4.8
+          ],
+          [
+            -23.333333333333332,
+            -20,
+            -1.7999999999999998
+          ],
+          [
+            0,
+            0,
+            -7.8
+          ],
+          [
+            0,
+            0,
+            -7.8
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.009
+          ],
+          [
+            0.25,
+            0.19
+          ],
+          [
+            0.5,
+            0.49
+          ],
+          [
+            0.75,
+            0.8
+          ],
+          [
+            1,
+            0.98
+          ]
+        ]
+      },
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 12,
+        "highlights": -24,
+        "shadows": -13,
+        "whites": 0,
+        "blacks": 0,
+        "temperature": 9,
+        "tint": -9,
+        "saturation": 14,
+        "vibrance": 8,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 14,
+        "grainSize": 1,
+        "sharpness": 0,
+        "clarity": -12,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 65,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0.009,
+          0.19,
+          0.49,
+          0.8,
+          0.98
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 3,
+            "s": -3,
+            "l": -3
+          },
+          {
+            "h": 4,
+            "s": 8,
+            "l": 2
+          },
+          {
+            "h": -10,
+            "s": 7,
+            "l": -2
+          },
+          {
+            "h": -16,
+            "s": -24,
+            "l": -9
+          },
+          {
+            "h": 5,
+            "s": -12,
+            "l": 3
+          },
+          {
+            "h": -7,
+            "s": -20,
+            "l": 6
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "city"
+        ],
+        "looks": [
+          "warm",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#b79b64",
+      "earth": "#d7b269"
+    },
+    {
+      "id": "shado-acros-gray-matter",
+      "name": "AcrosGrayMatter",
+      "creator": "@shadovisuals · Fujifilm",
+      "type": "adapted",
+      "description": "Blanco y negro intenso, cielos oscuros y grano fino.",
+      "source": "https://www.instagram.com/shadovisuals/",
+      "sourceLabel": "Ver creador ↗",
+      "palette": [
+        "#a1a19d",
+        "#484947",
+        "#d4d3cc"
+      ],
+      "original": {
+        "name": "AcrosGrayMatter",
+        "source_attribution": "@shadovisuals",
+        "source_url": "https://www.instagram.com/shadovisuals/",
+        "reference_origin": "Captura FUJISTYLE aportada por el usuario",
+        "exposure_compensation": 0,
+        "iso": null,
+        "film_simulation": "ACROS+R FILTER",
+        "white_balance": "Auto",
+        "white_balance_red": 4,
+        "white_balance_blue": -6,
+        "dynamic_range": "Auto",
+        "grain_roughness": "Weak",
+        "grain_size": "Small",
+        "color_chrome_effect": "Off",
+        "color_chrome_fx_blue": "Off",
+        "color": 0,
+        "sharpness": 3,
+        "highlight": -1.5,
+        "shadow": 3.5,
+        "high_iso_nr": 0,
+        "clarity": -2
+      },
+      "adaptation": {
+        "version": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "limitations": "El balance Auto depende de la toma. DR200/DR400 no recuperan luces recortadas en un JPEG. Las simulaciones Fuji, el grano, la nitidez y la reducción de ruido no tienen equivalencia exacta en este motor.",
+        "professionalVersion": 1,
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      },
+      "settings": {
+        "exposure": 0,
+        "contrast": 22,
+        "highlights": -18,
+        "shadows": -34,
+        "whites": 0,
+        "blacks": -5,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "clarity": -12,
+        "denoise": 0,
+        "vignette": 0,
+        "grain": 14,
+        "mono": true,
+        "sharpness": 24,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            15
+          ],
+          [
+            0,
+            0,
+            9
+          ],
+          [
+            0,
+            0,
+            -5
+          ],
+          [
+            0,
+            0,
+            -24
+          ],
+          [
+            0,
+            0,
+            -30
+          ],
+          [
+            0,
+            0,
+            -42
+          ],
+          [
+            0,
+            0,
+            -18
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.18
+          ],
+          [
+            0.5,
+            0.49
+          ],
+          [
+            0.75,
+            0.8
+          ],
+          [
+            1,
+            0.99
+          ]
+        ]
+      },
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 22,
+        "highlights": -18,
+        "shadows": -34,
+        "whites": 0,
+        "blacks": -5,
+        "temperature": 0,
+        "tint": 0,
+        "saturation": 0,
+        "vibrance": 0,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 14,
+        "grainSize": 1,
+        "sharpness": 24,
+        "clarity": -12,
+        "denoise": 0,
+        "vignette": 0,
+        "colorChrome": 0,
+        "blueChrome": 0,
+        "mono": 1,
+        "curve": [
+          0,
+          0.18,
+          0.49,
+          0.8,
+          0.99
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 0,
+            "l": 15
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 9
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": -5
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": -24
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": -30
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": -42
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": -18
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "city",
+          "portrait"
+        ],
+        "looks": [
+          "mono",
+          "dark",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#a1a19d",
+      "earth": "#484947"
+    },
+    {
+      "id": "shado-dream-cars-astia",
+      "name": "DreamCarsAstia",
+      "creator": "@shadovisuals · Fujifilm",
+      "type": "adapted",
+      "description": "Metal frío, blancos claros y negros definidos, sin grano.",
+      "source": "https://www.instagram.com/shadovisuals/",
+      "sourceLabel": "Ver creador ↗",
+      "palette": [
+        "#717d7b",
+        "#d2cbc0",
+        "#242b29"
+      ],
+      "original": {
+        "name": "DreamCarsAstia",
+        "source_attribution": "@shadovisuals",
+        "source_url": "https://www.instagram.com/shadovisuals/",
+        "reference_origin": "Captura FUJISTYLE aportada por el usuario",
+        "exposure_compensation": 0,
+        "iso": null,
+        "film_simulation": "ASTIA/SOFT",
+        "white_balance": "Kelvin",
+        "wb_kelvin": 5700,
+        "white_balance_red": -1,
+        "white_balance_blue": 1,
+        "dynamic_range": "DR200",
+        "grain_roughness": "Off",
+        "grain_size": "Small",
+        "color_chrome_effect": "Weak",
+        "color_chrome_fx_blue": "Off",
+        "color": 4,
+        "sharpness": 2,
+        "highlight": 1,
+        "shadow": 2,
+        "high_iso_nr": -2,
+        "clarity": 2
+      },
+      "adaptation": {
+        "version": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "limitations": "El balance Auto depende de la toma. DR200/DR400 no recuperan luces recortadas en un JPEG. Las simulaciones Fuji, el grano, la nitidez y la reducción de ruido no tienen equivalencia exacta en este motor.",
+        "professionalVersion": 1,
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      },
+      "settings": {
+        "exposure": 0,
+        "contrast": 12,
+        "highlights": 10,
+        "shadows": -23,
+        "whites": 0,
+        "blacks": -4,
+        "temperature": -4,
+        "tint": 0,
+        "saturation": 17,
+        "vibrance": 6,
+        "clarity": 12,
+        "denoise": 6,
+        "vignette": 0,
+        "grain": 0,
+        "mono": false,
+        "sharpness": 16,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            5,
+            -6
+          ],
+          [
+            0,
+            -3,
+            -2
+          ],
+          [
+            0,
+            -15,
+            -3
+          ],
+          [
+            0,
+            -18,
+            -9
+          ],
+          [
+            0,
+            -14,
+            -3
+          ],
+          [
+            -10,
+            -10,
+            -1
+          ],
+          [
+            0,
+            0,
+            -3
+          ],
+          [
+            0,
+            0,
+            -3
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.22
+          ],
+          [
+            0.5,
+            0.51
+          ],
+          [
+            0.75,
+            0.81
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "webSettings": {
+        "framing": null,
+        "laboratory": null,
+        "exposure": 0,
+        "contrast": 12,
+        "highlights": 10,
+        "shadows": -23,
+        "whites": 0,
+        "blacks": -4,
+        "temperature": -4,
+        "tint": 0,
+        "saturation": 17,
+        "vibrance": 6,
+        "fade": 0,
+        "gamma": 0,
+        "grain": 0,
+        "grainSize": 1,
+        "sharpness": 16,
+        "clarity": 12,
+        "denoise": 6,
+        "vignette": 0,
+        "colorChrome": 25,
+        "blueChrome": 0,
+        "mono": 0,
+        "curve": [
+          0,
+          0.22,
+          0.51,
+          0.81,
+          1
+        ],
+        "curvePoints": null,
+        "hsl": [
+          {
+            "h": 0,
+            "s": 5,
+            "l": -3
+          },
+          {
+            "h": 0,
+            "s": -3,
+            "l": 1
+          },
+          {
+            "h": 0,
+            "s": -15,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": -18,
+            "l": -6
+          },
+          {
+            "h": 0,
+            "s": -14,
+            "l": 0
+          },
+          {
+            "h": -3,
+            "s": -10,
+            "l": 2
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          },
+          {
+            "h": 0,
+            "s": 0,
+            "l": 0
+          }
+        ]
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "city",
+          "everyday"
+        ],
+        "looks": [
+          "cool",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#717d7b",
+      "earth": "#d2cbc0"
+    },
+    {
+      "id": "online-amber-print",
+      "name": "Amber Print",
+      "creator": "Film Lab",
+      "description": "Tonos ámbar, negros suaves y grano fino.",
+      "type": "original",
+      "settings": {
+        "contrast": 8,
+        "temperature": 22,
+        "grain": 18,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0252
+          ],
+          [
+            0.0625,
+            0.085495
+          ],
+          [
+            0.125,
+            0.14579
+          ],
+          [
+            0.1875,
+            0.20608500000000002
+          ],
+          [
+            0.25,
+            0.26638
+          ],
+          [
+            0.3125,
+            0.326675
+          ],
+          [
+            0.375,
+            0.38697000000000004
+          ],
+          [
+            0.4375,
+            0.447265
+          ],
+          [
+            0.5,
+            0.50756
+          ],
+          [
+            0.5625,
+            0.567855
+          ],
+          [
+            0.625,
+            0.62815
+          ],
+          [
+            0.6875,
+            0.688445
+          ],
+          [
+            0.75,
+            0.7487400000000001
+          ],
+          [
+            0.8125,
+            0.8090350000000001
+          ],
+          [
+            0.875,
+            0.86933
+          ],
+          [
+            0.9375,
+            0.929625
+          ],
+          [
+            1,
+            0.98992
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 22,
+        "fade": 14,
+        "contrast": 8,
+        "grain": 18
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "editorial-0",
+      "recommendation": {
+        "scenes": [
+          "everyday",
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-coastal-blue",
+      "name": "Coastal Blue",
+      "creator": "Film Lab",
+      "description": "Tonos fríos, azules profundos y luces suaves.",
+      "type": "original",
+      "settings": {
+        "highlights": -24,
+        "temperature": -12,
+        "vibrance": 16,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -2
+          ],
+          [
+            0,
+            0,
+            -7.199999999999999
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": -12,
+        "blueChrome": 40,
+        "vibrance": 16,
+        "highlights": -24
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape"
+        ],
+        "looks": [
+          "cool",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-dusty-rose",
+      "name": "Dusty Rose",
+      "creator": "Film Lab",
+      "description": "Matiz rosado, color apagado y negros lavados.",
+      "type": "original",
+      "settings": {
+        "contrast": -10,
+        "tint": 18,
+        "saturation": -18,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0324
+          ],
+          [
+            0.0625,
+            0.09206500000000001
+          ],
+          [
+            0.125,
+            0.15173
+          ],
+          [
+            0.1875,
+            0.211395
+          ],
+          [
+            0.25,
+            0.27106
+          ],
+          [
+            0.3125,
+            0.330725
+          ],
+          [
+            0.375,
+            0.39039
+          ],
+          [
+            0.4375,
+            0.450055
+          ],
+          [
+            0.5,
+            0.5097200000000001
+          ],
+          [
+            0.5625,
+            0.569385
+          ],
+          [
+            0.625,
+            0.62905
+          ],
+          [
+            0.6875,
+            0.688715
+          ],
+          [
+            0.75,
+            0.74838
+          ],
+          [
+            0.8125,
+            0.808045
+          ],
+          [
+            0.875,
+            0.86771
+          ],
+          [
+            0.9375,
+            0.9273750000000001
+          ],
+          [
+            1,
+            0.98704
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "tint": 18,
+        "saturation": -18,
+        "fade": 18,
+        "contrast": -10
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "editorial-3",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "neutral",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-forest-walk",
+      "name": "Forest Walk",
+      "creator": "Film Lab",
+      "description": "Color profundo, sombras densas y calidez suave.",
+      "type": "original",
+      "settings": {
+        "highlights": -20,
+        "shadows": -16,
+        "temperature": 8,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ],
+          [
+            0,
+            0,
+            -4.2
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 8,
+        "colorChrome": 35,
+        "shadows": -16,
+        "highlights": -20
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "online-deep-woodland",
+      "recommendation": {
+        "scenes": [
+          "landscape"
+        ],
+        "looks": [
+          "warm",
+          "deep",
+          "dark"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-pastel-morning",
+      "name": "Pastel Morning",
+      "creator": "Film Lab",
+      "description": "Colores pastel, sombras claras y contraste suave.",
+      "type": "original",
+      "settings": {
+        "contrast": -24,
+        "shadows": 28,
+        "saturation": -16,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.018
+          ],
+          [
+            0.0625,
+            0.078925
+          ],
+          [
+            0.125,
+            0.13985
+          ],
+          [
+            0.1875,
+            0.20077499999999998
+          ],
+          [
+            0.25,
+            0.2617
+          ],
+          [
+            0.3125,
+            0.322625
+          ],
+          [
+            0.375,
+            0.38355
+          ],
+          [
+            0.4375,
+            0.444475
+          ],
+          [
+            0.5,
+            0.5054
+          ],
+          [
+            0.5625,
+            0.566325
+          ],
+          [
+            0.625,
+            0.62725
+          ],
+          [
+            0.6875,
+            0.688175
+          ],
+          [
+            0.75,
+            0.7491
+          ],
+          [
+            0.8125,
+            0.810025
+          ],
+          [
+            0.875,
+            0.87095
+          ],
+          [
+            0.9375,
+            0.931875
+          ],
+          [
+            1,
+            0.9928
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "contrast": -24,
+        "shadows": 28,
+        "saturation": -16,
+        "fade": 10
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "portrait",
+          "landscape"
+        ],
+        "looks": [
+          "neutral",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-cinema-teal",
+      "name": "Cinema Teal",
+      "creator": "Film Lab",
+      "description": "Tonos fríos, contraste marcado y bordes oscuros.",
+      "type": "original",
+      "settings": {
+        "contrast": 28,
+        "temperature": -16,
+        "tint": 5,
+        "vignette": 20,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1.4000000000000001
+          ],
+          [
+            0,
+            0,
+            -5.04
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": -16,
+        "tint": 5,
+        "contrast": 28,
+        "vignette": 20,
+        "blueChrome": 28
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "negative",
+      "recommendation": {
+        "scenes": [
+          "city",
+          "night"
+        ],
+        "looks": [
+          "cool",
+          "deep",
+          "dark"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-desert-light",
+      "name": "Desert Light",
+      "creator": "Film Lab",
+      "description": "Calidez dorada, luces suaves y textura fina.",
+      "type": "original",
+      "settings": {
+        "highlights": -26,
+        "temperature": 28,
+        "saturation": -12,
+        "grain": 15,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 28,
+        "highlights": -26,
+        "saturation": -12,
+        "grain": 15
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "shado-albuquerque-35",
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-rainy-city",
+      "name": "Rainy City",
+      "creator": "Film Lab",
+      "description": "Color frío y apagado, con contraste definido.",
+      "type": "original",
+      "settings": {
+        "contrast": 18,
+        "temperature": -18,
+        "saturation": -32,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0144
+          ],
+          [
+            0.0625,
+            0.07564
+          ],
+          [
+            0.125,
+            0.13688
+          ],
+          [
+            0.1875,
+            0.19812
+          ],
+          [
+            0.25,
+            0.25936000000000003
+          ],
+          [
+            0.3125,
+            0.32060000000000005
+          ],
+          [
+            0.375,
+            0.38184
+          ],
+          [
+            0.4375,
+            0.44308000000000003
+          ],
+          [
+            0.5,
+            0.50432
+          ],
+          [
+            0.5625,
+            0.56556
+          ],
+          [
+            0.625,
+            0.6268
+          ],
+          [
+            0.6875,
+            0.68804
+          ],
+          [
+            0.75,
+            0.74928
+          ],
+          [
+            0.8125,
+            0.81052
+          ],
+          [
+            0.875,
+            0.87176
+          ],
+          [
+            0.9375,
+            0.933
+          ],
+          [
+            1,
+            0.99424
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": -18,
+        "saturation": -32,
+        "contrast": 18,
+        "fade": 8
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "negative",
+      "recommendation": {
+        "scenes": [
+          "city"
+        ],
+        "looks": [
+          "cool",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-soft-wedding",
+      "name": "Soft Wedding",
+      "creator": "Film Lab",
+      "description": "Luz cálida, sombras abiertas y detalle suave.",
+      "type": "original",
+      "settings": {
+        "contrast": -18,
+        "highlights": -30,
+        "shadows": 20,
+        "temperature": 6,
+        "mono": false,
+        "sharpness": 0,
+        "denoise": 6,
+        "texture": -3,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 6,
+        "contrast": -18,
+        "highlights": -30,
+        "shadows": 20,
+        "sharpness": -12
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "piel-seda",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-autumn-paper",
+      "name": "Autumn Paper",
+      "creator": "Film Lab",
+      "description": "Tonos cálidos y rosados, negros lavados y grano.",
+      "type": "original",
+      "settings": {
+        "temperature": 24,
+        "tint": 8,
+        "saturation": -20,
+        "grain": 22,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.036
+          ],
+          [
+            0.0625,
+            0.09534999999999999
+          ],
+          [
+            0.125,
+            0.1547
+          ],
+          [
+            0.1875,
+            0.21405
+          ],
+          [
+            0.25,
+            0.2734
+          ],
+          [
+            0.3125,
+            0.33275
+          ],
+          [
+            0.375,
+            0.39209999999999995
+          ],
+          [
+            0.4375,
+            0.45144999999999996
+          ],
+          [
+            0.5,
+            0.5108
+          ],
+          [
+            0.5625,
+            0.57015
+          ],
+          [
+            0.625,
+            0.6295000000000001
+          ],
+          [
+            0.6875,
+            0.6888500000000001
+          ],
+          [
+            0.75,
+            0.7482
+          ],
+          [
+            0.8125,
+            0.80755
+          ],
+          [
+            0.875,
+            0.8669
+          ],
+          [
+            0.9375,
+            0.92625
+          ],
+          [
+            1,
+            0.9856
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 24,
+        "tint": 8,
+        "saturation": -20,
+        "fade": 20,
+        "grain": 22
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "editorial-0",
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "everyday"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-night-neon",
+      "name": "Night Neon",
+      "creator": "Film Lab",
+      "description": "Color intenso, azules profundos y sombras firmes.",
+      "type": "original",
+      "settings": {
+        "contrast": 25,
+        "shadows": -12,
+        "vibrance": 24,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            -1.8
+          ],
+          [
+            0,
+            0,
+            -6.4799999999999995
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "contrast": 25,
+        "vibrance": 24,
+        "blueChrome": 36,
+        "shadows": -12
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "night",
+          "city"
+        ],
+        "looks": [
+          "cool",
+          "deep",
+          "dark"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-clean-travel",
+      "name": "Clean Travel",
+      "creator": "Film Lab",
+      "description": "Color vivo, sombras claras y detalle definido.",
+      "type": "original",
+      "settings": {
+        "highlights": -20,
+        "shadows": 16,
+        "vibrance": 18,
+        "mono": false,
+        "sharpness": 14,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "vibrance": 18,
+        "highlights": -20,
+        "shadows": 16,
+        "sharpness": 14
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "everyday"
+        ],
+        "looks": [
+          "neutral"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-faded-denim",
+      "name": "Faded Denim",
+      "creator": "Film Lab",
+      "description": "Tonos fríos, negros lavados y grano visible.",
+      "type": "original",
+      "settings": {
+        "temperature": -8,
+        "saturation": -24,
+        "grain": 28,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0468
+          ],
+          [
+            0.0625,
+            0.10520499999999999
+          ],
+          [
+            0.125,
+            0.16361
+          ],
+          [
+            0.1875,
+            0.22201500000000002
+          ],
+          [
+            0.25,
+            0.28042
+          ],
+          [
+            0.3125,
+            0.338825
+          ],
+          [
+            0.375,
+            0.39723
+          ],
+          [
+            0.4375,
+            0.455635
+          ],
+          [
+            0.5,
+            0.5140399999999999
+          ],
+          [
+            0.5625,
+            0.572445
+          ],
+          [
+            0.625,
+            0.6308499999999999
+          ],
+          [
+            0.6875,
+            0.689255
+          ],
+          [
+            0.75,
+            0.74766
+          ],
+          [
+            0.8125,
+            0.8060649999999999
+          ],
+          [
+            0.875,
+            0.86447
+          ],
+          [
+            0.9375,
+            0.9228749999999999
+          ],
+          [
+            1,
+            0.9812799999999999
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": -8,
+        "fade": 26,
+        "saturation": -24,
+        "grain": 28
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "city",
+          "everyday"
+        ],
+        "looks": [
+          "cool",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-warm-portrait",
+      "name": "Warm Portrait",
+      "creator": "Film Lab",
+      "description": "Calidez suave, luces contenidas y detalle delicado.",
+      "type": "original",
+      "settings": {
+        "contrast": -10,
+        "highlights": -22,
+        "temperature": 12,
+        "tint": 4,
+        "mono": false,
+        "sharpness": 0,
+        "denoise": 10,
+        "texture": -5,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 12,
+        "tint": 4,
+        "contrast": -10,
+        "sharpness": -20,
+        "highlights": -22
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "piel-seda",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-noir-street",
+      "name": "Noir Street",
+      "creator": "Film Lab",
+      "description": "Blanco y negro de alto contraste, sombras densas y grano.",
+      "type": "original",
+      "settings": {
+        "contrast": 42,
+        "shadows": -24,
+        "vignette": 22,
+        "grain": 32,
+        "mono": true,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "mono": 1,
+        "contrast": 42,
+        "shadows": -24,
+        "grain": 32,
+        "vignette": 22
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "shado-acros-gray-matter",
+      "recommendation": {
+        "scenes": [
+          "city",
+          "night"
+        ],
+        "looks": [
+          "mono",
+          "dark",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-soft-silver",
+      "name": "Soft Silver",
+      "creator": "Film Lab",
+      "description": "Blanco y negro suave, negros lavados y grano fino.",
+      "type": "original",
+      "settings": {
+        "contrast": -12,
+        "highlights": -20,
+        "grain": 16,
+        "mono": true,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0288
+          ],
+          [
+            0.0625,
+            0.08878
+          ],
+          [
+            0.125,
+            0.14876
+          ],
+          [
+            0.1875,
+            0.20873999999999998
+          ],
+          [
+            0.25,
+            0.26872
+          ],
+          [
+            0.3125,
+            0.3287
+          ],
+          [
+            0.375,
+            0.38867999999999997
+          ],
+          [
+            0.4375,
+            0.44866
+          ],
+          [
+            0.5,
+            0.50864
+          ],
+          [
+            0.5625,
+            0.56862
+          ],
+          [
+            0.625,
+            0.6286
+          ],
+          [
+            0.6875,
+            0.6885800000000001
+          ],
+          [
+            0.75,
+            0.74856
+          ],
+          [
+            0.8125,
+            0.80854
+          ],
+          [
+            0.875,
+            0.8685200000000001
+          ],
+          [
+            0.9375,
+            0.9285
+          ],
+          [
+            1,
+            0.98848
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "mono": 1,
+        "contrast": -12,
+        "fade": 16,
+        "highlights": -20,
+        "grain": 16
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "editorial-11",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "mono",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-sepia-notes",
+      "name": "Sepia Notes",
+      "creator": "Film Lab",
+      "description": "Color casi monocromo, calidez intensa y textura granulada.",
+      "type": "original",
+      "settings": {
+        "contrast": 12,
+        "temperature": 42,
+        "grain": 25,
+        "mono": true,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.0324
+          ],
+          [
+            0.0625,
+            0.09206500000000001
+          ],
+          [
+            0.125,
+            0.15173
+          ],
+          [
+            0.1875,
+            0.211395
+          ],
+          [
+            0.25,
+            0.27106
+          ],
+          [
+            0.3125,
+            0.330725
+          ],
+          [
+            0.375,
+            0.39039
+          ],
+          [
+            0.4375,
+            0.450055
+          ],
+          [
+            0.5,
+            0.5097200000000001
+          ],
+          [
+            0.5625,
+            0.569385
+          ],
+          [
+            0.625,
+            0.62905
+          ],
+          [
+            0.6875,
+            0.688715
+          ],
+          [
+            0.75,
+            0.74838
+          ],
+          [
+            0.8125,
+            0.808045
+          ],
+          [
+            0.875,
+            0.86771
+          ],
+          [
+            0.9375,
+            0.9273750000000001
+          ],
+          [
+            1,
+            0.98704
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "mono": 0.85,
+        "temperature": 42,
+        "fade": 18,
+        "grain": 25,
+        "contrast": 12
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "everyday",
+          "portrait"
+        ],
+        "looks": [
+          "warm",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-summer-postcard",
+      "name": "Summer Postcard",
+      "creator": "Film Lab",
+      "description": "Color cálido y vivo, luces suaves y negros lavados.",
+      "type": "original",
+      "settings": {
+        "highlights": -20,
+        "temperature": 16,
+        "vibrance": 20,
+        "grain": 12,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0.021599999999999998
+          ],
+          [
+            0.0625,
+            0.08220999999999999
+          ],
+          [
+            0.125,
+            0.14282
+          ],
+          [
+            0.1875,
+            0.20343
+          ],
+          [
+            0.25,
+            0.26404
+          ],
+          [
+            0.3125,
+            0.32465
+          ],
+          [
+            0.375,
+            0.38526
+          ],
+          [
+            0.4375,
+            0.44587
+          ],
+          [
+            0.5,
+            0.5064799999999999
+          ],
+          [
+            0.5625,
+            0.56709
+          ],
+          [
+            0.625,
+            0.6276999999999999
+          ],
+          [
+            0.6875,
+            0.6883099999999999
+          ],
+          [
+            0.75,
+            0.7489199999999999
+          ],
+          [
+            0.8125,
+            0.80953
+          ],
+          [
+            0.875,
+            0.8701399999999999
+          ],
+          [
+            0.9375,
+            0.9307499999999999
+          ],
+          [
+            1,
+            0.9913599999999999
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "temperature": 16,
+        "vibrance": 20,
+        "fade": 12,
+        "highlights": -20,
+        "grain": 12
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "nostalgic-summer",
+      "recommendation": {
+        "scenes": [
+          "landscape",
+          "everyday"
+        ],
+        "looks": [
+          "warm"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-studio-neutral",
+      "name": "Studio Neutral",
+      "creator": "Film Lab",
+      "description": "Color neutro, sombras claras y detalle suavizado.",
+      "type": "original",
+      "settings": {
+        "highlights": -16,
+        "shadows": 12,
+        "denoise": 12,
+        "mono": false,
+        "sharpness": 10,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "highlights": -16,
+        "shadows": 12,
+        "sharpness": 10,
+        "denoise": 12
+      },
+      "hiddenFromCatalog": true,
+      "replacementId": "online-clean-travel",
+      "recommendation": {
+        "scenes": [
+          "portrait"
+        ],
+        "looks": [
+          "neutral",
+          "soft"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    },
+    {
+      "id": "online-deep-woodland",
+      "name": "Deep Woodland",
+      "creator": "Film Lab",
+      "description": "Color profundo y contenido, con sombras densas.",
+      "type": "original",
+      "settings": {
+        "contrast": 25,
+        "shadows": -20,
+        "saturation": -15,
+        "mono": false,
+        "sharpness": 0,
+        "grainSize": 25,
+        "hsl": [
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ],
+          [
+            0,
+            0,
+            -6
+          ]
+        ],
+        "curve": [
+          [
+            0,
+            0
+          ],
+          [
+            0.25,
+            0.25
+          ],
+          [
+            0.5,
+            0.5
+          ],
+          [
+            0.75,
+            0.75
+          ],
+          [
+            1,
+            1
+          ]
+        ]
+      },
+      "palette": [
+        "#9aaf9a",
+        "#b6a087"
+      ],
+      "webSettings": {
+        "contrast": 25,
+        "colorChrome": 50,
+        "saturation": -15,
+        "shadows": -20
+      },
+      "hiddenFromCatalog": false,
+      "replacementId": null,
+      "recommendation": {
+        "scenes": [
+          "landscape"
+        ],
+        "looks": [
+          "neutral",
+          "dark",
+          "deep"
+        ],
+        "curated": true
+      },
+      "sky": "#9aaf9a",
+      "earth": "#b6a087",
+      "adaptation": {
+        "professionalVersion": 1,
+        "method": "Interpretación de los ajustes web mediante LightCraft. Se conservan nombre, autor y referencia; la apariencia no es idéntica entre motores.",
+        "notes": [
+          "HSL y Color Chrome se interpretan con el mezclador perceptual; los centros y pesos difieren.",
+          "Gamma, desvanecido y curva se componen en una curva tonal; el suavizado negativo se aproxima con detalle y ruido.",
+          "Las simulaciones Fujifilm siguen siendo interpretaciones; no son perfiles oficiales ni revelados calibrados."
+        ]
+      }
+    }
+  ]
+};

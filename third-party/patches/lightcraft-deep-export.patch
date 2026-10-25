@@ -1,0 +1,43 @@
+--- a/crates/pipeline/src/lib.rs
++++ b/crates/pipeline/src/lib.rs
+@@ -521,13 +521,20 @@
+ 
+ /// Render `src` with settings `s`.
+ pub fn render(src: &Rgb32f, info: &SourceInfo, s: &DevelopSettings, req: &RenderRequest) -> Rendered {
+-    render_impl(Src::Borrowed(src), info, s, req, None)
++    render_impl(Src::Borrowed(src), info, s, req, None, true)
+ }
+ 
+ /// [`render`], reusing (and refreshing) the intermediate results in `cache`. The output is
+ /// identical to [`render`]'s.
+ pub fn render_cached(src: &Arc<Rgb32f>, info: &SourceInfo, s: &DevelopSettings, req: &RenderRequest, cache: &StageCache) -> Rendered {
+-    render_impl(Src::Shared(src), info, s, req, Some(cache))
++    render_impl(Src::Shared(src), info, s, req, Some(cache), true)
++}
++
++/// Film Lab extension: render high-depth data without an unused display preview/histogram.
++/// Identical high-depth samples to `render_cached`; U8 requests are rejected.
++pub fn render_deep_cached(src: &Arc<Rgb32f>, info: &SourceInfo, s: &DevelopSettings, req: &RenderRequest, cache: &StageCache) -> Option<DeepImage> {
++    if req.depth == OutputDepth::U8 { return None; }
++    render_impl(Src::Shared(src), info, s, req, Some(cache), false).deep
+ }
+ 
+ enum Src<'a> {
+@@ -535,7 +542,7 @@
+     Shared(&'a Arc<Rgb32f>),
+ }
+ 
+-fn render_impl(src: Src<'_>, info: &SourceInfo, s: &DevelopSettings, req: &RenderRequest, cache: Option<&StageCache>) -> Rendered {
++fn render_impl(src: Src<'_>, info: &SourceInfo, s: &DevelopSettings, req: &RenderRequest, cache: Option<&StageCache>, make_preview: bool) -> Rendered {
+     // sections switched off with their eye render as if at their defaults (issue #316)
+     let effective = s.effective();
+     let edit: &DevelopSettings = &effective;
+@@ -598,7 +605,7 @@
+     }
+     if req.depth != OutputDepth::U8 {
+         let deep = finish::finish_deep(&prep, s, frame, info, req.space, req.depth, req.proof);
+-        let image = deep.to_rgba8();
++        let image = if make_preview { deep.to_rgba8() } else { Rgba8::new(0,0) };
+         let histogram = Histogram::of_srgb8(&image);
+         lap("finish (deep)", &mut t);
+         return Rendered { image, histogram, deep: Some(deep) };

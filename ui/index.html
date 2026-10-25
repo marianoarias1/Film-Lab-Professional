@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' filmlab: data:; media-src filmlab:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Film Lab Professional</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="#"
+        ><span class="mark">◉</span><b>film</b><span>lab</span
+        ><small>PROFESSIONAL</small></a
+      >
+      <div class="header-center">
+        <span class="dot"></span>Tu equipo. Tus originales.
+      </div>
+      <div class="actions">
+        <button id="projectButton" class="plain">Proyecto <span>⌄</span></button
+        ><button id="importButton" class="outline">+ Agregar archivos</button
+        ><button id="googleButton" class="outline">Google Fotos</button
+        ><button id="exportButton" class="dark" disabled>
+          Exportar <span id="selectedCount">0</span> ↗
+        </button>
+      </div>
+    </header>
+    <div id="engineError" class="error-banner" hidden></div>
+    <main>
+      <aside class="filters">
+        <div class="eyebrow">TU MIRADA, EN OTRO TONO</div>
+        <h1>Filtros</h1>
+        <p class="intro">Un punto de partida.<br />El resto lo decidís vos.</p>
+        <label class="search"
+          ><span>⌕</span
+          ><input
+            id="search"
+            placeholder="Filtro o creador"
+            aria-label="Buscar filtro"
+        /></label>
+        <div class="recipe-discovery">
+          <label>Escena<select id="recipeScene"><option value="all">Todas</option><option value="portrait">Retrato</option><option value="landscape">Paisaje</option><option value="city">Ciudad</option><option value="night">Noche</option><option value="everyday">Día a día</option><option value="versatile">Versátiles</option></select></label>
+          <label>Estilo<select id="recipeLook"><option value="all">Todos</option><option value="warm">Cálidos</option><option value="cool">Fríos</option><option value="neutral">Neutros</option><option value="soft">Suaves</option><option value="deep">Profundos</option><option value="dark">Oscuros</option><option value="mono">Blanco y negro</option></select></label>
+        </div>
+        <div class="collection">
+          <span>COLECCIÓN PROFESSIONAL</span><span id="catalogCount">30</span>
+        </div>
+        <div id="recipeList"></div>
+        <div class="filter-note">
+          <span>✳</span>
+          <p>
+            Catálogo de Film Lab web interpretado para Professional. La apariencia puede variar entre motores.
+          </p>
+        </div>
+        <div class="local-label">◈ Procesamiento local · sin nube</div>
+      </aside>
+      <section class="stage">
+        <div class="stage-top">
+          <div>
+            <span class="eyebrow" id="fileKind">TU ESPACIO DE TRABAJO</span
+            ><strong id="fileName">Empezá con una fotografía o un video</strong>
+          </div>
+          <span id="precision" class="badge">32 bits · color lineal</span>
+        </div>
+        <div class="photo-area" id="photoArea">
+          <div class="image-wrap" id="imageWrap">
+            <img
+              id="preview"
+              alt="Previsualización editada"
+              draggable="false"
+              hidden
+            /><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><video id="playback" controls hidden></video>
+            <div id="emptyState">
+              <div class="empty-mark">◉</div>
+              <h2>Tu próximo revelado.</h2>
+              <p>
+                Abrí un JPEG, un RAW o un video.<br />Los originales permanecen
+                en tu disco.
+              </p>
+              <button id="emptyImport" class="dark">+ Abrir archivos</button
+              ><small>Professional 0.5 · Windows</small>
+            </div>
+          </div>
+          <div class="image-toolbar">
+            <button id="undo" title="Deshacer (Ctrl+Z)" disabled>
+              ↶ <span>Deshacer</span></button
+            ><button id="redo" title="Rehacer (Ctrl+Shift+Z)" disabled>
+              <span>Rehacer</span> ↷
+            </button>
+          </div>
+          <div id="renderStatus" class="render-status" hidden>
+            <span class="spinner"></span> Aplicando ajustes…
+          </div>
+          <button id="before" class="compare" disabled>
+            Mantener para ver original</button
+          ><span id="renderTime" class="render-time"></span>
+        </div>
+        <div id="videoControls" class="video-controls" hidden>
+          <button id="playProxy" class="outline">▷ Generar reproducción</button
+          ><input
+            id="scrub"
+            type="range"
+            min="0"
+            max="1"
+            step=".04"
+            value="0"
+            aria-label="Posición del video"
+          /><output id="timecode">0:00</output
+          ><span class="muted">Con audio</span>
+        </div>
+        <div id="warning" class="warning" hidden></div>
+        <div class="filmstrip-heading">
+          <span>ARCHIVOS DEL PROYECTO <b id="fileCount">0</b></span>
+          <div>
+            <button id="selectAll" class="plain">Seleccionar todos</button
+            ><button id="selectNone" class="plain">Ninguno</button>
+          </div>
+        </div>
+        <div id="filmstrip" class="filmstrip"></div>
+        <footer>
+          <span id="saveStatus">Sesión local</span
+          ><span id="engineStatus">Preparando motor…</span>
+        </footer>
+      </section>
+      <aside class="controls">
+        <nav class="editor-tabs">
+          <button data-tab="edit" class="active">Editar</button
+          ><button data-tab="lab">Laboratorio</button>
+        </nav>
+        <div class="controls-head">
+          <h2 id="panelTitle">A tu manera.</h2>
+          <button id="reset" class="plain" disabled>Restablecer</button>
+        </div>
+        <p id="controlsEmpty" class="intro">
+          Cargá un archivo para ajustar luz, color y textura.
+        </p>
+        <div id="editPanel">
+          <nav class="groups">
+            <button data-group="light" class="active">☼<span>Luz</span></button
+            ><button data-group="color">♧<span>Color</span></button
+            ><button data-group="detail">◌<span>Textura</span></button
+            ><button data-group="curve">⌁<span>Curva</span></button>
+          </nav>
+          <div id="sliders"></div>
+          <div id="curvePanel" hidden>
+            <p class="help">
+              Horizontal: sombras → luces.<br />Vertical: más oscuro → más
+              claro.
+            </p>
+            <svg
+              id="curveSvg"
+              viewBox="0 0 300 240"
+              role="img"
+              aria-label="Curva de tonos"
+            >
+              <defs>
+                <pattern
+                  id="grid"
+                  width="75"
+                  height="60"
+                  patternUnits="userSpaceOnUse"
+                >
+                  <path d="M75 0H0V60" fill="none" stroke="#dfe4d8" />
+                </pattern>
+              </defs>
+              <rect x="0" y="0" width="300" height="240" fill="url(#grid)" />
+              <path
+                id="curvePath"
+                fill="none"
+                stroke="#405a47"
+                stroke-width="2.5"
+              />
+              <g id="curvePoints"></g>
+            </svg>
+            <div class="curve-labels">
+              <span>Sombras</span><span>Luces</span>
+            </div>
+            <div class="curve-inputs" id="curveInputs"></div>
+            <button id="resetCurve" class="outline">Restablecer curva</button>
+          </div>
+        </div>
+        <div id="labPanel" hidden>
+          <section id="maskPanel" class="mask-panel">
+            <h3>Máscaras · Ajustes locales</h3>
+            <p class="help">Elegí una zona y ajustá solo su luz y color. Cada archivo conserva sus máscaras.</p>
+            <select id="maskType" aria-label="Tipo de máscara">
+              <option value="brush">Pincel · pintar / borrar</option><option value="radial" selected>Radial · óvalo</option><option value="vertical">Degradado vertical</option><option value="horizontal">Degradado horizontal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
+            </select>
+            <button id="addMask" class="outline">+ Crear máscara</button>
+            <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar contorno y guías</label><div id="maskList"></div><div id="maskControls"></div>
+          </section>
+          <details><summary>Película y color global</summary>
+          <div class="lab-card">
+            <span>✳</span><strong>Película y luz</strong>
+            <p>Textura y color, sin alterar tu original.</p>
+          </div>
+          <div id="labSliders"></div>
+          <p class="help">
+            La fuga se ubica haciendo clic o arrastrando sobre la foto. Su
+            posición se conserva por archivo.
+          </p>
+          </details>
+        </div>
+        <div class="control-bottom">
+          <span>◈</span> El original siempre queda intacto.
+        </div>
+      </aside>
+    </main>
+    <div id="projectMenu" class="project-menu" hidden>
+      <div>
+        <h3>Tu proyecto</h3>
+        <button id="closeProject" class="plain" aria-label="Cerrar">×</button>
+      </div>
+      <label
+        >Nombre<input
+          id="projectName"
+          value="Sin título"
+          maxlength="120" /></label
+      ><button id="saveProject" class="dark">Guardar proyecto local</button
+      ><button id="openProject" class="outline">Abrir proyecto</button
+      ><button id="newProject" class="plain">Nuevo proyecto</button>
+      <button id="savePreviewDiagnostics" class="outline">Guardar diagnóstico de respuesta</button>
+      <button id="saveDiagnostics" class="outline">Guardar último diagnóstico</button>
+      <p class="help">
+        Se guardan los ajustes y la ubicación de los originales. Mantené esos
+        archivos en tu disco.
+      </p>
+    </div>
+    <dialog id="exportDialog">
+      <div class="dialog-title">
+        <h2>Tu mirada, lista.</h2>
+        <button id="closeExport" class="plain" aria-label="Cerrar">×</button>
+      </div>
+      <p id="exportSummary"></p>
+      <label
+        >Formato de fotografías<select id="photoFormat">
+          <option value="png">PNG · 16 bits</option>
+          <option value="jpg">JPEG · calidad 95 · 4:4:4</option>
+        </select></label
+      >
+      <label>Codificación de video<select id="videoEncoding">
+        <option value="auto">Automática · NVIDIA NVENC si está disponible</option>
+        <option value="cpu">CPU · software</option>
+      </select></label>
+      <p class="help">NVENC acelera la codificación. Los ajustes se procesan en CPU. Si NVIDIA no está disponible, se usa CPU automáticamente.</p>
+      <label class="report-option"><input id="saveExportReport" type="checkbox" checked> Guardar diagnóstico JSON junto a cada archivo</label>
+      <div class="export-info">
+        <span>Videos</span><b>MP4 · H.264 + audio · tamaño original</b>
+      </div>
+      <p class="help">
+        Cada archivo usa sus propios ajustes. Exportación SDR; no conserva
+        metadatos EXIF en esta prueba.
+      </p>
+      <button id="confirmExport" class="dark">Elegir carpeta y exportar</button>
+    </dialog>
+    <dialog id="progressDialog">
+      <h2 id="progressTitle">Preparando exportación</h2>
+      <progress id="progress" max="1" value="0"></progress>
+      <p id="progressText">Procesando en tu equipo…</p>
+      <div class="export-stats" aria-live="polite">
+        <p id="progressFile"></p><p id="progressEncoder"></p><p id="progressSpeed"></p>
+        <p id="progressEta"></p><p id="progressElapsed"></p><p id="progressFallback" class="help"></p>
+      </div>
+      <button id="cancelExport" class="outline">Cancelar</button>
+    </dialog>
+    <dialog id="messageDialog">
+      <h2 id="messageTitle"></h2>
+      <p id="messageText"></p>
+      <button id="messageClose" class="dark">Entendido</button>
+    </dialog>
+    <dialog id="googleDialog">
+      <h2>Importar desde Google Fotos</h2>
+      <p>Elegí una carpeta local y autorizá tu cuenta en el navegador. Solo se importará lo que selecciones.</p>
+      <p class="help">Los videos se descargan en la versión que ofrece Google; puede diferir del original. Para RAW usá Agregar archivos.</p>
+      <p id="googleStatus" role="status">Listo para conectar.</p>
+      <button id="googleStart" class="dark">Conectar y elegir archivos</button>
+      <button id="googleConfig" class="outline">Configurar Google (JSON local)</button>
+      <button id="googleClose" class="plain">Cerrar</button>
+    </dialog>
+    <div id="toast" role="status" hidden></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

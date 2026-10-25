@@ -1,0 +1,16 @@
+node_modules/
+native/target/
+release/
+*.flpro
+*.tmp
+native/target-*/
+*.exe
+*.dll
+*.zip
+.env
+.env.*
+!.env.example
+client_secret*.json
+credentials*.json
+/projects/
+/imports/

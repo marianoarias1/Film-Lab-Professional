@@ -1,0 +1,6 @@
+[submodule "vendor/lightcraft"]
+	path = vendor/lightcraft
+	url = https://github.com/storytold/lightcraft.git
+[submodule "vendor/filmcraft"]
+	path = vendor/filmcraft
+	url = https://github.com/storytold/filmcraft.git

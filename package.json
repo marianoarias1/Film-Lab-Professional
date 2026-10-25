@@ -1,0 +1,61 @@
+{
+  "name": "filmlab-professional",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Film Lab Professional \u00b7 prototipo de escritorio local",
+  "author": "Film Lab",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "build:engine": "cargo build --release --manifest-path native/Cargo.toml",
+    "build:win": "npm run build:engine && electron-builder --win portable --x64",
+    "test": "node --test tests/*.test.cjs",
+    "test:engine": "node tests/engine-integration.cjs",
+    "check": "node scripts/check.cjs",
+    "setup": "node scripts/setup.cjs",
+    "test:native": "cargo test --release --locked --manifest-path native/Cargo.toml",
+    "test:export": "node tests/export-integration.cjs",
+    "test:preview": "node tests/preview-integration.cjs",
+    "test:catalog": "node tests/catalog-integration.cjs",
+    "test:masks": "node tests/masks-engine-integration.cjs"
+  },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "app.filmlab.professional",
+    "productName": "Film Lab Professional",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop/**/*",
+      "ui/**/*",
+      "package.json",
+      "README.md",
+      "docs/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "native/target/release/filmlab-professional-engine.exe",
+        "to": "engine/filmlab-professional-engine.exe"
+      },
+      {
+        "from": "third-party",
+        "to": "licenses"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false
+    }
+  }
+}

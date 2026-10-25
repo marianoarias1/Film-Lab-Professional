@@ -1,0 +1,32 @@
+[package]
+name = "filmlab-professional-engine"
+version = "0.4.0"
+edition = "2024"
+license = "LicenseRef-Proprietary"
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+lightcraft-geom = { path = "../vendor/lightcraft/crates/geom" }
+lightcraft-raw = { path = "../vendor/lightcraft/crates/raw" }
+lightcraft-codecs = { path = "../vendor/lightcraft/crates/codecs" }
+lightcraft-color = { path = "../vendor/lightcraft/crates/color" }
+lightcraft-raster = { path = "../vendor/lightcraft/crates/raster" }
+lightcraft-pipeline = { path = "../vendor/lightcraft/crates/pipeline" }
+lightcraft-develop = { path = "../vendor/lightcraft/crates/develop" }
+filmcraft-codecs = { path = "../vendor/filmcraft/crates/codecs" }
+filmcraft-media = { path = "../vendor/filmcraft/crates/media" }
+filmcraft-frame = { path = "../vendor/filmcraft/crates/frame" }
+filmcraft-project = { path = "../vendor/filmcraft/crates/project" }
+filmcraft-render = { path = "../vendor/filmcraft/crates/render" }
+filmcraft-export = { path = "../vendor/filmcraft/crates/export" }
+filmcraft-time = { path = "../vendor/filmcraft/crates/time" }
+filmcraft-color = { path = "../vendor/filmcraft/crates/color" }
+filmcraft-platform = { path = "../vendor/filmcraft/crates/platform" }
+log = "0.4"
+[profile.dev]
+opt-level = 1
+[profile.dev.package."*"]
+opt-level = 2
+[profile.release]
+codegen-units = 1
+opt-level = 2
