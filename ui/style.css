@@ -900,3 +900,22 @@ progress {
 .mask-panel{padding:12px 0 22px;border-bottom:1px solid var(--line,#ddd)}#maskList{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}#maskList .active{background:#dfe8d2;color:#24392e}#maskControls input[type=text],#maskType{width:100%;padding:10px;border:1px solid #d4dacd;border-radius:8px;background:transparent;color:inherit}#maskControls h4{margin:20px 0 10px}#maskControls>label{display:block;padding:8px 0}#maskControls input[type=checkbox]{width:auto}details>summary{cursor:pointer;padding:16px 0}
 
 #maskOverlay{position:absolute;z-index:3;touch-action:none;overflow:hidden;user-select:none}#maskOverlay[hidden]{display:none}
+
+/* Direct manipulation masks, using Film Lab's sage palette. */
+#maskTint{position:absolute;z-index:2;pointer-events:none}
+#maskTint[hidden]{display:none}
+#maskOverlay{ -webkit-user-select:none; -webkit-touch-callout:none }
+.mask-tool-hint{background:#e7edde;border:1px solid #d0ddc4;padding:12px;border-radius:9px;font-size:12px;line-height:1.6}
+.mask-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:12px 0}
+.mask-actions label{margin:0;display:flex;align-items:center;gap:5px}
+.mask-adjust-group{border-top:1px solid var(--line);margin-top:8px}
+.mask-adjust-group>summary{font-weight:600;font-size:13px;padding:15px 0}
+.brush-controls{border-bottom:1px solid var(--line);padding:8px 0 15px;margin-bottom:12px}
+.brush-controls label{display:block;font-size:12px;margin:12px 0}
+.brush-controls output{float:right;color:var(--muted)}
+.brush-controls input[type=range]{display:block;width:100%;margin-top:10px}
+.engine-info{display:inline-flex;align-items:center;gap:8px}
+.render-status{position:static;transform:none;background:none;border:0;box-shadow:none;padding:0;display:inline-flex;pointer-events:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#maskPanel>label.help{display:flex;align-items:center;gap:7px;margin:12px 0}
+#maskPanel input[type=checkbox]{accent-color:var(--green);flex-shrink:0}

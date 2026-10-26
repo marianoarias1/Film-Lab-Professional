@@ -72,7 +72,7 @@
               alt="Previsualización editada"
               draggable="false"
               hidden
-            /><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><video id="playback" controls hidden></video>
+            /><canvas id="maskTint" aria-hidden="true" hidden></canvas><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><video id="playback" controls hidden></video>
             <div id="emptyState">
               <div class="empty-mark">◉</div>
               <h2>Tu próximo revelado.</h2>
@@ -90,9 +90,6 @@
             ><button id="redo" title="Rehacer (Ctrl+Shift+Z)" disabled>
               <span>Rehacer</span> ↷
             </button>
-          </div>
-          <div id="renderStatus" class="render-status" hidden>
-            <span class="spinner"></span> Aplicando ajustes…
           </div>
           <button id="before" class="compare" disabled>
             Mantener para ver original</button
@@ -122,7 +119,7 @@
         <div id="filmstrip" class="filmstrip"></div>
         <footer>
           <span id="saveStatus">Sesión local</span
-          ><span id="engineStatus">Preparando motor…</span>
+          ><span class="engine-info"><span id="renderStatus" class="render-status" role="status" aria-label="Procesando ajustes" title="Procesando ajustes" hidden><span class="spinner"></span><span class="sr-only">Procesando ajustes</span></span><span id="engineStatus">Preparando motor…</span></span>
         </footer>
       </section>
       <aside class="controls">
@@ -187,12 +184,12 @@
             <h3>Máscaras · Ajustes locales</h3>
             <p class="help">Elegí una zona y ajustá solo su luz y color. Cada archivo conserva sus máscaras.</p>
             <select id="maskType" aria-label="Tipo de máscara">
-              <option value="brush">Pincel · pintar / borrar</option><option value="radial" selected>Radial · óvalo</option><option value="vertical">Degradado vertical</option><option value="horizontal">Degradado horizontal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
+              <option value="brush">Pincel · pintar / borrar</option><option value="radial" selected>Radial · óvalo</option><option value="linear">Degradado lineal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
             </select>
             <button id="addMask" class="outline">+ Crear máscara</button>
-            <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar contorno y guías</label><div id="maskList"></div><div id="maskControls"></div>
+            <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar zona y guías</label><div id="maskList"></div><div id="maskControls"></div>
           </section>
-          <details><summary>Película y color global</summary>
+          <details class="global-effects"><summary>Película y color global</summary>
           <div class="lab-card">
             <span>✳</span><strong>Película y luz</strong>
             <p>Textura y color, sin alterar tu original.</p>

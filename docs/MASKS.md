@@ -1,23 +1,33 @@
-# Laboratorio Professional · Máscaras 0.5
+# Laboratorio Professional · Máscaras
 
-## Tipos y uso
-- Radial: óvalo con centro móvil, dos radios, giro y suavizado. Arrastrá el centro o los dos puntos de tamaño sobre la foto.
-- Degradado vertical/horizontal: el efecto va de Inicio (completo) a Fin (sin efecto). Mové los puntos para inclinarlo.
-- Pincel: pintá sobre la foto; Modo borrar quita pinceladas de esa máscara. El tamaño y suavizado se aplican a los trazos nuevos.
-- Rango de luminosidad: presets Sombras, Tonos medios y Luces. 0 = negros, 1 = blancos; los límites y las transiciones son editables.
+## Dibujar y transformar
+
+Elegí Radial, Degradado lineal o Pincel y pulsá Crear máscara. La herramienta queda activa: la zona se crea al hacer clic y arrastrar sobre la fotografía. Cancelar o Escape abandona la herramienta; Escape durante un gesto revierte ese gesto. Un clic sin arrastrar no crea un degradado.
+
+- **Radial:** arrastrá para dibujar el óvalo. Los cuatro puntos exteriores cambian sus radios; el centro mueve la zona. Arrastrar el contorno fuera de los puntos gira el óvalo; el cursor indica la rotación. Desvanecer controla la transición.
+- **Degradado lineal:** reemplaza las opciones vertical y horizontal. Arrastrá de la zona con efecto completo hacia la zona sin efecto. El punto central mueve todo sin cambiar inclinación ni transición. Arrastrar la línea central fuera del punto rota el degradado; cualquiera de las dos líneas exteriores comprime o extiende la transición, conservando el centro. Los extremos serializados se mantienen dentro de la imagen; cerca de sus bordes la amplitud puede reducirse al rotar. Los proyectos anteriores conservan sus degradados.
+- **Pincel:** el cursor muestra un círculo exterior (tamaño) y otro interior (zona sin desvanecer). Pintar y borrar, tamaño, desvanecer, flujo y densidad se aplican a las pinceladas nuevas. Borrar quita cobertura de esa máscara, sin modificar el original. Una máscara nueva empieza en modo Pintar.
+- **Rango de luminosidad:** Sombras, Tonos medios y Luces conservan límites y transiciones editables. La escala del motor es perceptual/logarítmica. No se simula una superposición para este rango a partir del JPEG ya revelado.
+
+La superposición verde indica la cobertura de la máscara seleccionada y respeta inversión, desvanecido y borrado. Es una guía geométrica a resolución reducida (máximo 384 px de lado), no se exporta. En el pincel aproxima la rasterización del motor a esa escala: el borde final de una exportación puede diferir unos píxeles. El interruptor Mostrar zona y guías oculta la superposición y los puntos sin desactivar el efecto; volvé a activarlo para transformar la zona. El cursor del pincel permanece visible al pintar.
 
 ## Ajustes locales
-Intensidad global de la máscara, exposición, contraste, altas luces, sombras, blancos, negros, temperatura, matiz, saturación, textura, claridad y neblina. Renombrar, duplicar, ocultar, invertir y eliminar. Mostrar contorno y guías no modifica el archivo exportado. Las guías de pincel indican trazos, no son una vista exacta del alfa resultante después de borrar.
 
-Cada archivo mantiene sus máscaras y su historial. Un gesto equivale a un paso de deshacer. Se guardan en .flpro y en recuperación. Máximo 32 máscaras por archivo, 128 trazos y 10.000 puntos por máscara de pincel.
+Intensidad de la máscara y grupos desplegables:
 
-Editar efectos globales permite volver a película, fuga y color global sin mover una máscara. La receta y los ajustes globales forman la base de las correcciones locales. Cambiar de receta conserva las máscaras locales. Restablecer todos los ajustes sí las elimina; Deshacer permite recuperarlas.
+- Luz: exposición, contraste, altas luces, sombras, blancos y negros.
+- Color: temperatura, matiz, tono y saturación.
+- Textura y efectos: textura, claridad y neblina.
+- Detalle: nitidez, reducción de ruido, moiré y halos de color.
+
+Todos usan controles locales ya soportados por el motor. Renombrar, duplicar, ocultar, invertir y eliminar mantienen su comportamiento. Cada archivo conserva sus máscaras y su historial; un gesto equivale a un paso de deshacer. Se guardan en .flpro y en recuperación. La recuperación automática usa el último gesto terminado. Máximo 32 máscaras por archivo, 128 trazos y 10.000 puntos por máscara de pincel.
+
+Editar efectos globales permite volver a película, fuga y color global. Cambiar de receta conserva las máscaras locales. Restablecer todos los ajustes las elimina; Deshacer permite recuperarlas. El procesamiento se indica con un pequeño spinner en el pie del editor, fuera de la fotografía.
 
 ## Fotos y video
-El motor LightCraft aplica las mismas máscaras a preview y exportación. En video las máscaras tienen una posición fija en todos los fotogramas: no hay seguimiento, animación ni selección automática de sujeto/cielo. No se descargan modelos de IA. Un rango de luminosidad se evalúa en cada fotograma, por eso su zona puede variar con la escena.
 
-## Compatibilidad
-Professional 0.5 abre proyectos de 0.1–0.4. Guardá una copia: las versiones anteriores no deben abrir los proyectos nuevos porque ignorarían las máscaras. La versión web normal no se modifica. Las coordenadas son relativas al archivo y escalan con la exportación; las guías no se exportan.
+LightCraft aplica las mismas máscaras a preview y exportación. En video su geometría es fija: no hay seguimiento, animación ni selección automática de sujeto/cielo. Un rango de luminosidad se evalúa por fotograma y puede variar con la escena. Las guías nunca se exportan. No se modifica Film Lab web.
 
 ## Referencias
-Implementación mediante la API de máscaras del LightCraft incluido (d999e382). No se copian recursos ni algoritmos de Adobe. Se mantienen las licencias y atribuciones del proyecto.
+
+API de máscaras del LightCraft incluido (d999e382), con sus licencias y atribuciones. Las capturas aportadas sirven como referencia de interacción; no se copian recursos de Adobe.
