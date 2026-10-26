@@ -52,3 +52,10 @@ test('ordered compound coverage adds, subtracts and intersects zones',async()=>{
  mask.invert=true;const d=maskCoverage(mask,b);near(d[i]+c[i],1);
  mask.components.push({op:'intersect',shape:{kind:'luminanceRange'}});assert.equal(maskCoverage(mask,b),null);
 });
+test('hover inspection isolates a zone without altering group state or its operation',async()=>{
+ const {maskPreview,maskCoverage}=await geometry;
+ const mask={id:1,invert:true,adjust:{exposure:1},components:[{op:'add',invert:false,shape:{kind:'linear',start:{x:0,y:0},end:{x:1,y:0}}},{op:'intersect',invert:false,shape:{kind:'radial',center:{x:.5,y:.5},rx:.2,ry:.2,angle:0,feather:30,invert:false}}]};
+ const original=structuredClone(mask),view=maskPreview(mask,1);assert.equal(view.components.length,1);assert.equal(view.components[0].op,'add');assert.equal(view.invert,false);assert.equal(view.adjust,mask.adjust);
+ assert.deepEqual(mask,original);assert.equal(maskPreview(mask,null),mask);
+ const a=maskCoverage(view,{width:20,height:20});assert(a[10*20+10]>.9);near(a[0],0);
+});

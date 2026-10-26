@@ -2,7 +2,7 @@
 
 ## Dibujar y transformar
 
-Elegí Radial, Degradado lineal o Pincel y pulsá Crear máscara. La herramienta queda activa: la zona se crea al hacer clic y arrastrar sobre la fotografía. Cancelar o Escape abandona la herramienta; Escape durante un gesto revierte ese gesto. Un clic sin arrastrar no crea un degradado.
+Pulsá Nueva máscara y elegí Radial, Degradado lineal o Pincel. La herramienta queda activa: la zona se crea al hacer clic y arrastrar sobre la fotografía. Cancelar o Escape abandona la herramienta; Escape durante un gesto revierte ese gesto. Un clic sin arrastrar no crea un degradado.
 
 - **Radial:** arrastrá para dibujar el óvalo. Los cuatro puntos exteriores cambian sus radios; el centro mueve la zona. Arrastrar el contorno fuera de los puntos gira el óvalo; el cursor indica la rotación. Desvanecer controla la transición.
 - **Degradado lineal:** reemplaza las opciones vertical y horizontal. Arrastrá de la zona con efecto completo hacia la zona sin efecto. El punto central mueve todo sin cambiar inclinación ni transición. Arrastrar la línea central fuera del punto rota el degradado; cualquiera de las dos líneas exteriores comprime o extiende la transición, conservando el centro. Los extremos serializados se mantienen dentro de la imagen; cerca de sus bordes la amplitud puede reducirse al rotar. Los proyectos anteriores conservan sus degradados.
@@ -34,7 +34,7 @@ API de máscaras del LightCraft incluido (d999e382), con sus licencias y atribuc
 
 ## Professional 0.6 · Combinar zonas, archivos y zoom
 
-Elegir Pincel, Radial o Lineal activa el dibujo directamente, sin botón Crear máscara. Los rangos de luminosidad conservan un botón separado del selector. Al terminar un dibujo el selector vuelve a su estado inicial para permitir elegir otra vez la misma herramienta.
+Nueva máscara abre una paleta. Elegir Pincel, Radial o Lineal activa el dibujo; elegir un rango de luminosidad crea la selección. Las acciones de cada grupo abren esa misma paleta para añadir, restar o intersectar una zona.
 
 Dentro de una máscara, Añadir zona, Restar zona e Intersectar zona permiten elegir después la herramienta. Cada zona aparece en una lista: podés seleccionarla para transformar su geometría, cambiar su operación o eliminarla. La primera zona establece la base; las siguientes se evalúan en orden. Añadir une por máximo, Restar multiplica por el complemento e Intersectar multiplica coberturas. Todas comparten los ajustes de la máscara. Máximo 16 zonas por máscara; deshacer/rehacer conserva la composición completa. La superposición verde muestra el resultado combinado cuando todas las zonas son geométricas o de pincel. Si hay un rango de luminancia, se oculta la superposición y se explica esa limitación; el rango sí se aplica en el revelado/exportación.
 
@@ -43,3 +43,11 @@ Cada tarjeta de archivo tiene una × para quitarlo del proyecto, con confirmaci�
 Ctrl + rueda arriba acerca y Ctrl + rueda abajo aleja, entre encuadre completo y 8×. El acercamiento toma como referencia el cursor. El botón de porcentaje vuelve al encuadre completo. El zoom es de visualización: no cambia el archivo exportado. Las guías, el pincel y sus gestos conservan la alineación a cualquier zoom; cambiar de archivo vuelve al encuadre completo.
 
 **Actualización:** esta versión requiere ejecutar `npm run build:engine` una vez. Los proyectos anteriores se abren y al guardarlos usan el identificador 0.6, para evitar que una versión anterior ignore o rechace las zonas combinadas. Guardá una copia si necesitás conservar compatibilidad con versiones anteriores.
+
+## Organización visual y espacio de trabajo
+
+Nueva máscara abre una paleta de herramientas para crear otro grupo independiente. Cada grupo muestra su nombre, miniatura de cobertura, visibilidad y menú de duplicar/eliminar. Sus zonas aparecen anidadas, con su operación y un menú propio. Añadir, Restar e Intersectar están dentro de la tarjeta del grupo y abren allí la paleta: no usan un selector lejano. Se puede contraer cada grupo. Los ajustes inferiores pertenecen al grupo seleccionado; el control de desvanecido/pincel corresponde a la zona seleccionada.
+
+Al pasar el cursor o enfocar el nombre del grupo se muestra su cobertura combinada; sobre una zona, solo la cobertura de esa zona. Al salir se restaura la máscara seleccionada. Es una inspección temporal: no altera ajustes, selección, historial ni exportación. Los rangos de luminosidad mantienen la limitación de superposición documentada arriba.
+
+Filtros se abre desde la solapa izquierda; Archivos desde la solapa inferior. Se pueden abrir ambos de forma independiente, y el estado se recuerda en este equipo. Cerrados por defecto, liberan espacio para la fotografía. La franja de archivos usa tarjetas más compactas y el área de preview reduce márgenes, manteniendo la foto completa. Ningún cambio de panel modifica el revelado o el encuadre exportado.

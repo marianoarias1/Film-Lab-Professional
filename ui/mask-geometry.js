@@ -120,3 +120,9 @@ export function maskCoverage(mask,b,brushCache={}){
   if(mask.invert)for(let i=0;i<alpha.length;i++)alpha[i]=1-alpha[i];
   return alpha;
 }
+
+// Hover inspection never mutates selection, operations, adjustments or history.
+export function maskPreview(mask,index=null){
+  if(index===null||!mask.components[index])return mask;
+  return {...mask,invert:false,components:[{...mask.components[index],op:'add'}]};
+}

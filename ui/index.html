@@ -29,8 +29,9 @@
       </div>
     </header>
     <div id="engineError" class="error-banner" hidden></div>
-    <main>
-      <aside class="filters">
+    <main class="workspace" id="workspace">
+      <nav class="workspace-rail" aria-label="Paneles"><button id="toggleFilters" aria-controls="filtersPanel" aria-expanded="false" title="Mostrar filtros">▦<span>Filtros</span></button></nav>
+      <aside class="filters" id="filtersPanel" hidden>
         <div class="eyebrow">TU MIRADA, EN OTRO TONO</div>
         <h1>Filtros</h1>
         <p class="intro">Un punto de partida.<br />El resto lo decidís vos.</p>
@@ -109,14 +110,15 @@
           ><span class="muted">Con audio</span>
         </div>
         <div id="warning" class="warning" hidden></div>
-        <div class="filmstrip-heading">
+        <button id="toggleFiles" class="files-tab" aria-controls="filesPanel" aria-expanded="false"><span>▧ Archivos <b id="workspaceFileCount">0</b></span><span class="panel-chevron" aria-hidden="true">⌃</span></button>
+        <section id="filesPanel" hidden><div class="filmstrip-heading">
           <span>ARCHIVOS DEL PROYECTO <b id="fileCount">0</b></span>
           <div>
             <button id="selectAll" class="plain">Seleccionar todos</button
             ><button id="selectNone" class="plain">Ninguno</button>
           </div>
         </div>
-        <div id="filmstrip" class="filmstrip"></div>
+        <div id="filmstrip" class="filmstrip"></div></section>
         <footer>
           <span id="saveStatus">Sesión local</span
           ><span class="engine-info"><span id="renderStatus" class="render-status" role="status" aria-label="Procesando ajustes" title="Procesando ajustes" hidden><span class="spinner"></span><span class="sr-only">Procesando ajustes</span></span><span id="engineStatus">Preparando motor…</span></span>
@@ -181,12 +183,11 @@
         </div>
         <div id="labPanel" hidden>
           <section id="maskPanel" class="mask-panel">
-            <h3>Máscaras · Ajustes locales</h3>
-            <p class="help">Elegí una zona y ajustá solo su luz y color. Cada archivo conserva sus máscaras.</p>
-            <select id="maskType" aria-label="Tipo de máscara">
+            <h3>Máscaras</h3><button id="newMaskGroup" class="outline new-mask-group">+ Nueva máscara</button><div id="newMaskTools"></div>
+            <select hidden tabindex="-1" id="maskType" aria-label="Tipo de máscara">
               <option value="" selected>Elegí una herramienta…</option><option value="brush">Pincel · pintar / borrar</option><option value="radial">Radial · óvalo</option><option value="linear">Degradado lineal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
             </select>
-            <button id="addMask" class="outline" hidden>+ Crear máscara</button>
+            <button tabindex="-1" id="addMask" class="outline" hidden>+ Crear máscara</button>
             <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar zona y guías</label><div id="maskList"></div><div id="maskControls"></div>
           </section>
           <details class="global-effects"><summary>Película y color global</summary>

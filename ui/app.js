@@ -1,4 +1,4 @@
-import {clamp, createShape, linearGeometry, transformShape, shapeAlpha, brushAlpha, maskCoverage} from "./mask-geometry.js";
+import {clamp, createShape, linearGeometry, transformShape, shapeAlpha, brushAlpha, maskCoverage, maskPreview} from "./mask-geometry.js";
 import webCatalog from "./catalog/web-recipes.js";
 import {PreviewQueue} from "./preview-queue.js";
 import {progressView} from "./export-progress.js";
@@ -119,6 +119,7 @@ function updateButtons() {
   $("exportButton").disabled = busy || !selectedIds(state.files).length;
   $("selectedCount").textContent = selectedIds(state.files).length;
   $("fileCount").textContent = state.files.length;
+  $("workspaceFileCount").textContent = state.files.length;
   $("controlsEmpty").hidden = !!f;
   $("playProxy").disabled = busy || !f;
   $("importButton").disabled = busy;
@@ -439,6 +440,7 @@ $("resetCurve").onclick = () => {
 function activate(id) {
   if (busy) return;
   endMask(true);
+  maskPicker=null;hoverMask=null;
   pendingMask=null;toolOperation="new";$("maskType").value="";activeComponent=0;resetZoom();
   gesture = null;
   before = false;
@@ -799,6 +801,7 @@ $("filmstrip").ondblclick = async (e) => {
   }
 };
 function clearEditor() {
+  maskPicker=null;hoverMask=null;
   resetZoom();
   endMask(true);
   pendingMask=null;
@@ -997,16 +1000,18 @@ function maskEdit(fn){const f=current();if(!f||busy)return;const old=structuredC
 function chosenComponent(){const m=chosenMask();activeComponent=Math.min(activeComponent,Math.max(0,(m?.components.length||1)-1));return m?.components[activeComponent];}
 function chosenMask(){return current()?.settings.masks?.find(m=>m.id===activeMaskId);}
 let activeComponent=0, toolOperation="new";
+let maskPicker=null,hoverMask=null;
+const collapsedMasks=new Set(),maskThumbCache=new Map();
 let pendingMask=null, brushFlow=100, brushDensity=100, brushPointer=null, maskPaintFrame=0;
 let overlayCache={key:null};
 const brushRasterCache={};
 function makeMask(shape) {
   const masks=current().settings.masks??=[],id=Math.max(0,...masks.map(m=>m.id))+1;
   const names={brush:'Pincel',radial:'Radial',linear:'Degradado lineal',luminanceRange:'Luminancia'};
-  return {id,name:`${names[shape.kind]} ${id}`,visible:true,invert:false,
+  return {id,name:`Máscara ${id}`,visible:true,invert:false,
     components:[{op:'add',invert:false,shape}],adjust:{exposure:0,temp:0,tint:0,contrast:0,highlights:0,shadows:0,whites:0,blacks:0,saturation:0,texture:0,clarity:0,dehaze:0,sharpness:0,noise:0,amount:100}};
 }
-function cancelMaskTool(){pendingMask=null;toolOperation='new';$('maskType').value='';drawMasks();}
+function cancelMaskTool(){maskPicker=null;hoverMask=null;pendingMask=null;toolOperation='new';$('maskType').value='';drawMasks();}
 function startMaskTool(operation='new'){
   if(!current()||busy)return;
   endMask(true);
@@ -1034,20 +1039,84 @@ $('addMask').onclick=()=>{
   });toolOperation='new';$('maskType').value='';drawMasks();
 };
 
+function openMaskPicker(op,maskId=null){
+  endMask(true);pendingMask=null;hoverMask=null;toolOperation=op;
+  if(maskId!==null)activeMaskId=maskId;
+  maskPicker=maskPicker?.op===op&&maskPicker?.maskId===maskId?null:{op,maskId};
+  drawMasks();
+}
+$('newMaskGroup').onclick=()=>openMaskPicker('new');
+function maskToolPicker(op){
+  const grid=makeEl('div',{className:'mask-tool-picker'});
+  for(const [type,icon,label]of [['radial','◯','Radial'],['linear','▱','Lineal'],['brush','✎','Pincel'],['shadows','◕','Sombras'],['midtones','◐','Medios tonos'],['lights','◔','Luces']]){
+    const b=makeEl('button',{className:'mask-tool-option',disabled:busy});b.setAttribute('aria-label',label);b.append(makeEl('span',{className:'mask-tool-icon'},icon),makeEl('span',{},label));
+    b.onclick=()=>{maskPicker=null;$('maskType').value=type;startMaskTool(op);if(['shadows','midtones','lights'].includes(type))$('addMask').onclick();};grid.append(b);
+  }
+  return grid;
+}
+function previewMaskOnHover(maskId,index){hoverMask={maskId,index};drawMaskOutline();}
+function clearMaskHover(){hoverMask=null;drawMaskOutline();}
+function maskThumbnail(m,index=null){
+  const view=maskPreview(m,index),f=current(),aspect=(f?.width||4)/(f?.height||3),w=aspect>=1?36:Math.max(1,Math.round(36*aspect)),h=aspect>=1?Math.max(1,Math.round(36/aspect)):36;
+  const key=JSON.stringify([w,h,view.components,view.invert]);
+  const canvas=makeEl('canvas',{className:'mask-thumb',width:40,height:40});canvas.setAttribute('aria-hidden','true');const ctx=canvas.getContext('2d');
+  if(maskThumbCache.has(key)){ctx.putImageData(maskThumbCache.get(key),0,0);return canvas;}
+  ctx.fillStyle='#25362d';ctx.fillRect(0,0,40,40);const alpha=maskCoverage(view,{width:w,height:h});
+  if(alpha){const image=ctx.createImageData(w,h);for(let i=0;i<alpha.length;i++){image.data[i*4]=image.data[i*4+1]=image.data[i*4+2]=Math.round(25+alpha[i]*220);image.data[i*4+3]=255;}ctx.putImageData(image,Math.floor((40-w)/2),Math.floor((40-h)/2));}
+  else{ctx.fillStyle='#dce9cc';ctx.font='22px sans-serif';ctx.fillText('◐',9,28);}
+  if(maskThumbCache.size>=128)maskThumbCache.delete(maskThumbCache.keys().next().value);maskThumbCache.set(key,ctx.getImageData(0,0,40,40));return canvas;
+}
+function maskGroupCard(m){
+  const key=current().id+':'+m.id,collapsed=collapsedMasks.has(key),active=m.id===activeMaskId;
+  const card=makeEl('section',{className:'mask-group-card'+(active?' active':'')});card.dataset.maskId=m.id;
+  card.setAttribute('aria-label',m.name);
+  card.onpointerenter=()=>previewMaskOnHover(m.id,null);card.onpointerleave=clearMaskHover;
+  const head=makeEl('div',{className:'mask-group-head'});
+  const fold=makeEl('button',{className:'mask-fold',disabled:busy},collapsed?'▸':'▾');fold.setAttribute('aria-label',(collapsed?'Desplegar ':'Contraer ')+m.name);fold.setAttribute('aria-expanded',String(!collapsed));fold.onclick=()=>{if(collapsed)collapsedMasks.delete(key);else collapsedMasks.add(key);drawMasks();};
+  const choose=makeEl('button',{className:'mask-group-select',disabled:busy});choose.append(maskThumbnail(m),makeEl('strong',{},m.name));choose.setAttribute('aria-pressed',String(active));
+  choose.onclick=()=>{endMask(true);maskPicker=null;pendingMask=null;toolOperation='new';activeMaskId=m.id;activeComponent=0;drawMasks();};
+  choose.onfocus=()=>previewMaskOnHover(m.id,null);choose.onblur=clearMaskHover;
+  const eye=makeEl('button',{className:'mask-eye',disabled:busy},m.visible?'◉':'○');eye.setAttribute('aria-label',(m.visible?'Ocultar ':'Mostrar ')+m.name);eye.setAttribute('aria-pressed',String(m.visible));eye.onclick=()=>maskEdit(()=>m.visible=!m.visible);
+  const menu=makeEl('details',{className:'mask-menu'});menu.append(makeEl('summary',{title:'Opciones de '+m.name},'⋯'));
+  const duplicate=makeEl('button',{className:'plain',disabled:busy},'Duplicar');duplicate.onclick=()=>maskEdit(list=>{if(list.length>=32)return;const copy=structuredClone(m);copy.id=Math.max(...list.map(x=>x.id))+1;copy.name+=' · copia';list.push(copy);activeMaskId=copy.id;activeComponent=0;});
+  const remove=makeEl('button',{className:'plain',disabled:busy},'Eliminar máscara');remove.onclick=()=>maskEdit(list=>list.splice(list.indexOf(m),1));menu.append(duplicate,remove);head.append(fold,choose,eye,menu);card.append(head);
+  if(!collapsed){
+    const children=makeEl('div',{className:'mask-group-zones'});
+    m.components.forEach((c,i)=>{
+      const row=makeEl('div',{className:'mask-child'+(active&&activeComponent===i?' active':'')});row.dataset.component=i;
+      const names={radial:'Radial',linear:'Degradado lineal',brush:'Pincel',luminanceRange:'Luminosidad'};
+      const button=makeEl('button',{className:'mask-child-select',disabled:busy});button.append(maskThumbnail(m,i),makeEl('span',{},names[c.shape.kind]+' '+(i+1)));
+      const operation=makeEl('span',{className:'mask-operation'},({add:'+',subtract:'-',intersect:'∩'}[c.op||'add']));operation.title={add:'Añadir',subtract:'Restar',intersect:'Intersectar'}[c.op||'add'];if(c.op==='intersect')operation.innerHTML='<svg viewBox="0 0 18 18" width="14" height="14" aria-hidden="true"><path d="M4 15V8a5 5 0 0 1 10 0v7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';button.append(operation);
+      button.setAttribute('aria-pressed',String(active&&activeComponent===i));button.onclick=()=>{endMask(true);maskPicker=null;pendingMask=null;toolOperation='new';activeMaskId=m.id;activeComponent=i;drawMasks();};
+      row.onpointerenter=e=>{e.stopPropagation();previewMaskOnHover(m.id,i);};row.onpointerleave=()=>previewMaskOnHover(m.id,null);button.onfocus=()=>previewMaskOnHover(m.id,i);button.onblur=clearMaskHover;
+      row.append(button);
+      const options=makeEl('details',{className:'mask-menu'});options.append(makeEl('summary',{title:'Opciones de zona '+(i+1)},'⋯'));
+      if(i>0){const select=makeEl('select',{disabled:busy});select.setAttribute('aria-label','Operación de zona '+(i+1));for(const [v,t]of [['add','Añadir'],['subtract','Restar'],['intersect','Intersectar']])select.append(makeEl('option',{value:v,selected:(c.op||'add')===v},t));select.onchange=()=>maskEdit(()=>c.op=select.value);options.append(select);}
+      if(m.components.length>1){const del=makeEl('button',{className:'plain',disabled:busy},'Eliminar zona');del.onclick=()=>maskEdit(()=>{m.components.splice(i,1);m.components[0].op='add';activeComponent=Math.min(activeComponent,m.components.length-1);});options.append(del);}
+      if(options.children.length>1)row.append(options);children.append(row);
+    });card.append(children);
+    const actions=makeEl('div',{className:'mask-group-actions'});
+    for(const [op,label]of [['add','Añadir'],['subtract','Restar'],['intersect','Intersectar']]){
+      const b=makeEl('button',{className:'outline',disabled:busy||m.components.length>=16},label);b.onclick=()=>openMaskPicker(op,m.id);actions.append(b);
+    }card.append(actions);
+    if(maskPicker?.maskId===m.id&&maskPicker.op!=='new')card.append(maskToolPicker(maskPicker.op));
+  }
+  return card;
+}
 function drawMasks(){
   requestAnimationFrame(drawMaskOutline);
   const f=current(),masks=f?.settings.masks||[];
   $('addMask').disabled=!f||busy;$('maskType').disabled=!f||busy;
-  $('addMask').hidden=!['shadows','midtones','lights'].includes($('maskType').value);
+  $('addMask').hidden=true;
   $('addMask').textContent=toolOperation==='new'?'+ Crear máscara':'Aplicar rango a la máscara';
   if(activeMaskId!==-1&&!masks.some(m=>m.id===activeMaskId))activeMaskId=masks[0]?.id??null;
-  $('maskList').replaceChildren(...masks.map(m=>{
-    const b=makeEl('button',{className:'outline '+(m.id===activeMaskId?'active':''),disabled:busy},(m.visible?'◉ ':'○ ')+m.name);
-    b.setAttribute('aria-pressed',String(m.id===activeMaskId));
-    b.onclick=()=>{pendingMask=null;toolOperation="new";$("maskType").value="";activeComponent=0;activeMaskId=m.id;drawMasks();};return b;
-  }));
-  const global=makeEl('button',{className:'plain',disabled:!f||busy},'Editar efectos globales');
-  global.onclick=()=>{pendingMask=null;toolOperation='new';activeMaskId=-1;$('labPanel').querySelector('details.global-effects').open=true;drawMasks();};$('maskList').append(global);
+  hoverMask=null;
+  $('newMaskGroup').disabled=!f||busy;
+  $('newMaskTools').replaceChildren();
+  if(maskPicker?.op==='new')$('newMaskTools').append(maskToolPicker('new'));
+  $('maskList').replaceChildren(...masks.map(m=>maskGroupCard(m)));
+  const global=makeEl('button',{className:'plain global-mask-action',disabled:!f||busy},'Película y color global');
+  global.onclick=()=>{maskPicker=null;hoverMask=null;pendingMask=null;toolOperation='new';activeMaskId=-1;$('labPanel').querySelector('details.global-effects').open=true;drawMasks();};$('maskList').append(global);
   const box=$('maskControls');box.replaceChildren();
   if(pendingMask){
     const help=makeEl('div',{className:'mask-tool-hint'});
@@ -1059,12 +1128,11 @@ function drawMasks(){
   const m=chosenMask();if(!m)return;
   const name=makeEl('input',{type:'text',value:m.name,maxLength:160,disabled:busy});name.setAttribute('aria-label','Nombre de la máscara');name.onchange=()=>maskEdit(()=>m.name=name.value||'Máscara');box.append(name);
   const actions=makeEl('div',{className:'mask-actions'});
-  for(const [label,key]of [['Mostrar efecto','visible'],['Invertir zona','invert']]){
+  for(const [label,key]of [['Invertir máscara','invert']]){
     const row=makeEl('label',{className:'help'}),check=makeEl('input',{type:'checkbox',checked:m[key],disabled:busy});
     check.onchange=()=>maskEdit(()=>m[key]=check.checked);row.append(check,document.createTextNode(' '+label));actions.append(row);
   }
-  const duplicate=makeEl('button',{className:'plain',disabled:busy},'Duplicar');duplicate.onclick=()=>maskEdit(list=>{if(list.length>=32){toast('Límite de máscaras alcanzado.');return;}const copy=structuredClone(m);copy.id=Math.max(...list.map(m=>m.id))+1;copy.name+=' · copia';activeMaskId=copy.id;list.push(copy);});
-  const remove=makeEl('button',{className:'plain',disabled:busy},'Eliminar');remove.onclick=()=>maskEdit(list=>list.splice(list.indexOf(m),1));actions.append(duplicate,remove);box.append(actions);
+  box.append(actions);
   function control(parent,target,key,label,min,max,step=1){
     const row=makeEl('div',{className:'control'}),text=makeEl('label',{},label),output=makeEl('output',{},format(target[key]??0,step));text.append(output);
     const input=makeEl('input',{type:'range',min,max,step,value:target[key]??0,disabled:busy});input.setAttribute('aria-label',label);let old;
@@ -1077,18 +1145,6 @@ function drawMasks(){
     input.onchange=finish;input.onpointerup=finish;input.onpointercancel=finish;input.onblur=finish;row.append(text,input);parent.append(row);
   }
   chosenComponent();
-  const zoneButtons=makeEl('div',{className:'mask-zone-actions'});
-  for(const [op,label]of [['add','Añadir zona'],['subtract','Restar zona'],['intersect','Intersectar zona']]){
-    const button=makeEl('button',{className:'outline '+(toolOperation===op?'active':''),disabled:busy||m.components.length>=16},label);button.onclick=()=>startMaskTool(op);zoneButtons.append(button);
-  }box.append(zoneButtons);
-  box.append(makeEl('p',{className:'help'},toolOperation==='new'?'Todas las zonas comparten los ajustes de esta máscara. Elegí una zona para transformarla.':'Elegí una herramienta arriba para '+({add:'añadir',subtract:'restar',intersect:'intersectar'}[toolOperation])+' una zona.'));
-  const zones=makeEl('div',{className:'mask-zone-list'});
-  m.components.forEach((c,i)=>{
-    const row=makeEl('div'),names={radial:'Radial',linear:'Lineal',brush:'Pincel',luminanceRange:'Luminosidad'},label=({add:'＋',subtract:'−',intersect:'∩'}[c.op||'add'])+' '+names[c.shape.kind]+' '+(i+1);
-    const select=makeEl('button',{className:'plain '+(i===activeComponent?'active':''),disabled:busy},label);select.onclick=()=>{activeComponent=i;drawMasks();};row.append(select);
-    if(i>0){const op=makeEl('select',{disabled:busy});op.setAttribute('aria-label','Operación de zona '+(i+1));for(const [v,t]of [['add','Añadir'],['subtract','Restar'],['intersect','Intersectar']])op.append(makeEl('option',{value:v,selected:c.op===v},t));op.onchange=()=>maskEdit(()=>c.op=op.value);row.append(op);}
-    if(m.components.length>1){const del=makeEl('button',{className:'plain',disabled:busy},'×');del.setAttribute('aria-label','Eliminar zona '+(i+1));del.onclick=()=>maskEdit(()=>{m.components.splice(i,1);m.components[0].op='add';activeComponent=Math.min(activeComponent,m.components.length-1);});row.append(del);}zones.append(row);
-  });box.append(zones);
   if(m.components.some(c=>c.shape.kind==='luminanceRange'))box.append(makeEl('p',{className:'help'},'La luminosidad se calcula al revelar. Las guías muestran la zona activa; la superposición verde no se muestra en esta combinación.'));
   const shape=chosenComponent().shape;
   if(shape.kind==='radial')control(box,shape,'feather','Desvanecer',0,100);
@@ -1130,17 +1186,18 @@ function brushControls(box){
 function maskBox(){const b=$('preview').getBoundingClientRect(),w=$('imageWrap').getBoundingClientRect();return {x:(b.left-w.left)/viewZoom,y:(b.top-w.top)/viewZoom,width:b.width/viewZoom,height:b.height/viewZoom};}
 function queueMaskPaint(){if(!maskPaintFrame)maskPaintFrame=requestAnimationFrame(()=>{maskPaintFrame=0;drawMaskOutline();});}
 function drawMaskOutline(){
-  const svg=$('maskOverlay'),canvas=$('maskTint'),m=chosenMask(),img=$('preview');
+  const svg=$('maskOverlay'),canvas=$('maskTint'),selected=chosenMask(),hovered=hoverMask&&current()?.settings.masks?.find(m=>m.id===hoverMask.maskId),m=hovered||selected,img=$('preview');
   const hidden=tab!=='lab'||(!m&&!pendingMask)||img.hidden||before||!$('playback').hidden;
   svg.toggleAttribute('hidden',hidden);canvas.hidden=hidden;svg.replaceChildren();if(hidden)return;
   const b=maskBox();if(b.width<=0||b.height<=0)return;
   for(const el of [svg,canvas])Object.assign(el.style,{left:b.x+'px',top:b.y+'px',width:b.width+'px',height:b.height+'px'});
   svg.setAttribute('viewBox',`0 0 ${b.width} ${b.height}`);
-  const shape=chosenComponent()?.shape,show=$('maskOutline').checked;
+  const component=hovered?m.components[hoverMask.index??0]:chosenComponent();
+  const shape=component?.shape,show=$('maskOutline').checked||!!hovered;
   svg.style.pointerEvents=pendingMask||shape?.kind==='brush'?'auto':'none';
   svg.style.cursor=pendingMask==='brush'||(!pendingMask&&shape?.kind==='brush')?'none':pendingMask?'crosshair':'default';
-  canvas.hidden=!show||!shape||!m.visible||m.components.some(c=>!['radial','linear','brush'].includes(c.shape.kind));
-  if(!canvas.hidden)paintMaskTint(canvas,m,b);
+  canvas.hidden=!show||!shape||!m.visible||(hovered&&hoverMask.index!==null?!['radial','linear','brush'].includes(shape.kind):m.components.some(c=>!['radial','linear','brush'].includes(c.shape.kind)));
+  if(!canvas.hidden)paintMaskTint(canvas,maskPreview(m,hovered?hoverMask.index:null),b);
   const element=(name,attrs,action)=>{
     const el=document.createElementNS('http://www.w3.org/2000/svg',name);for(const[k,v]of Object.entries(attrs))el.setAttribute(k,v);
     if(action){el.dataset.action=action;el.style.pointerEvents='all';el.style.cursor=action==='rotate'?rotateCursor:action==='center'?'move':resizeCursor(shape,b,action);const title=document.createElementNS(el.namespaceURI,'title');title.textContent=action==='rotate'?'Arrastrar para girar':action==='center'?'Arrastrar para mover':'Arrastrar para cambiar el tamaño';el.append(title);}
@@ -1291,5 +1348,15 @@ $('imageWrap').parentElement.addEventListener('wheel',e=>{
   viewPan.x+=(e.clientX-(b.left+b.width/2))*(1-ratio);viewPan.y+=(e.clientY-(b.top+b.height/2))*(1-ratio);
   viewZoom=next;if(viewZoom===1)viewPan={x:0,y:0};applyZoom();
 },{passive:false});
+let panelState={filters:false,files:false};
+try{const saved=JSON.parse(localStorage.getItem('filmlab.workspace.panels'));if(saved)panelState={filters:saved.filters===true,files:saved.files===true};}catch{}
+function drawWorkspace(){
+  $('workspace').classList.toggle('filters-open',panelState.filters);$('filtersPanel').hidden=!panelState.filters;$('filesPanel').hidden=!panelState.files;
+  $('toggleFilters').setAttribute('aria-expanded',String(panelState.filters));$('toggleFilters').title=panelState.filters?'Ocultar filtros':'Mostrar filtros';
+  $('toggleFiles').setAttribute('aria-expanded',String(panelState.files));
+  requestAnimationFrame(queueMaskPaint);
+}
+for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files']])$(id).onclick=()=>{panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
+drawWorkspace();
 // Install tools before boot draws their initial state.
 boot();
