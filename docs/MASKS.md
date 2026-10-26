@@ -31,3 +31,15 @@ LightCraft aplica las mismas máscaras a preview y exportación. En video su geo
 ## Referencias
 
 API de máscaras del LightCraft incluido (d999e382), con sus licencias y atribuciones. Las capturas aportadas sirven como referencia de interacción; no se copian recursos de Adobe.
+
+## Professional 0.6 · Combinar zonas, archivos y zoom
+
+Elegir Pincel, Radial o Lineal activa el dibujo directamente, sin botón Crear máscara. Los rangos de luminosidad conservan un botón separado del selector. Al terminar un dibujo el selector vuelve a su estado inicial para permitir elegir otra vez la misma herramienta.
+
+Dentro de una máscara, Añadir zona, Restar zona e Intersectar zona permiten elegir después la herramienta. Cada zona aparece en una lista: podés seleccionarla para transformar su geometría, cambiar su operación o eliminarla. La primera zona establece la base; las siguientes se evalúan en orden. Añadir une por máximo, Restar multiplica por el complemento e Intersectar multiplica coberturas. Todas comparten los ajustes de la máscara. Máximo 16 zonas por máscara; deshacer/rehacer conserva la composición completa. La superposición verde muestra el resultado combinado cuando todas las zonas son geométricas o de pincel. Si hay un rango de luminancia, se oculta la superposición y se explica esa limitación; el rango sí se aplica en el revelado/exportación.
+
+Cada tarjeta de archivo tiene una × para quitarlo del proyecto, con confirmación. El original nunca se borra. Se libera el archivo activo del motor y se conserva el resto del proyecto; al quitar el último vuelve el editor vacío. Quitar un archivo no tiene deshacer, por eso se confirma.
+
+Ctrl + rueda arriba acerca y Ctrl + rueda abajo aleja, entre encuadre completo y 8×. El acercamiento toma como referencia el cursor. El botón de porcentaje vuelve al encuadre completo. El zoom es de visualización: no cambia el archivo exportado. Las guías, el pincel y sus gestos conservan la alineación a cualquier zoom; cambiar de archivo vuelve al encuadre completo.
+
+**Actualización:** esta versión requiere ejecutar `npm run build:engine` una vez. Los proyectos anteriores se abren y al guardarlos usan el identificador 0.6, para evitar que una versión anterior ignore o rechace las zonas combinadas. Guardá una copia si necesitás conservar compatibilidad con versiones anteriores.

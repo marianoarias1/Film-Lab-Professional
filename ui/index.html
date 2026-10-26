@@ -81,7 +81,7 @@
                 en tu disco.
               </p>
               <button id="emptyImport" class="dark">+ Abrir archivos</button
-              ><small>Professional 0.5 · Windows</small>
+              ><small>Professional 0.6 · Windows</small>
             </div>
           </div>
           <div class="image-toolbar">
@@ -93,7 +93,7 @@
           </div>
           <button id="before" class="compare" disabled>
             Mantener para ver original</button
-          ><span id="renderTime" class="render-time"></span>
+          ><button id="zoomReset" class="zoom-reset" title="Volver al encuadre completo">100%</button><span id="renderTime" class="render-time"></span>
         </div>
         <div id="videoControls" class="video-controls" hidden>
           <button id="playProxy" class="outline">▷ Generar reproducción</button
@@ -184,9 +184,9 @@
             <h3>Máscaras · Ajustes locales</h3>
             <p class="help">Elegí una zona y ajustá solo su luz y color. Cada archivo conserva sus máscaras.</p>
             <select id="maskType" aria-label="Tipo de máscara">
-              <option value="brush">Pincel · pintar / borrar</option><option value="radial" selected>Radial · óvalo</option><option value="linear">Degradado lineal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
+              <option value="" selected>Elegí una herramienta…</option><option value="brush">Pincel · pintar / borrar</option><option value="radial">Radial · óvalo</option><option value="linear">Degradado lineal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
             </select>
-            <button id="addMask" class="outline">+ Crear máscara</button>
+            <button id="addMask" class="outline" hidden>+ Crear máscara</button>
             <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar zona y guías</label><div id="maskList"></div><div id="maskControls"></div>
           </section>
           <details class="global-effects"><summary>Película y color global</summary>
@@ -226,6 +226,7 @@
         archivos en tu disco.
       </p>
     </div>
+    <dialog id="removeFileDialog"><h2>Quitar del proyecto</h2><p id="removeFileName"></p><p>Se quitará este archivo y sus ajustes del proyecto. El original permanece en tu disco.</p><div class="dialog-actions"><button id="cancelRemoveFile" class="outline">Cancelar</button><button id="confirmRemoveFile" class="dark">Quitar del proyecto</button></div></dialog>
     <dialog id="exportDialog">
       <div class="dialog-title">
         <h2>Tu mirada, lista.</h2>

@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld(
     googleImport: () => ipcRenderer.invoke("google-import"),
     googleCancel: () => ipcRenderer.invoke("google-cancel"),
     googleConfig: () => ipcRenderer.invoke("google-config"),
+    removeFile: id => ipcRenderer.invoke("remove-file", id),
     onGoogleStatus: fn => {const cb=(_,text)=>fn(text);ipcRenderer.on("google-status",cb);return ()=>ipcRenderer.removeListener("google-status",cb);},
     boot: () => ipcRenderer.invoke("boot"),
     saveDiagnostics: () => ipcRenderer.invoke("save-diagnostics"),

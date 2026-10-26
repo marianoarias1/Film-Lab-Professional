@@ -189,6 +189,7 @@ app.whenReady().then(async () => {
   let hello, error;
   try {
     hello = await engine.start();
+    if((hello.engineVersion||hello.engine)!==ENGINE)throw new Error("El motor necesita actualizarse. Ejecutá npm run build:engine y volvé a abrir Professional.");
   } catch (e) {
     error = e.message;
   }
@@ -370,6 +371,12 @@ app.whenReady().then(async () => {
     return true;
   });
   ipcMain.on("cancel", () => { cancelExport=true; engine.cancel(); });
+  ipcMain.handle("remove-file", (_, id) => serial(async () => {
+    ensureFile(id);
+    if(opened===id){await engine.request("release",{key:id});opened=null;}
+    files.delete(id);dirty=true;
+    return true;
+  }));
   ipcMain.handle("autosave", async (_, p) => {
     const copy = snapshot(p);
     dirty = true;

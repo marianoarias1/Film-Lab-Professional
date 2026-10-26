@@ -43,3 +43,12 @@ test('rotating an edge-bound linear mask never produces invalid coincident endpo
  const {transformShape}=await geometry,b={width:800,height:400},s={kind:'linear',start:{x:.2,y:0},end:{x:.8,y:0}};
  const t=transformShape(s,'rotate',{x:500,y:0},{x:400,y:100},b);assert.deepEqual(t,s);
 });
+test('ordered compound coverage adds, subtracts and intersects zones',async()=>{
+ const {combineAlpha,maskCoverage}=await geometry;
+ near(combineAlpha(.3,.7,'add'),.7);near(combineAlpha(.3,.7,'subtract'),.09);near(combineAlpha(.3,.7,'intersect'),.21);
+ const b={width:40,height:40},radial={kind:'radial',center:{x:.5,y:.5},rx:.35,ry:.35,angle:0,feather:0},linear={kind:'linear',start:{x:0,y:0},end:{x:1,y:0}},mask={invert:false,components:[{op:'add',shape:radial},{op:'subtract',shape:linear}]};
+ const a=maskCoverage(mask,b),i=20*40+20;assert(a[i]>0&&a[i]<1);near(a[0],0);
+ mask.components[1].op='intersect';const c=maskCoverage(mask,b);assert(c[i]>0&&c[i]<1);near(c[0],0);
+ mask.invert=true;const d=maskCoverage(mask,b);near(d[i]+c[i],1);
+ mask.components.push({op:'intersect',shape:{kind:'luminanceRange'}});assert.equal(maskCoverage(mask,b),null);
+});

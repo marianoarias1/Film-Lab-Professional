@@ -99,3 +99,24 @@ function strokeLayer(s,b,old){
   }
   return {alpha,prev,points:s.points.map(p=>({...p}))};
 }
+
+// Matches LightCraft's ordered max/add, multiply/subtract and multiply/intersect.
+export function combineAlpha(base,zone,operation,first=false){
+  if(first&&operation!=='intersect')return zone;
+  if(operation==='subtract')return base*(1-zone);
+  if(operation==='intersect')return base*zone;
+  return Math.max(base,zone);
+}
+export function maskCoverage(mask,b,brushCache={}){
+  if(mask.components.some(c=>!['radial','linear','brush'].includes(c.shape.kind)))return null;
+  const alpha=new Float32Array(b.width*b.height);
+  mask.components.forEach((c,index)=>{
+    const brush=c.shape.kind==='brush'?brushAlpha(c.shape.strokes,b,brushCache[index]??={}):null;
+    for(let y=0;y<b.height;y++)for(let x=0;x<b.width;x++){
+      const i=y*b.width+x;let a=brush?brush[i]:shapeAlpha(c.shape,x+.5,y+.5,b);
+      if(c.invert)a=1-a;alpha[i]=combineAlpha(alpha[i],a,c.op||'add',index===0);
+    }
+  });
+  if(mask.invert)for(let i=0;i<alpha.length;i++)alpha[i]=1-alpha[i];
+  return alpha;
+}

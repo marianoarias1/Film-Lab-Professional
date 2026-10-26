@@ -47,3 +47,8 @@ test("Migra proyectos 0.1-0.3 sin modificar sus ajustes y marca el motor 0.4",()
   const upgraded=validateProject(p);assert.equal(upgraded.engineVersion,ENGINE);assert.deepEqual(upgraded.files[0].settings,p.files[0].settings);
   assert.notEqual(upgraded.engineVersion,p.engineVersion);
 });
+test('opens 0.5 projects without losing compound-mask settings when upgrading',()=>{
+ const p=doc('/source/photo.jpg');p.engineVersion='filmlab-pro-0.5-lc-d999e382-fc-6c3948a3';
+ p.files[0].settings.masks=[{id:1,components:[{op:'add',shape:{kind:'radial'}},{op:'subtract',shape:{kind:'brush'}}]}];
+ const result=validateProject(p);assert.equal(result.engineVersion,ENGINE);assert.deepEqual(result.files[0].settings,p.files[0].settings);
+});
