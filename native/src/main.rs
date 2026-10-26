@@ -9,20 +9,20 @@ use lightcraft_develop::{DevelopSettings, Treatment, WbMode};
 use lightcraft_pipeline::{DeepSamples, OutputDepth, RenderRequest, SourceInfo, StageCache};
 use lightcraft_raster::Rgb32f;
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     collections::HashMap,
     io::{self, BufRead, Write},
     path::Path,
     sync::{
-        Arc, Mutex,
         atomic::{AtomicBool, AtomicU64, Ordering},
+        Arc, Mutex,
     },
     time::Instant,
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.5-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.6-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -101,7 +101,7 @@ impl Settings {
             return Err("Máximo 32 máscaras por archivo".into());
         }
         for m in &self.masks {
-            if m.components.len() != 1 || m.name.len() > 160 {
+            if m.components.is_empty() || m.components.len() > 16 || m.name.len() > 160 {
                 return Err("Máscara inválida".into());
             }
             let a = &m.adjust;
@@ -142,66 +142,68 @@ impl Settings {
                 return Err("Ajuste local inválido".into());
             }
             let unit = |v: f64| v.is_finite() && (0. ..=1.).contains(&v);
-            match &m.components[0].shape {
-                lightcraft_develop::MaskShape::Radial {
-                    center,
-                    rx,
-                    ry,
-                    angle,
-                    feather,
-                    ..
-                } => {
-                    if !unit(center.x)
-                        || !unit(center.y)
-                        || !(*rx >= 0.01 && *rx <= 2.)
-                        || !(*ry >= 0.01 && *ry <= 2.)
-                        || !angle.is_finite()
-                        || !(-180. ..=180.).contains(angle)
-                        || !(0. ..=100.).contains(feather)
-                    {
-                        return Err("Geometría radial inválida".into());
+            for component in &m.components {
+                match &component.shape {
+                    lightcraft_develop::MaskShape::Radial {
+                        center,
+                        rx,
+                        ry,
+                        angle,
+                        feather,
+                        ..
+                    } => {
+                        if !unit(center.x)
+                            || !unit(center.y)
+                            || !(*rx >= 0.01 && *rx <= 2.)
+                            || !(*ry >= 0.01 && *ry <= 2.)
+                            || !angle.is_finite()
+                            || !(-180. ..=180.).contains(angle)
+                            || !(0. ..=100.).contains(feather)
+                        {
+                            return Err("Geometría radial inválida".into());
+                        }
                     }
-                }
-                lightcraft_develop::MaskShape::Linear { start, end } => {
-                    if !unit(start.x)
-                        || !unit(start.y)
-                        || !unit(end.x)
-                        || !unit(end.y)
-                        || (start.x - end.x).abs() + (start.y - end.y).abs() < 0.001
-                    {
-                        return Err("El degradado necesita dos puntos distintos".into());
+                    lightcraft_develop::MaskShape::Linear { start, end } => {
+                        if !unit(start.x)
+                            || !unit(start.y)
+                            || !unit(end.x)
+                            || !unit(end.y)
+                            || (start.x - end.x).abs() + (start.y - end.y).abs() < 0.001
+                        {
+                            return Err("El degradado necesita dos puntos distintos".into());
+                        }
                     }
-                }
-                lightcraft_develop::MaskShape::LuminanceRange {
-                    lo,
-                    hi,
-                    lo_feather,
-                    hi_feather,
-                } => {
-                    if !unit(*lo)
-                        || !unit(*hi)
-                        || lo > hi
-                        || !unit(*lo_feather)
-                        || !unit(*hi_feather)
-                    {
-                        return Err("Rango de luminancia inválido".into());
+                    lightcraft_develop::MaskShape::LuminanceRange {
+                        lo,
+                        hi,
+                        lo_feather,
+                        hi_feather,
+                    } => {
+                        if !unit(*lo)
+                            || !unit(*hi)
+                            || lo > hi
+                            || !unit(*lo_feather)
+                            || !unit(*hi_feather)
+                        {
+                            return Err("Rango de luminancia inválido".into());
+                        }
                     }
-                }
-                lightcraft_develop::MaskShape::Brush { strokes } => {
-                    if strokes.len() > 128
-                        || strokes.iter().map(|s| s.points.len()).sum::<usize>() > 10000
-                        || strokes.iter().any(|s| {
-                            s.points.iter().any(|p| !unit(p.x) || !unit(p.y))
-                                || !(0.001..=1.).contains(&s.size)
-                                || !(0. ..=100.).contains(&s.feather)
-                                || !(0. ..=100.).contains(&s.flow)
-                                || !(0. ..=100.).contains(&s.density)
-                        })
-                    {
-                        return Err("Pincel inválido o demasiado extenso".into());
+                    lightcraft_develop::MaskShape::Brush { strokes } => {
+                        if strokes.len() > 128
+                            || strokes.iter().map(|s| s.points.len()).sum::<usize>() > 10000
+                            || strokes.iter().any(|s| {
+                                s.points.iter().any(|p| !unit(p.x) || !unit(p.y))
+                                    || !(0.001..=1.).contains(&s.size)
+                                    || !(0. ..=100.).contains(&s.feather)
+                                    || !(0. ..=100.).contains(&s.flow)
+                                    || !(0. ..=100.).contains(&s.density)
+                            })
+                        {
+                            return Err("Pincel inválido o demasiado extenso".into());
+                        }
                     }
+                    _ => return Err("Tipo de máscara no admitido en esta versión".into()),
                 }
-                _ => return Err("Tipo de máscara no admitido en esta versión".into()),
             }
         }
         let value = serde_json::to_value(self).map_err(|e| e.to_string())?;
@@ -1276,6 +1278,56 @@ mod tests {
         s.exposure = 0.;
         s.curve = vec![[0.5, 0.5], [0.1, 0.2]];
         assert!(s.validate().is_err());
+    }
+    #[test]
+    fn compound_masks_validate_all_zones_and_render_distinct_operations() {
+        let pixels = Arc::new(Rgb32f {
+            width: 32,
+            height: 24,
+            data: vec![[0.18, 0.2, 0.12]; 768],
+        });
+        let info = SourceInfo::default();
+        let radial = json!({"kind":"radial","center":{"x":0.4,"y":0.5},"rx":0.35,"ry":0.3,"angle":0,"feather":30,"invert":false});
+        let linear = json!({"kind":"linear","start":{"x":0.0,"y":0.0},"end":{"x":1.0,"y":1.0}});
+        let mut outputs = Vec::new();
+        for op in ["add", "subtract", "intersect"] {
+            let mut settings = Settings::default();
+            settings.masks=serde_json::from_value(json!([{"id":1,"components":[{"op":"add","shape":radial.clone()},{"op":op,"shape":linear.clone()}],"adjust":{"exposure":1.0}}])).unwrap();
+            settings.validate().unwrap();
+            let normal = render(
+                &pixels,
+                &info,
+                &StageCache::default(),
+                &settings,
+                32,
+                OutputDepth::F32Linear,
+            )
+            .deep
+            .unwrap();
+            let direct =
+                render_export(&pixels, &info, &StageCache::default(), &settings, 32).unwrap();
+            let (DeepSamples::F32(a), DeepSamples::F32(b)) = (normal.samples, direct.samples)
+            else {
+                panic!("depth")
+            };
+            assert_eq!(a, b, "Compound preview/export mismatch");
+            outputs.push(a);
+            settings.masks[0].components[1].shape=serde_json::from_value(json!({"kind":"luminanceRange","lo":0.8,"hi":0.2,"lo_feather":0.1,"hi_feather":0.1})).unwrap();
+            assert!(
+                settings.validate().is_err(),
+                "Must validate every component"
+            );
+        }
+        assert_ne!(outputs[0], outputs[1]);
+        assert_ne!(outputs[1], outputs[2]);
+        assert_ne!(outputs[0], outputs[2]);
+        let mut settings = Settings::default();
+        settings.masks = serde_json::from_value(json!([{"id":1,"components":[]}])).unwrap();
+        assert!(settings.validate().is_err());
+        settings.masks[0].components = serde_json::from_value(json!([{"shape":radial}])).unwrap();
+        let c = settings.masks[0].components[0].clone();
+        settings.masks[0].components = vec![c; 17];
+        assert!(settings.validate().is_err());
     }
     #[test]
     fn masks_reach_float_preview_and_export_and_disabled_masks_do_nothing() {

@@ -1,13 +1,13 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const ENGINE = "filmlab-pro-0.5-lc-d999e382-fc-6c3948a3";
+const ENGINE = "filmlab-pro-0.6-lc-d999e382-fc-6c3948a3";
 const LEGACY_ENGINE = "filmlab-pro-0.1-lc-d999e382-fc-6c3948a3";
 function validateProject(p) {
   if (
     !p ||
     p.schemaVersion !== 1 ||
-    ![ENGINE,LEGACY_ENGINE,"filmlab-pro-0.4-lc-d999e382-fc-6c3948a3"].includes(p.engineVersion) ||
+    ![ENGINE,LEGACY_ENGINE,"filmlab-pro-0.5-lc-d999e382-fc-6c3948a3","filmlab-pro-0.4-lc-d999e382-fc-6c3948a3"].includes(p.engineVersion) ||
     !Array.isArray(p.files) ||
     p.files.length > 500
   )

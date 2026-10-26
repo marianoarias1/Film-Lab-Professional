@@ -1,4 +1,4 @@
-export const ENGINE = "filmlab-pro-0.5-lc-d999e382-fc-6c3948a3";
+export const ENGINE = "filmlab-pro-0.6-lc-d999e382-fc-6c3948a3";
 export const defaults = () => ({
   masks: [],
   exposure: 0,

@@ -900,3 +900,83 @@ progress {
 .mask-panel{padding:12px 0 22px;border-bottom:1px solid var(--line,#ddd)}#maskList{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}#maskList .active{background:#dfe8d2;color:#24392e}#maskControls input[type=text],#maskType{width:100%;padding:10px;border:1px solid #d4dacd;border-radius:8px;background:transparent;color:inherit}#maskControls h4{margin:20px 0 10px}#maskControls>label{display:block;padding:8px 0}#maskControls input[type=checkbox]{width:auto}details>summary{cursor:pointer;padding:16px 0}
 
 #maskOverlay{position:absolute;z-index:3;touch-action:none;overflow:hidden;user-select:none}#maskOverlay[hidden]{display:none}
+
+/* Direct manipulation masks, using Film Lab's sage palette. */
+#maskTint{position:absolute;z-index:2;pointer-events:none}
+#maskTint[hidden]{display:none}
+#maskOverlay{ -webkit-user-select:none; -webkit-touch-callout:none }
+.mask-tool-hint{background:#e7edde;border:1px solid #d0ddc4;padding:12px;border-radius:9px;font-size:12px;line-height:1.6}
+.mask-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:12px 0}
+.mask-actions label{margin:0;display:flex;align-items:center;gap:5px}
+.mask-adjust-group{border-top:1px solid var(--line);margin-top:8px}
+.mask-adjust-group>summary{font-weight:600;font-size:13px;padding:15px 0}
+.brush-controls{border-bottom:1px solid var(--line);padding:8px 0 15px;margin-bottom:12px}
+.brush-controls label{display:block;font-size:12px;margin:12px 0}
+.brush-controls output{float:right;color:var(--muted)}
+.brush-controls input[type=range]{display:block;width:100%;margin-top:10px}
+.engine-info{display:inline-flex;align-items:center;gap:8px}
+.render-status{position:static;transform:none;background:none;border:0;box-shadow:none;padding:0;display:inline-flex;pointer-events:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#maskPanel>label.help{display:flex;align-items:center;gap:7px;margin:12px 0}
+#maskPanel input[type=checkbox]{accent-color:var(--green);flex-shrink:0}
+#addMask{margin-top:12px;display:block}#addMask[hidden]{display:none}
+.mask-zone-actions{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.mask-zone-actions button{font-size:10px;padding:8px}
+.mask-zone-actions .active,.mask-zone-list .active{background:#dfe8d2;color:#24392e}
+.mask-zone-list{display:grid;gap:5px;margin-bottom:14px}
+.mask-zone-list>div{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:6px;padding:4px}
+.mask-zone-list select{min-width:0;max-width:100px;font:inherit;font-size:10px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:4px}
+.file{position:relative}.remove-file{position:absolute;right:4px;top:4px;border:0;background:var(--paper);color:var(--ink);border-radius:50%;width:24px;height:24px;padding:0;font-size:18px;line-height:1}
+.file .type{margin-right:20px}
+.zoom-reset{position:absolute;left:12px;bottom:13px;z-index:6;border:1px solid var(--line);background:var(--paper);color:var(--muted);padding:6px 10px;border-radius:5px;font-size:10px}
+#imageWrap{transform-origin:center;will-change:transform}
+/* Independent desktop drawers leave the photograph as the main workspace. */
+main.workspace{grid-template-columns:48px 0 minmax(0,1fr) 320px}
+main.workspace.filters-open{grid-template-columns:48px 248px minmax(0,1fr) 320px}
+.workspace-rail{grid-column:1;border-right:1px solid var(--line);padding-top:14px;display:flex;align-items:center;flex-direction:column}
+.workspace-rail button{display:flex;flex-direction:column;align-items:center;gap:8px;border-radius:6px;padding:10px 5px;background:transparent;font-size:21px}
+.workspace-rail button span{font-size:10px;writing-mode:vertical-rl;letter-spacing:.7px}
+.workspace-rail button[aria-expanded=true]{background:#e0e8d3}
+.workspace .filters{grid-column:2;grid-row:1;min-width:0}
+.workspace .stage{grid-column:3;grid-row:1;padding:10px 12px 4px}
+.workspace .controls{grid-column:4;grid-row:1;padding-left:18px;padding-right:18px}
+.workspace .stage-top{margin-bottom:8px;flex-shrink:0}
+.workspace .photo-area{padding:8px 6px 32px;min-height:120px}
+.files-tab{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;width:100%;background:transparent;border-top:1px solid var(--line);border-radius:0;padding:9px 4px;margin-top:5px;font-size:11px;color:var(--muted)}
+.files-tab b{font-size:10px;background:#e0e8d3;border-radius:4px;padding:2px 6px;margin-left:5px}
+.files-tab .panel-chevron{font-size:18px;line-height:12px}
+.files-tab[aria-expanded=true] .panel-chevron{transform:rotate(180deg)}
+#filesPanel{flex-shrink:0}#filesPanel .filmstrip-heading{margin:4px 0 6px;font-size:9px}
+#filesPanel .filmstrip{height:84px;min-height:84px;gap:7px}
+#filesPanel .file{width:108px}#filesPanel .file-icon{font-size:18px;margin:1px auto}
+.workspace footer{min-height:20px;padding-top:5px;font-size:8px;gap:10px}
+.new-mask-group{width:100%;text-align:left;padding:11px 12px;margin:0 0 10px}
+#maskList{display:grid;gap:10px;margin:12px 0}
+.mask-group-card{min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--paper);padding:6px}
+.mask-group-card.active{border-color:#9aae89;box-shadow:0 0 0 1px #9aae8925}
+.mask-group-head{display:flex;align-items:center;gap:3px;min-width:0}
+.mask-group-select,.mask-child-select{display:flex;align-items:center;gap:8px;background:transparent;padding:4px;border-radius:5px;min-width:0;flex:1;text-align:left}
+.mask-group-select strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.mask-fold,.mask-eye{padding:4px;background:transparent;border-radius:4px;font-size:14px;flex-shrink:0}
+.mask-thumb{width:32px;height:32px;border:1px solid #adbba4;border-radius:5px;flex-shrink:0}
+.mask-group-zones{margin:5px 0 6px 24px;padding-left:8px;border-left:1px solid #d0dac6;display:grid;gap:3px}
+.mask-child{display:flex;align-items:center;min-width:0;border-radius:5px}
+.mask-child.active{background:#e4ebd9}.mask-child:hover{background:#edf1e7}
+.mask-child-select{font-size:11px;padding:5px 4px}.mask-child-select .mask-thumb{width:24px;height:24px}
+.mask-child-select>span:not(.mask-operation){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mask-operation{margin-left:auto;color:var(--muted);font-size:14px}
+.mask-group-actions{display:flex;gap:5px;border-top:1px solid var(--line);padding-top:7px;margin-top:6px}
+.mask-group-actions button{font-size:10px;padding:7px 5px;flex:1;min-width:0}
+.mask-tool-picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:9px 0}
+.mask-tool-option{background:#edf0e5;border:1px solid var(--line);border-radius:6px;padding:9px 3px;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:10px}
+.mask-tool-option:hover{background:#dfe8d2}.mask-tool-icon{font-size:21px;line-height:24px}
+.mask-menu{position:relative;flex-shrink:0}.mask-menu>summary{list-style:none;padding:3px 5px;font-size:18px;line-height:24px;border-radius:4px}.mask-menu>summary::-webkit-details-marker{display:none}
+.mask-menu[open]{z-index:5}.mask-menu[open]>summary{background:#e5ebdc}
+.mask-menu[open]>button,.mask-menu[open]>select{display:block;position:relative;background:var(--paper);border:1px solid var(--line);padding:8px;white-space:nowrap;font-size:11px;min-width:110px;max-width:140px}
+.mask-menu[open]{position:absolute;right:6px;background:var(--paper);box-shadow:0 4px 16px #20322525;border-radius:5px}
+.mask-group-head,.mask-child{position:relative}.global-mask-action{text-align:left;font-size:11px;color:var(--muted)}
+#maskControls>input[type=text]{font-weight:600;margin:5px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:9px 0}
+@media(max-width:1250px){main.workspace.filters-open{grid-template-columns:44px 210px minmax(0,1fr) 290px}main.workspace{grid-template-columns:44px 0 minmax(0,1fr) 290px}}
+/* Keep preview scale stable while native drafts/refinements change resolution. */
+input[type=range].color-track{height:4px}
+input[type=range].color-track::-moz-range-track{background:transparent}

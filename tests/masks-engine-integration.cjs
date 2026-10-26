@@ -1,8 +1,13 @@
 const {Engine}=require('../desktop/engine.cjs');const fs=require('node:fs/promises');const path=require('node:path');const assert=require('node:assert/strict');const {spawnSync}=require('node:child_process');
 const bin=process.env.FILMLAB_ENGINE||path.resolve('native/target/release/filmlab-professional-engine'+(process.platform==='win32'?'.exe':''));
 (async()=>{const e=new Engine(bin);const out=path.resolve('tests/fixtures/results/masks');await fs.mkdir(out,{recursive:true});try{
- const hello=await e.start();assert.equal(hello.engineVersion||hello.engine,'filmlab-pro-0.5-lc-d999e382-fc-6c3948a3');
- const mask={id:1,name:'Radial test',visible:true,invert:false,components:[{shape:{kind:'radial',center:{x:.4,y:.4},rx:.4,ry:.3,angle:15,feather:65,invert:false}}],adjust:{exposure:1,shadows:20,temp:10}};
+ const hello=await e.start();assert.equal(hello.engineVersion||hello.engine,'filmlab-pro-0.6-lc-d999e382-fc-6c3948a3');
+ const mask={id:1,name:'Compound test',visible:true,invert:false,components:[{shape:{kind:'radial',center:{x:.4,y:.4},rx:.4,ry:.3,angle:15,feather:65,invert:false}}],adjust:{exposure:1,shadows:20,temp:10}};
+ mask.components.push(
+  {op:'add',invert:false,shape:{kind:'brush',strokes:[{points:[{x:.3,y:.4},{x:.6,y:.5}],size:.15,feather:60,flow:100,density:100,erase:false,auto_mask:false}]}},
+  {op:'subtract',invert:false,shape:{kind:'linear',start:{x:0,y:0},end:{x:1,y:0}}},
+  {op:'intersect',invert:false,shape:{kind:'luminanceRange',lo:0,hi:1,lo_feather:.15,hi_feather:.15}}
+ );
  for(const [name,kind]of [['gradient.jpg','photo'],['synthetic.dng','photo'],['clip.mp4','video']]){
  const source=path.resolve('tests/fixtures',name);await e.request('open',{key:name,path:source,kind});
  const before=path.join(out,name+'-before.png'),after=path.join(out,name+'-after.png');
