@@ -51,3 +51,9 @@ Nueva máscara abre una paleta de herramientas para crear otro grupo independien
 Al pasar el cursor o enfocar el nombre del grupo se muestra su cobertura combinada; sobre una zona, solo la cobertura de esa zona. Al salir se restaura la máscara seleccionada. Es una inspección temporal: no altera ajustes, selección, historial ni exportación. Los rangos de luminosidad mantienen la limitación de superposición documentada arriba.
 
 Filtros se abre desde la solapa izquierda; Archivos desde la solapa inferior. Se pueden abrir ambos de forma independiente, y el estado se recuerda en este equipo. Cerrados por defecto, liberan espacio para la fotografía. La franja de archivos usa tarjetas más compactas y el área de preview reduce márgenes, manteniendo la foto completa. Ningún cambio de panel modifica el revelado o el encuadre exportado.
+
+## Preview estable y controles de color
+
+La preview rápida y la refinada usan el mismo tamaño de visualización, calculado con el espacio disponible y la proporción de la imagen. Cambiar la resolución del revelado durante un arrastre o al aplicar una receta no cambia el tamaño de la foto ni el de las guías. Cambiar de archivo recalcula la proporción; abrir/cerrar paneles sigue ajustando la foto al espacio disponible.
+
+La franja superior de nombre de archivo y metadatos ya no ocupa espacio en el área de edición. Los nombres siguen disponibles en las tarjetas de Archivos. Temperatura y matiz muestran pistas de color mediante degradados, tanto en ajustes globales como locales; tono y el mezclador muestran su gama correspondiente. Estas pistas no cambian los valores ni el resultado del motor.

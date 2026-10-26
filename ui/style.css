@@ -977,3 +977,6 @@ main.workspace.filters-open{grid-template-columns:48px 248px minmax(0,1fr) 320px
 .mask-group-head,.mask-child{position:relative}.global-mask-action{text-align:left;font-size:11px;color:var(--muted)}
 #maskControls>input[type=text]{font-weight:600;margin:5px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:9px 0}
 @media(max-width:1250px){main.workspace.filters-open{grid-template-columns:44px 210px minmax(0,1fr) 290px}main.workspace{grid-template-columns:44px 0 minmax(0,1fr) 290px}}
+/* Keep preview scale stable while native drafts/refinements change resolution. */
+input[type=range].color-track{height:4px}
+input[type=range].color-track::-moz-range-track{background:transparent}

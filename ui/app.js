@@ -1,3 +1,4 @@
+import {fittedPreview, colorTrack} from "./display-controls.js";
 import {clamp, createShape, linearGeometry, transformShape, shapeAlpha, brushAlpha, maskCoverage, maskPreview} from "./mask-geometry.js";
 import webCatalog from "./catalog/web-recipes.js";
 import {PreviewQueue} from "./preview-queue.js";
@@ -264,6 +265,7 @@ function slider(def, scope = "") {
     disabled: !current() || busy,
   });
   row.append(output);
+  const track=colorTrack(key);if(track){input.style.background=track;input.classList.add("color-track");}
   el.append(row, input);
   const start = () => {
     if (!gesture && current())
@@ -450,6 +452,7 @@ function activate(id) {
   previewQueue.invalidate();
   originalUrl = null;
   previewUrl = null;
+  previewAspect=null;
   $("preview").hidden = true;
   $("emptyState").hidden = true;
   $("renderTime").textContent = "";
@@ -485,6 +488,8 @@ const previewQueue = new PreviewQueue({
     const image = new Image(); image.src = result.url;
     await image.decode();
     if (!isCurrent() || job.id !== state.activeId || busy) return false;
+    previewAspect??=image.naturalWidth/image.naturalHeight;
+    fitPreview();
     previewUrl = result.url;
     $("preview").src = before && originalUrl ? originalUrl : result.url;
     $("preview").hidden = false;
@@ -1135,7 +1140,7 @@ function drawMasks(){
   box.append(actions);
   function control(parent,target,key,label,min,max,step=1){
     const row=makeEl('div',{className:'control'}),text=makeEl('label',{},label),output=makeEl('output',{},format(target[key]??0,step));text.append(output);
-    const input=makeEl('input',{type:'range',min,max,step,value:target[key]??0,disabled:busy});input.setAttribute('aria-label',label);let old;
+    const input=makeEl('input',{type:'range',min,max,step,value:target[key]??0,disabled:busy});input.setAttribute('aria-label',label);const track=colorTrack(key);if(track){input.style.background=track;input.classList.add('color-track');}let old;
     input.oninput=()=>{
       if(!old)old=structuredClone(f.settings);target[key]=Number(input.value);
       if(key==='lo')target.lo=Math.min(target.lo,target.hi);if(key==='hi')target.hi=Math.max(target.hi,target.lo);
@@ -1255,8 +1260,8 @@ function paintMaskTint(canvas,m,b){
   context.putImageData(image,0,0);overlayCache={key};
 }
 $('maskOutline').onchange=drawMaskOutline;
-new ResizeObserver(queueMaskPaint).observe($('imageWrap'));
-$('preview').addEventListener('load',queueMaskPaint);
+new ResizeObserver(()=>{fitPreview();queueMaskPaint();}).observe($('imageWrap'));
+$('preview').addEventListener('load',()=>{fitPreview();queueMaskPaint();});
 const svg=$('maskOverlay');
 function eventPoint(e){const b=svg.getBoundingClientRect();return {x:clamp(e.clientX-b.left,0,b.width),y:clamp(e.clientY-b.top,0,b.height)};}
 svg.onpointerdown=e=>{
@@ -1332,6 +1337,12 @@ $('confirmRemoveFile').onclick=async()=>{
   finally{busy=false;updateButtons();drawRecipes();}
 };
 
+let previewAspect=null;
+function fitPreview(){
+  const wrap=$('imageWrap'),size=fittedPreview(wrap.clientWidth,wrap.clientHeight,previewAspect);
+  if(!size)return;
+  $('preview').style.width=size.width+'px';$('preview').style.height=size.height+'px';
+}
 let viewZoom=1,viewPan={x:0,y:0};
 function applyZoom(){
   $('imageWrap').style.transform=`translate(${viewPan.x}px, ${viewPan.y}px) scale(${viewZoom})`;
