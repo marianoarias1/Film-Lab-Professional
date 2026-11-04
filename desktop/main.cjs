@@ -338,6 +338,7 @@ app.whenReady().then(async () => {
             output: temp,
             proxy: !!m.proxy,
             encoding,
+            delivery: m.proxy ? {} : (m.delivery || {}),
           });
           if(cancelExport) throw new Error("Exportación cancelada.");
           await fs.rename(temp, dest);

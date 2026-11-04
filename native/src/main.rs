@@ -1,4 +1,6 @@
+mod delivery;
 mod export_diagnostics;
+mod lab_effects;
 use filmcraft_frame::{AudioBuffer, VideoFrame};
 use filmcraft_media::{FrameRequest, MediaInfo, MediaSource, SharedSource};
 use filmcraft_project::{
@@ -9,20 +11,20 @@ use lightcraft_develop::{DevelopSettings, Treatment, WbMode};
 use lightcraft_pipeline::{DeepSamples, OutputDepth, RenderRequest, SourceInfo, StageCache};
 use lightcraft_raster::Rgb32f;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     collections::HashMap,
     io::{self, BufRead, Write},
     path::Path,
     sync::{
-        atomic::{AtomicBool, AtomicU64, Ordering},
         Arc, Mutex,
+        atomic::{AtomicBool, AtomicU64, Ordering},
     },
     time::Instant,
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.6-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.7-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -42,6 +44,7 @@ struct Settings {
     grain: f64,
     grain_size: f64,
     masks: Vec<lightcraft_develop::Mask>,
+    lab_effects: lab_effects::Effects,
     hsl: [[f64; 3]; 8],
     sharpness: f64,
     denoise: f64,
@@ -77,6 +80,7 @@ impl Default for Settings {
             grain: 0.,
             grain_size: 25.,
             masks: Vec::new(),
+            lab_effects: Default::default(),
             hsl: [[0.; 3]; 8],
             sharpness: 0.,
             denoise: 0.,
@@ -97,6 +101,7 @@ impl Default for Settings {
 }
 impl Settings {
     fn validate(&self) -> Result<()> {
+        self.lab_effects.validate()?;
         if self.masks.len() > 32 {
             return Err("Máximo 32 máscaras por archivo".into());
         }
@@ -567,9 +572,10 @@ fn render_quality(
     };
     req.depth = deep;
     let mut r = lightcraft_pipeline::render_cached(pixels, info, &s.develop(info), &req, cache);
-    if s.light_leak > 0. {
+    if s.light_leak > 0. || s.lab_effects.enabled {
         if let Some(deep) = r.deep.as_mut() {
             apply_leak(deep, s);
+            lab_effects::apply(deep, &s.lab_effects);
             r.image = deep.to_rgba8();
         }
     }
@@ -612,6 +618,7 @@ fn render_export(
         lightcraft_pipeline::render_deep_cached(pixels, info, &s.develop(info), &request, cache)
             .ok_or("Sin salida de alta precisión")?;
     apply_leak(&mut deep, s);
+    lab_effects::apply(&mut deep, &s.lab_effects);
     Ok(deep)
 }
 
@@ -623,6 +630,7 @@ fn png(r: &lightcraft_raster::Rgba8) -> Result<Vec<u8>> {
     .map_err(|e| e.to_string())
 }
 struct Graded {
+    delivery: delivery::Delivery,
     metrics: Arc<export_diagnostics::Metrics>,
     src: SharedSource,
     settings: Settings,
@@ -634,7 +642,8 @@ impl MediaSource for Graded {
     }
     fn video_frame(&self, req: FrameRequest) -> filmcraft_media::Result<Arc<VideoFrame>> {
         let edge = (self
-            .info
+            .src
+            .info()
             .video
             .as_ref()
             .map_or(1, |v| v.width.max(v.height)) as f32
@@ -653,6 +662,10 @@ impl MediaSource for Graded {
             edge,
         )
         .map_err(filmcraft_media::MediaError::Decode)?;
+        let deep = self
+            .delivery
+            .transform(deep, req.scale)
+            .map_err(filmcraft_media::MediaError::Decode)?;
         export_diagnostics::record(&self.metrics.grade_ns, grade_start);
         let packing_start = Instant::now();
         let DeepSamples::F32(rgb) = deep.samples else {
@@ -676,6 +689,7 @@ impl MediaSource for Graded {
 fn export_video(
     src: &SharedSource,
     settings: Settings,
+    delivery: delivery::Delivery,
     out: &str,
     proxy: bool,
     encoding: &str,
@@ -690,8 +704,14 @@ fn export_video(
     export_diagnostics::clear_decline();
     let metrics = Arc::new(export_diagnostics::Metrics::default());
     let mut p = Project::new("Film Lab Professional");
-    let info = src.info();
-    let v = info.video.as_ref().ok_or("Sin video")?;
+    let mut output_info = src.info().clone();
+    let original = output_info.video.as_ref().ok_or("Sin video")?;
+    let (w, h) = delivery.size(original.width as usize, original.height as usize, true);
+    let output_video = output_info.video.as_mut().unwrap();
+    output_video.width = w as u32;
+    output_video.height = h as u32;
+    let info = &output_info;
+    let v = info.video.as_ref().unwrap();
     if info.duration <= Tick::ZERO {
         return Err("Duración inválida".into());
     }
@@ -745,6 +765,7 @@ fn export_video(
             .push(clip);
     }
     let graded: SharedSource = Arc::new(Graded {
+        delivery: delivery.clone(),
         metrics: metrics.clone(),
         src: src.clone(),
         settings,
@@ -817,10 +838,12 @@ fn export_video(
                 std::thread::sleep(std::time::Duration::from_millis(200));
             }
         });
+        let mut encode_settings = export_diagnostics::settings(&mode, out, scale);
+        delivery.configure_video(&mut encode_settings);
         let attempt_result = filmcraft_export::export(
             &Arc::new(p.clone()),
             seq,
-            &export_diagnostics::settings(&mode, out, scale),
+            &encode_settings,
             &sources,
             &progress,
         );
@@ -870,7 +893,7 @@ fn export_video(
     } else {
         "CPU"
     };
-    let diagnostics = json!({"schemaVersion":1,"appVersion":"0.4.0","engine":ENGINE,
+    let diagnostics = json!({"schemaVersion":1,"appVersion":env!("CARGO_PKG_VERSION"),"engine":ENGINE,
         "status":if final_report.is_some(){"completed"}else if cancel.load(Ordering::Relaxed){"cancelled"}else{"failed"},
         "source":{"width":v.width,"height":v.height,"frameRate":v.frame_rate,"durationSeconds":info.duration.seconds(),"hasAudio":info.has_audio()},
         "precision":"float32","effectsBackend":"CPU","displayPreviewGenerated":false,"histogramGenerated":false,"requestedEncoding":requested,"actualEncoder":actual,
@@ -1031,12 +1054,17 @@ fn run(
         if cancel.load(Ordering::Relaxed) {
             return Err("Exportación cancelada".into());
         }
+        let delivery: delivery::Delivery =
+            serde_json::from_value(r.get("delivery").cloned().unwrap_or(json!({})))
+                .map_err(|e| e.to_string())?;
+        delivery.validate()?;
         let target = r["output"].as_str().ok_or("Missing output")?;
         let source = state.sources.get(key).ok_or("Archivo no abierto")?;
         match source {
             Source::Video(v) => export_video(
                 v,
                 settings,
+                delivery,
                 target,
                 r["proxy"].as_bool().unwrap_or(false),
                 encoding,
@@ -1056,6 +1084,9 @@ fn run(
                     &settings,
                     p.width.max(p.height),
                 )?;
+                let deep = delivery.transform(deep, 1.)?;
+                let output_width = deep.width;
+                let output_height = deep.height;
                 let grade_ms = grade_started.elapsed().as_secs_f64() * 1000.;
                 let encode_started = Instant::now();
                 let ext = Path::new(target)
@@ -1071,7 +1102,7 @@ fn run(
                 let bytes = if ext == "jpg" || ext == "jpeg" {
                     lightcraft_codecs::encode_jpeg(
                         &lightcraft_codecs::EncodeImage::rgba8(&deep.to_rgba8()),
-                        95,
+                        delivery.jpeg_quality,
                         lightcraft_codecs::ChromaSubsampling::S444,
                         &meta,
                     )
@@ -1104,7 +1135,7 @@ fn run(
                 }
                 let write_started = Instant::now();
                 std::fs::write(target, bytes).map_err(|e| e.to_string())?;
-                let diagnostics = json!({"schemaVersion":1,"appVersion":"0.4.0","status":"completed","format":ext,"width":p.width,"height":p.height,
+                let diagnostics = json!({"schemaVersion":1,"appVersion":env!("CARGO_PKG_VERSION"),"status":"completed","format":ext,"width":output_width,"height":output_height,"delivery":delivery,
                     "revealMs":reveal_ms,"gradeMs":grade_ms,"encodeMs":encode_ms,"writeMs":write_started.elapsed().as_secs_f64()*1000.,
                     "wallMs":photo_started.elapsed().as_secs_f64()*1000.,"displayPreviewGenerated":ext=="jpg"||ext=="jpeg","histogramGenerated":false,"settings":settings});
                 export_diagnostics::save_last(diagnostics.clone());

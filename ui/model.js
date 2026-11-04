@@ -1,6 +1,8 @@
-export const ENGINE = "filmlab-pro-0.6-lc-d999e382-fc-6c3948a3";
+export const effectDefaults=()=>({enabled:false,mode:'motion',amount:70,distance:15,bandWidth:20,transition:30,sharpness:0,dissolve:0,particleSize:1,points:[[.3,.5],[.7,.5],[.5,.35]],windows:[]});
+export const ENGINE = "filmlab-pro-0.7-lc-d999e382-fc-6c3948a3";
 export const defaults = () => ({
   masks: [],
+  labEffects: effectDefaults(),
   exposure: 0,
   contrast: 0,
   highlights: 0,

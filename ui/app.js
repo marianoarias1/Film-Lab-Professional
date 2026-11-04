@@ -1,3 +1,5 @@
+import {mountEffects} from "./lab-effects.js";
+import {mountDelivery} from "./delivery.js";
 import {fittedPreview, colorTrack} from "./display-controls.js";
 import {clamp, createShape, linearGeometry, transformShape, shapeAlpha, brushAlpha, maskCoverage, maskPreview} from "./mask-geometry.js";
 import webCatalog from "./catalog/web-recipes.js";
@@ -226,7 +228,7 @@ function drawRecipes() {
     button.onclick = () => {
       const f = current();
       const old = structuredClone(f.settings);
-      f.settings = { ...defaults(), ...structuredClone(r.settings), masks: structuredClone(f.settings.masks || []) };
+      f.settings = { ...defaults(), ...structuredClone(r.settings), masks: structuredClone(f.settings.masks || []), labEffects: structuredClone(f.settings.labEffects || defaults().labEffects) };
       f.recipe = r.id;
       commitEdit(f, old);
       drawControls();
@@ -336,6 +338,7 @@ function drawControls() {
   $("curvePanel").hidden = group !== "curve";
   drawCurve();
   drawMasks();
+  effects.draw();
   updateButtons();
 }
 function curveValues() {
@@ -653,7 +656,7 @@ $("before").onlostpointercapture = endBefore;
 $("before").oncontextmenu = (e) => e.preventDefault();
 let leakGesture = null;
 $("preview").onpointerdown = (e) => {
-  if (chosenMask() || tab !== "lab" || !current() || busy || current().settings.lightLeak === 0)
+  if (effects.active() || chosenMask() || tab !== "lab" || !current() || busy || current().settings.lightLeak === 0)
     return;
   leakGesture = structuredClone(current().settings);
   $("preview").setPointerCapture(e.pointerId);
@@ -835,6 +838,9 @@ $("exportButton").onclick = () => {
 };
 $("closeExport").onclick = () => $("exportDialog").close();
 $("confirmExport").onclick = () => {
+  const invalid=$("exportDialog").querySelector(":invalid"); if (invalid) {invalid.reportValidity(); return;}
+  const d=delivery.read();
+  if ((d.width===0)!==(d.height===0)) {message("Dimensiones", "Indicá ancho y alto, o dejá ambos en cero para conservar el original."); return;}
   $("exportDialog").close();
   doExport(false);
 };
@@ -886,6 +892,7 @@ async function doExport(proxy) {
         state.files.map((f) => [f.id, structuredClone(f.settings)]),
       ),
       format: $("photoFormat").value,
+      delivery: proxy ? {} : delivery.read(),
       encoding: $("videoEncoding").value,
       saveReport: $("saveExportReport").checked,
       proxy,
@@ -929,6 +936,8 @@ window.addEventListener("keydown", (e) => {
     }
   }
 });
+const delivery = mountDelivery();
+const effects = mountEffects({current, commit:(old)=>{const f=current();if(f&&commitEdit(f,old))f.recipe=null;}, preview:()=>schedulePreview(true), finished:()=>edited(), box:maskBox, isVisible:()=>tab==='lab'&&!before&&!$('preview').hidden&&$('playback').hidden, exclusive:()=>{activeMaskId=-1;pendingMask=null;maskPicker=null;drawMasks();}});
 async function boot() {
   drawFiles();
   drawRecipes();
@@ -1109,6 +1118,7 @@ function maskGroupCard(m){
   return card;
 }
 function drawMasks(){
+  if(pendingMask || (typeof activeMaskId==='number'&&activeMaskId>=0)) $('motionPanel').open=false;
   requestAnimationFrame(drawMaskOutline);
   const f=current(),masks=f?.settings.masks||[];
   $('addMask').disabled=!f||busy;$('maskType').disabled=!f||busy;
@@ -1191,8 +1201,9 @@ function brushControls(box){
 function maskBox(){const b=$('preview').getBoundingClientRect(),w=$('imageWrap').getBoundingClientRect();return {x:(b.left-w.left)/viewZoom,y:(b.top-w.top)/viewZoom,width:b.width/viewZoom,height:b.height/viewZoom};}
 function queueMaskPaint(){if(!maskPaintFrame)maskPaintFrame=requestAnimationFrame(()=>{maskPaintFrame=0;drawMaskOutline();});}
 function drawMaskOutline(){
+  effects.refresh();
   const svg=$('maskOverlay'),canvas=$('maskTint'),selected=chosenMask(),hovered=hoverMask&&current()?.settings.masks?.find(m=>m.id===hoverMask.maskId),m=hovered||selected,img=$('preview');
-  const hidden=tab!=='lab'||(!m&&!pendingMask)||img.hidden||before||!$('playback').hidden;
+  const hidden=effects.active()||tab!=='lab'||(!m&&!pendingMask)||img.hidden||before||!$('playback').hidden;
   svg.toggleAttribute('hidden',hidden);canvas.hidden=hidden;svg.replaceChildren();if(hidden)return;
   const b=maskBox();if(b.width<=0||b.height<=0)return;
   for(const el of [svg,canvas])Object.assign(el.style,{left:b.x+'px',top:b.y+'px',width:b.width+'px',height:b.height+'px'});

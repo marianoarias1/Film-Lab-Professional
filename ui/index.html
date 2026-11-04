@@ -73,7 +73,7 @@
               alt="Previsualización editada"
               draggable="false"
               hidden
-            /><canvas id="maskTint" aria-hidden="true" hidden></canvas><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><video id="playback" controls hidden></video>
+            /><canvas id="maskTint" aria-hidden="true" hidden></canvas><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><svg id="fxOverlay" aria-label="Guías de desenfoque creativo" hidden></svg><video id="playback" controls hidden></video>
             <div id="emptyState">
               <div class="empty-mark">◉</div>
               <h2>Tu próximo revelado.</h2>
@@ -82,7 +82,7 @@
                 en tu disco.
               </p>
               <button id="emptyImport" class="dark">+ Abrir archivos</button
-              ><small>Professional 0.6 · Windows</small>
+              ><small>Professional 0.7 · Windows</small>
             </div>
           </div>
           <div class="image-toolbar">
@@ -190,6 +190,7 @@
             <button tabindex="-1" id="addMask" class="outline" hidden>+ Crear máscara</button>
             <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar zona y guías</label><div id="maskList"></div><div id="maskControls"></div>
           </section>
+          <details id="motionPanel" class="creative-effects"><summary>Desenfoque y movimiento</summary><div id="motionControls"></div></details>
           <details class="global-effects"><summary>Película y color global</summary>
           <div class="lab-card">
             <span>✳</span><strong>Película y luz</strong>
@@ -234,10 +235,18 @@
         <button id="closeExport" class="plain" aria-label="Cerrar">×</button>
       </div>
       <p id="exportSummary"></p>
+      <label>Destino<select id="deliveryPreset"><option value="original">Original · máxima flexibilidad</option><option value="reel">Reels / Stories · vertical 9:16</option><option value="portrait">Publicación vertical · 4:5</option><option value="square">Publicación cuadrada · 1:1</option><option value="youtube">Video horizontal · Full HD</option><option value="youtube4k">Video horizontal · 4K</option></select></label>
+      <div class="delivery-grid">
+        <label>Ancho · px (0 = original)<input id="delivery-width" type="number" min="0" max="7680" step="2"></label><label>Alto · px (0 = original)<input id="delivery-height" type="number" min="0" max="7680" step="2"></label>
+        <label>Encuadre<select id="delivery-fit"><option value="contain">Completa · márgenes negros</option><option value="cover">Recortar para llenar</option></select></label><label>Calidad JPEG · 1–100<input id="delivery-jpegQuality" type="number" min="1" max="100"></label>
+        <label>Encuadre horizontal · 0–1<input id="delivery-cropX" type="number" min="0" max="1" step="0.05"></label><label>Encuadre vertical · 0–1<input id="delivery-cropY" type="number" min="0" max="1" step="0.05"></label>
+        <label>FPS · 0 conserva original<input id="delivery-fps" type="number" min="0" max="120" step="0.001"></label><label>Video · Mbps<input id="delivery-bitrateMbps" type="number" min="1" max="200"></label>
+        <label>Audio AAC · kbps<input id="delivery-audioKbps" type="number" min="64" max="320"></label><label class="report-option"><input id="delivery-upscale" type="checkbox"> Permitir ampliar resolución</label>
+      </div><p id="deliveryInfo" class="help"></p>
       <label
         >Formato de fotografías<select id="photoFormat">
           <option value="png">PNG · 16 bits</option>
-          <option value="jpg">JPEG · calidad 95 · 4:4:4</option>
+          <option value="jpg">JPEG · sRGB · 4:4:4</option>
         </select></label
       >
       <label>Codificación de video<select id="videoEncoding">
@@ -247,7 +256,7 @@
       <p class="help">NVENC acelera la codificación. Los ajustes se procesan en CPU. Si NVIDIA no está disponible, se usa CPU automáticamente.</p>
       <label class="report-option"><input id="saveExportReport" type="checkbox" checked> Guardar diagnóstico JSON junto a cada archivo</label>
       <div class="export-info">
-        <span>Videos</span><b>MP4 · H.264 + audio · tamaño original</b>
+        <span>Videos</span><b>MP4 · H.264 SDR + audio AAC</b>
       </div>
       <p class="help">
         Cada archivo usa sus propios ajustes. Exportación SDR; no conserva

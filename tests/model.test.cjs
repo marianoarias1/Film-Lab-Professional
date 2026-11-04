@@ -57,3 +57,9 @@ test("Snapshot versionado, sin historial efímero y sin alias de ajustes", async
   f.settings.curve.push([0, 0]);
   assert.equal(p.files[0].settings.curve.length, 0);
 });
+test('Desenfoque y ventanas conservan historial independiente y sobreviven al proyecto',async()=>{
+ const m=await model(),a=m.newFile({id:'a'}),b=m.newFile({id:'b'}),before=structuredClone(a.settings);
+ a.settings.labEffects.enabled=true;a.settings.labEffects.points[0]=[.1,.2];a.settings.labEffects.windows.push({x:.2,y:.2,width:.3,height:.4,feather:20,border:3});m.commitEdit(a,before);
+ assert.equal(b.settings.labEffects.enabled,false);assert.equal(b.settings.labEffects.windows.length,0);m.undo(a);assert.equal(a.settings.labEffects.windows.length,0);m.redo(a);assert.equal(a.settings.labEffects.windows.length,1);
+ const p=m.projectSnapshot({files:[a,b],activeId:'a'});assert.deepEqual(p.files[0].settings.labEffects,a.settings.labEffects);p.files[0].settings.labEffects.points[0][0]=.9;assert.equal(a.settings.labEffects.points[0][0],.1);
+});
