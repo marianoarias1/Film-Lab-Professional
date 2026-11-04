@@ -55,3 +55,4 @@ test('opens 0.5 projects without losing compound-mask settings when upgrading',(
 test('Abre proyectos 0.6 con los ajustes originales al migrar a 0.7',()=>{
  const p=doc('/source/photo.jpg');p.engineVersion='filmlab-pro-0.6-lc-d999e382-fc-6c3948a3';p.files[0].settings={exposure:1,masks:[]};const upgraded=validateProject(p);assert.equal(upgraded.engineVersion,ENGINE);assert.deepEqual(upgraded.files[0].settings,p.files[0].settings);
 });
+test('Migra proyectos 0.7 sin descartar su efecto creativo',()=>{const p=doc('/source/a.jpg');p.engineVersion='filmlab-pro-0.7-lc-d999e382-fc-6c3948a3';p.files[0].settings={labEffects:{enabled:true,mode:'tiltShift',dissolve:50}};assert.deepEqual(validateProject(p).files[0].settings,p.files[0].settings);});

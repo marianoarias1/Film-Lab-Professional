@@ -999,3 +999,12 @@ input[type=range].color-track::-moz-range-track{background:transparent}
 #motionControls .report-option{display:flex;align-items:center;gap:6px}
 #motionControls .report-option input{margin:0;accent-color:var(--green)}
 #motionControls .fx-range span{margin-bottom:8px}
+.fx-add-layer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin:14px 0}
+.fx-add-layer select{min-width:0;width:100%;padding:8px;border:1px solid var(--line);border-radius:7px;background:var(--paper)}
+.fx-layer-row{display:flex;gap:5px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:4px;margin:7px 0}
+.fx-layer-row.active{background:#eef3e5;border-color:#c0d3a7}
+.fx-layer-row input{accent-color:var(--green)}
+.fx-layer-row .fx-layer-select{flex:1;text-align:left;font-size:12px;padding:9px 4px}
+.fx-layer-row .plain{padding:6px}
+.fx-subtitle{font:600 13px var(--sans);margin:20px 0 12px}
+#fxOverlay{overflow:hidden}

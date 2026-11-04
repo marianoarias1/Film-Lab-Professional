@@ -87,7 +87,7 @@ Es una prueba técnica integrada, no un reemplazo listo para producción de Ligh
 
 ## Versionado y compatibilidad
 
-Los proyectos nuevos guardan `engineVersion: filmlab-pro-0.7-lc-d999e382-fc-6c3948a3`. Se abren proyectos 0.1–0.6 conservando sus ajustes y se migran al guardar. Las versiones anteriores rechazan los proyectos nuevos para evitar perder parámetros que sus motores no admiten. Se rechazan motores desconocidos.
+Los proyectos nuevos guardan `engineVersion: filmlab-pro-0.8-lc-d999e382-fc-6c3948a3`. Se abren proyectos 0.1–0.7 conservando sus ajustes y se migran al guardar. Las versiones anteriores rechazan los proyectos nuevos para evitar perder parámetros que sus motores no admiten. Se rechazan motores desconocidos.
 
 ## Desarrollar desde el código fuente
 
@@ -128,6 +128,6 @@ npm run build:win
 
 La app Standard y su repositorio no fueron modificados.
 
-## Laboratorio creativo y entrega 0.7
+## Laboratorio creativo y entrega 0.8
 
-Movimiento, trayectoria curva, franja nítida y ventanas protegidas con deshacer/rehacer por archivo. Presets editables para redes en foto y video; detalle de uso, límites y validación en [docs/creative-lab.md](docs/creative-lab.md). Requiere reconstruir el motor nativo con `npm run build:engine`.
+Capas combinables de movimiento y franja nítida; múltiples curvas con influencia local, pincel suave de nitidez y controles directos sobre las líneas. Deshacer/rehacer por archivo. Presets editables para redes en foto y video; detalle de uso, límites y validación en [docs/creative-lab.md](docs/creative-lab.md). Requiere reconstruir el motor nativo con `npm run build:engine`.

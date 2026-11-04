@@ -63,3 +63,10 @@ test('Desenfoque y ventanas conservan historial independiente y sobreviven al pr
  assert.equal(b.settings.labEffects.enabled,false);assert.equal(b.settings.labEffects.windows.length,0);m.undo(a);assert.equal(a.settings.labEffects.windows.length,0);m.redo(a);assert.equal(a.settings.labEffects.windows.length,1);
  const p=m.projectSnapshot({files:[a,b],activeId:'a'});assert.deepEqual(p.files[0].settings.labEffects,a.settings.labEffects);p.files[0].settings.labEffects.points[0][0]=.9;assert.equal(a.settings.labEffects.points[0][0],.1);
 });
+test('Migra el efecto 0.7 a una capa sin perder curvas ni ventanas y sin mutar el proyecto',async()=>{
+ const m=await model(),legacy={enabled:true,mode:'path',amount:80,distance:60,points:[[.1,.2],[.8,.7],[.4,.2]],windows:[{x:.1,y:.2,width:.2,height:.3,feather:20,border:0}]},copy=structuredClone(legacy),stack=m.normalizeEffects(legacy);
+ assert.equal(stack.stack,true);assert.equal(stack.layers.length,1);assert.deepEqual(stack.layers[0].points,legacy.points);assert.deepEqual(stack.layers[0].windows,legacy.windows);assert.deepEqual(legacy,copy);const again=m.normalizeEffects(stack);assert.deepEqual(again,stack);again.layers[0].points[0][0]=.7;assert.equal(stack.layers[0].points[0][0],.1);
+});
+test('Capas y pincel de nitidez usan un historial por archivo',async()=>{
+ const m=await model(),a=m.newFile({id:'a'}),b=m.newFile({id:'b'}),before=structuredClone(a.settings);a.settings.labEffects.enabled=true;a.settings.labEffects.layers.push({...m.effectLayerDefaults(),mode:'path',paths:[{points:[[.1,.2],[.8,.7],[.4,.2]],distance:45,influence:55}],strokes:[{points:[[.4,.4],[.5,.5]],size:.2,feather:80,erase:false}]});m.commitEdit(a,before);assert.equal(b.settings.labEffects.layers.length,0);m.undo(a);assert.equal(a.settings.labEffects.layers.length,0);m.redo(a);assert.equal(a.settings.labEffects.layers[0].strokes.length,1);assert.equal(m.projectSnapshot({files:[a],activeId:'a'}).files[0].settings.labEffects.layers[0].paths.length,1);
+});

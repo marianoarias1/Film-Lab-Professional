@@ -1,16 +1,25 @@
-# Desenfoque creativo y entrega · Professional 0.7
+# Laboratorio creativo y entrega · Professional 0.8
 
-En **Laboratorio → Desenfoque y movimiento**, activar el efecto y elegir:
+En **Laboratorio → Desenfoque y movimiento**, **Añadir efecto** crea una capa independiente. Hasta seis capas se combinan en el orden de la lista; se pueden seleccionar, activar/desactivar, eliminar o subir en el orden. Cada archivo conserva sus capas e historial de deshacer/rehacer. Cambiar de receta conserva estos efectos y las máscaras.
 
-- **Movimiento direccional:** orientar los dos puntos sobre la foto; Longitud controla el recorrido. Conservar imagen nítida mezcla el original con el rastro, una aproximación al aspecto de flash y exposición larga.
-- **Franja nítida:** ubicar/girar la franja con los puntos. Ancho y transición conservan una zona nítida y desenfocan su exterior.
-- **Trayectoria curva:** mover los dos extremos y el tercer punto de control de la curva. Se usa como recorrido del desenfoque, no como selección de sujeto.
-- **Disolución:** transición estocástica entre imagen original y desenfocada. Tamaño cambia su textura. Es una interpretación propia de la referencia, no la implementación del modo Dissolve de Photoshop.
-- **Ventanas nítidas:** Dibujar ventana y arrastrar sobre la foto; mover el rectángulo y redimensionar desde la esquina. Hasta ocho ventanas por archivo; suavidad y marco blanco opcionales. Ocultar las guías permite ver el resultado sin puntos superpuestos.
+## Franja nítida
 
-Los efectos trabajan en RGB lineal float antes de codificar, se guardan por archivo, admiten deshacer/rehacer y se conservan al cambiar de receta. Desactivarlos recupera el revelado sin el desenfoque; no modifica el original. El detalle protegido procede del original revelado: no reconstruye detalle ausente. En video la geometría es estática, sin tracking ni segmentación automática; el patrón de disolución es determinista para evitar ruido temporal.
+- Punto central: mover toda la franja.
+- Línea central: girar; el cursor y su ayuda indican la acción.
+- Líneas continuas exteriores: ampliar o reducir el área nítida.
+- Líneas punteadas: extender o comprimir la transición hacia el desenfoque.
+- Desenfoque e intensidad siguen en el panel; ancho y transición se manipulan directamente sobre la foto.
+- **Disolución de luces** distribuye textura fina y orgánica en el halo luminoso del desenfoque, con tamaño editable. Evita alternar original/blur indiscriminadamente en toda la imagen. Las áreas uniformes no adquieren sal y pimienta. No es grano fotográfico global ni una copia del modo Dissolve de Photoshop; la referencia usa también un sujeto recortado y transparencia, que esta herramienta no deduce automáticamente.
 
-La franja usa una aproximación gaussiana de tres pasadas. Movimiento y trayectoria integran hasta 96 muestras por píxel. Previews y exportación usan geometría normalizada y el mismo algoritmo; la exportación de resolución completa puede tardar más. No son simulaciones ópticas de profundidad ni equivalencias exactas con Photoshop.
+La franja usa una aproximación gaussiana de tres pasadas, en RGB lineal float. La geometría es normalizada para preview/exportación. Las guías se pueden ocultar.
+
+## Trayectorias y pincel
+
+Una capa de trayectorias admite hasta **ocho curvas**, con extremos y control central editables sobre la imagen. **Dibujar curva** permite arrastrar un recorrido nuevo. Seleccionar una curva muestra su longitud y alcance propios; las otras siguen participando. Los recorridos forman un campo de movimiento local con influencia suave según su proximidad. No se aplican como sucesivas pasadas de blur a toda la foto. No implementa todas las opciones de Path Blur de Photoshop ni seguimiento de sujetos.
+
+Las trayectorias **no ofrecen disolución ni nuevas ventanas rectangulares**. Para combinarlas con una franja/disolución, añadir otra capa. El **Pincel de nitidez** quita solo el efecto de la capa de trayectorias seleccionada: el centro recupera completamente su imagen de entrada y el borde cae gradualmente según Suavidad. El cursor muestra radio e interior; tamaño y suavidad son editables. El modo inverso devuelve el desenfoque en lo pintado. Se puede borrar el conjunto de pinceladas o deshacer cada trazo. Hasta 128 trazos y 8192 puntos por capa.
+
+El pincel no reconstruye detalle inexistente: conserva el revelado previo a esa capa, incluidos los efectos anteriores. En video la geometría y el patrón de textura son estáticos, sin tracking ni ruido temporal. Preview, foto y video utilizan el mismo motor float; la exportación completa puede tardar más. El movimiento direccional y las ventanas con marco opcional siguen disponibles en las capas que corresponden.
 
 ## Exportación para redes
 
@@ -27,6 +36,6 @@ Los destinos cargan valores iniciales **editables**, sin prometer evitar la reco
 
 MP4: H.264 SDR / Rec.709, AAC, NVENC cuando está disponible con recuperación CPU. Mantiene el audio. FPS 0 conserva la frecuencia original; elegir otra remuestrea temporalmente, sin interpolación por IA. PNG conserva 16 bits; JPEG sRGB 4:4:4 con calidad de 1 a 100. Las dimensiones se limitan a 7680 px y 34 MP; video redondea a dimensiones pares. No ampliar por defecto: un original menor puede producir una entrega menor al tamaño del preset; activar Permitir ampliar para exigir el tamaño solicitado. Conservar imagen completa puede introducir márgenes negros. El encuadre horizontal/vertical 0–1 cambia el anclaje del recorte o de los márgenes.
 
-Los proyectos de versiones anteriores se abren con el desenfoque desactivado. Se incrementó la identificación del motor para que una instalación antigua no abra una edición nueva y pierda estos datos silenciosamente. Después de actualizar el código: `npm run setup`, `npm run build:engine`, `npm start`.
+Los proyectos 0.1–0.7 siguen abriéndose. El efecto único de 0.7 se convierte en una capa y conserva puntos, ventanas y ajustes; las ventanas anteriores de una trayectoria se mantienen para no descartar su protección, aunque las nuevas trayectorias usan el pincel. El motor se identifica como 0.8 para que versiones antiguas no ignoren las capas nuevas. La textura y el campo de movimiento se recalcularon: la apariencia de esos efectos puede variar respecto de 0.7. Después de actualizar: `npm run setup`, `npm run build:engine`, `npm start`.
 
 Validación: `npm test`, `npm run check`, `npm run test:native`, `npm run test:creative`. La integración creativa usa JPEG, DNG y MP4 con audio reales y requiere ffprobe.
