@@ -4,13 +4,32 @@ const names={motion:'Movimiento direccional',tiltShift:'Franja nítida',path:'Tr
 const limit=(v,min=0,max=1)=>Math.max(min,Math.min(max,v));
 const rotateCursor=`url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><path d="M7 11a8 8 0 1 1 0 8M7 11V4m0 7h7" fill="none" stroke="white" stroke-width="4"/><path d="M7 11a8 8 0 1 1 0 8M7 11V4m0 7h7" fill="none" stroke="#254731" stroke-width="2"/></svg>')}") 14 14, alias`;
 
+
+const icons={
+ motion:'M3 8h12m-9 4h15M3 16h12m2-7 4 3-4 3',
+ tiltShift:'M4 5h16M4 10h16M4 14h16M4 19h16',
+ path:'M3 18C9 18 8 5 15 5c3 0 4 3 6 3M3 18h.01M21 8h.01',
+ plus:'M12 5v14M5 12h14',
+ eye:'M2 12s4-6 10-6 10 6 10 6-4 6-10 6-10-6-10-6Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z',
+ hidden:'m3 3 18 18M10 6c.7-.1 1.3-.1 2-.1 6 0 10 6 10 6a19 19 0 0 1-3 3.2M6 7.8A18 18 0 0 0 2 12s4 6 10 6c1.3 0 2.6-.3 3.7-.8',
+ up:'m6 13 6-6 6 6m-6-6v13',
+ trash:'M4 7h16m-14 0 1 13h10l1-13M9 7V4h6v3m-5 3v7m4-7v7',
+ guide:'M12 3v4m0 10v4M3 12h4m10 0h4m-5 0a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z',
+};
+const descriptions={motion:'Arrastre recto',tiltShift:'Foco en una franja',path:'Movimiento por zonas'};
+function fxIcon(name){
+ const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg'),path=document.createElementNS(ns,'path');
+ for(const [k,v] of Object.entries({viewBox:'0 0 24 24',width:18,height:18,fill:'none',stroke:'currentColor','stroke-width':1.6,'stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'}))svg.setAttribute(k,v);
+ path.setAttribute('d',icons[name]);svg.append(path);return svg;
+}
+
 export function mountEffects({current,commit,preview,finished,box,isVisible,exclusive}){
  const $=id=>document.getElementById(id),panel=$('motionPanel'),controls=$('motionControls'),svg=$('fxOverlay');
- let layerIndex=0,pathIndex=0,windowIndex=-1,tool=null,drag=null,showGuides=true,brushSize=.12,brushFeather=80,erase=false,cursor=null,fileId=null;
+ let layerIndex=0,pathIndex=0,windowIndex=-1,tool=null,drag=null,showGuides=true,brushSize=.12,brushFeather=80,erase=false,cursor=null,fileId=null,inspector='settings';
  const state=()=>current()?.settings.labEffects;
  const layer=()=>state()?.layers?.[layerIndex];
  const el=(tag,props={},text)=>{const e=Object.assign(document.createElement(tag),props);if(text!==undefined)e.textContent=text;return e;};
- function ensure(){const f=current();if(!f)return null;if(fileId!==f.id){fileId=f.id;layerIndex=0;pathIndex=0;windowIndex=-1;tool=null;cursor=null;}
+ function ensure(){const f=current();if(!f)return null;if(fileId!==f.id){fileId=f.id;inspector='settings';layerIndex=0;pathIndex=0;windowIndex=-1;tool=null;cursor=null;}
   if(!f.settings.labEffects?.stack)f.settings.labEffects=normalizeEffects(f.settings.labEffects);
   layerIndex=limit(layerIndex,0,Math.max(0,state().layers.length-1));const s=layer();if(s?.mode==='path'&&!s.paths.length)s.paths=[{points:structuredClone(s.points),distance:s.distance,influence:55}];pathIndex=limit(pathIndex,0,Math.max(0,(s?.paths.length||1)-1));return state();
  }
@@ -19,36 +38,136 @@ export function mountEffects({current,commit,preview,finished,box,isVisible,excl
   head.append(out);input.onpointerdown=()=>old=structuredClone(current().settings);input.oninput=()=>{old??=structuredClone(current().settings);target[key]=Number(input.value);out.value=input.value;refresh();preview();};const end=()=>{if(old){commit(old);old=null;finished();}};input.onchange=end;input.onpointerup=end;input.onpointercancel=end;input.onblur=end;wrap.append(head,input);return wrap;}
  function button(text,fn,cls='outline'){const b=el('button',{className:cls},text);b.onclick=fn;return b;}
  function add(mode){mutate(root=>{root.enabled=true;const s={...effectLayerDefaults(),mode};if(mode==='path')s.paths=[{points:structuredClone(s.points),distance:s.distance,influence:55}];root.layers.push(s);layerIndex=root.layers.length-1;pathIndex=0;windowIndex=-1;tool=null;showGuides=true;});}
- function draw(){const root=ensure();controls.replaceChildren();if(!root){controls.append(el('p',{className:'help'},'Cargá una fotografía o un video para experimentar.'));refresh();return;}
-  const addRow=el('div',{className:'fx-add-layer'}),select=el('select',{ariaLabel:'Efecto para añadir'});Object.entries(names).forEach(([value,text])=>select.append(el('option',{value},text)));const addButton=button('+ Añadir efecto',()=>add(select.value));addButton.disabled=root.layers.length>=6;addRow.append(select,addButton);controls.append(addRow);
-  root.layers.forEach((s,i)=>{const row=el('div',{className:'fx-layer-row'+(i===layerIndex?' active':'')}),check=el('input',{type:'checkbox',checked:s.enabled,ariaLabel:'Activar '+names[s.mode]+' '+(i+1)});check.onchange=()=>mutate(()=>s.enabled=check.checked);
-   const choose=button(`${i+1}. ${names[s.mode]}`,()=>{layerIndex=i;pathIndex=0;windowIndex=-1;tool=null;draw();},'plain fx-layer-select');choose.setAttribute('aria-pressed',String(i===layerIndex));const up=button('↑',()=>mutate(r=>{[r.layers[i-1],r.layers[i]]=[r.layers[i],r.layers[i-1]];layerIndex=i-1;}),'plain');up.disabled=i===0;up.title='Aplicar antes';const remove=button('×',()=>mutate(r=>{r.layers.splice(i,1);layerIndex=Math.max(0,i-1);tool=null;}),'plain');remove.setAttribute('aria-label','Eliminar efecto '+(i+1));row.append(check,choose,up,remove);controls.append(row);
-  });
-  const s=layer();if(!s){controls.append(el('p',{className:'help'},'Añadí una franja o un movimiento. Cada efecto conserva sus zonas y se puede combinar con otros.'));refresh();return;}
-  if(!root.enabled)root.enabled=true;
-  controls.append(el('h4',{className:'fx-subtitle'},names[s.mode]),range(s,'amount','Intensidad'));
-  if(s.mode==='tiltShift'){
-   controls.append(el('p',{className:'help'},'Punto central: mover. Línea central: girar. Líneas continuas: ancho. Líneas punteadas: transición.'),range(s,'distance','Desenfoque'),range(s,'dissolve','Disolución de luces'),range(s,'particleSize','Tamaño de la textura'));
-  }else if(s.mode==='path'){
-   const heading=el('div',{className:'fx-heading'});heading.append(el('strong',{},'Curvas de movimiento'));const addPath=button('+ Dibujar curva',()=>{tool=tool==='curve'?null:'curve';showGuides=true;draw();});addPath.disabled=s.paths.length>=8;heading.append(addPath);controls.append(heading);
-   s.paths.forEach((p,i)=>{const row=el('div',{className:'fx-window-row'}),choose=button(`Curva ${i+1}`,()=>{pathIndex=i;tool=null;draw();},'plain'+(i===pathIndex?' active':'')),remove=button('Eliminar',()=>mutate((r,s)=>{if(s.paths.length>1){s.paths.splice(i,1);pathIndex=Math.max(0,i-1);}}),'plain');remove.disabled=s.paths.length<2;row.append(choose,remove);controls.append(row);});
-   const p=s.paths[pathIndex];controls.append(range(p,'distance','Longitud de esta curva'),range(p,'influence','Alcance de esta curva',5,100),range(s,'sharpness','Conservar imagen nítida'));
-   const brush=button(tool==='brush'?'Terminar pincel':'Pincel de nitidez',()=>{tool=tool==='brush'?null:'brush';showGuides=true;draw();});brush.setAttribute('aria-pressed',String(tool==='brush'));controls.append(brush);
-   if(tool==='brush'){
-    const opts={size:Math.round(brushSize*100),feather:brushFeather};const size=range(opts,'size','Tamaño del pincel',1,60),soft=range(opts,'feather','Suavidad del pincel',5,100);
-    // Brush options do not alter the photograph until the next stroke.
-    for(const [wrap,key]of[[size,'size'],[soft,'feather']]){const input=wrap.querySelector('input'),out=wrap.querySelector('output');input.onpointerdown=null;input.onchange=null;input.onpointerup=null;input.onblur=null;input.oninput=()=>{out.value=input.value;if(key==='size')brushSize=Number(input.value)/100;else brushFeather=Number(input.value);refresh();};}controls.append(size,soft);
-    const toggle=button(erase?'Modo: devolver desenfoque':'Modo: recuperar nitidez',()=>{erase=!erase;draw();});controls.append(toggle,el('p',{className:'help'},'Centro nítido, borde gradual. Pintá para quitar esta trayectoria; invertí el modo para devolverla.'));
-   }
-   if(s.strokes.length>=128||s.strokes.reduce((n,s)=>n+s.points.length,0)>=8192)controls.append(el('p',{className:'help'},'Alcanzaste el límite de pinceladas de este efecto. Podés deshacer o borrar sus trazos.'));
-   if(s.strokes.length)controls.append(button('Borrar pinceladas',()=>mutate((r,s)=>s.strokes=[]),'plain'));
-   controls.append(el('p',{className:'help'},tool==='curve'?'Arrastrá sobre la foto para crear otra curva. Luego mové su punto central para doblarla.':'Cada curva orienta el movimiento cerca de su recorrido. Para sumar disolución, añadí un efecto de franja independiente.'));
-  }else controls.append(range(s,'distance','Longitud del rastro'),range(s,'sharpness','Conservar imagen nítida'),el('p',{className:'help'},'Arrastrá los extremos para orientar el movimiento.'));
-  if(s.mode!=='path')drawWindows(s);
-  const guides=el('label',{className:'report-option'}),check=el('input',{type:'checkbox',checked:showGuides});check.onchange=()=>{showGuides=check.checked;tool=null;refresh();};guides.append(check,' Mostrar guías');controls.append(guides,el('p',{className:'help'},'Cada efecto se guarda por archivo. En video las zonas son estáticas.'));refresh();
+
+ function iconButton(icon,label,action,pressed){
+  const b=button('',action,'fx-icon-button');b.append(fxIcon(icon));b.title=label;b.setAttribute('aria-label',label);
+  if(pressed!==undefined)b.setAttribute('aria-pressed',String(pressed));
+  return b;
  }
- function drawWindows(s){const title=el('div',{className:'fx-heading'}),add=button(tool==='window'?'Cancelar dibujo':'+ Dibujar ventana',()=>{tool=tool==='window'?null:'window';showGuides=true;draw();});add.disabled=s.windows.length>=8;title.append(el('strong',{},'Ventanas nítidas'),add);controls.append(title);
- s.windows.forEach((w,i)=>{const row=el('div',{className:'fx-window-row'});row.append(button(`Ventana ${i+1}`,()=>{windowIndex=i;draw();},'plain'+(windowIndex===i?' active':'')),button('Eliminar',()=>mutate((r,s)=>{s.windows.splice(i,1);windowIndex=-1;}),'plain'));controls.append(row);if(windowIndex===i)controls.append(range(w,'feather','Suavidad del borde'),range(w,'border','Marco blanco',0,24));});}
+ function hint(text,active=false){return el('p',{className:active?'fx-hint fx-tool-active':'fx-hint'},text);}
+ function changeView(view){inspector=view;tool=null;cursor=null;draw();}
+ function draw(){
+  const root=ensure();controls.replaceChildren();
+  if(!root){controls.append(hint('Abrí una foto o un video para agregar efectos.'));refresh();return;}
+  const header=el('div',{className:'fx-stack-header'});
+  header.append(el('span',{className:'fx-kicker'},'Capas de efecto'),el('span',{className:'fx-count'},root.layers.length+' / 6'));
+  controls.append(header);
+  if(root.layers.length){
+   const list=el('div',{className:'fx-layer-list'});
+   root.layers.forEach((s,i)=>{
+    const selected=i===layerIndex,row=el('div',{className:'fx-layer-row'+(selected?' active':'')+(!s.enabled?' is-off':'')});
+    const choose=button('',()=>{layerIndex=i;pathIndex=0;windowIndex=-1;changeView('settings');},'fx-layer-select');
+    choose.append(el('span',{className:'fx-layer-icon'}),el('span',{className:'fx-layer-name'},names[s.mode]));
+    choose.firstChild.append(fxIcon(s.mode));choose.setAttribute('aria-pressed',String(selected));
+    const label=(s.enabled?'Ocultar ':'Mostrar ')+names[s.mode]+' '+(i+1);
+    const visible=iconButton(s.enabled?'eye':'hidden',label,()=>mutate(()=>{s.enabled=!s.enabled;}),s.enabled);
+    row.append(choose,visible);list.append(row);
+   });
+   controls.append(list);
+  }
+  if(root.layers.length<6){
+   const palette=el('details',{className:'fx-palette',open:root.layers.length===0});
+   const summary=el('summary',{className:'fx-add'});summary.append(fxIcon('plus'),el('span',{},'Añadir efecto'));palette.append(summary);
+   const options=el('div',{className:'fx-palette-options'});
+   Object.entries(names).forEach(([mode,name])=>{
+    const choice=button('',()=>{inspector='settings';add(mode);},'fx-palette-option');
+    const mark=el('span',{className:'fx-layer-icon'});mark.append(fxIcon(mode));
+    const copy=el('span',{className:'fx-option-copy'});copy.append(el('strong',{},name),el('small',{},descriptions[mode]));
+    choice.append(mark,copy);options.append(choice);
+   });
+   palette.append(options);controls.append(palette);
+  }
+  const s=layer();if(!s){refresh();return;}
+  if(!root.enabled)root.enabled=true;
+  const card=el('section',{className:'fx-inspector'});
+  const title=el('div',{className:'fx-inspector-head'}),copy=el('div',{className:'fx-inspector-copy'});
+  copy.append(el('span',{className:'fx-kicker'},'Capa '+(layerIndex+1)),el('h4',{},names[s.mode]));
+  const actions=el('div',{className:'fx-inspector-actions'});
+  const up=iconButton('up','Aplicar antes',()=>mutate(r=>{const i=layerIndex;[r.layers[i-1],r.layers[i]]=[r.layers[i],r.layers[i-1]];layerIndex=i-1;}));
+  up.disabled=layerIndex===0;
+  const remove=iconButton('trash','Eliminar esta capa',()=>mutate(r=>{r.layers.splice(layerIndex,1);layerIndex=Math.max(0,layerIndex-1);inspector='settings';tool=null;}));
+  remove.classList.add('fx-danger');
+  actions.append(up,remove);title.append(copy,actions);card.append(title);
+
+  const tabs=el('div',{className:'fx-inspector-tabs',role:'group',ariaLabel:'Controles de la capa'});
+  const other=s.mode==='path'?'Pincel':'Ventanas';
+  for(const [value,name] of [['settings',s.mode==='path'?'Curvas':'Ajustes'],['zones',other]]){
+   const tab=button(name,()=>changeView(value),'fx-tab');tab.setAttribute('aria-pressed',String(inspector===value));tabs.append(tab);
+  }
+  card.append(tabs);
+  const body=el('div',{className:'fx-inspector-body'});
+  if(inspector==='zones'){
+   if(s.mode==='path')drawBrush(s,body);else drawWindows(s,body);
+  }else{
+   body.append(range(s,'amount','Intensidad'));
+   if(s.mode==='tiltShift'){
+    body.append(range(s,'distance','Desenfoque'));
+    const texture=el('div',{className:'fx-control-group'});
+    texture.append(el('h5',{},'Textura'),range(s,'dissolve','Disolución de luces'),range(s,'particleSize','Tamaño'));
+    body.append(texture);
+    body.append(hint('Punto: mover · Línea central: girar\nLíneas: ancho · Punteadas: transición'));
+   }else if(s.mode==='path'){
+    drawPaths(s,body);
+   }else{
+    body.append(range(s,'distance','Longitud del rastro'),range(s,'sharpness','Conservar nitidez'),hint('Arrastrá los extremos sobre la foto para orientar el movimiento.'));
+   }
+  }
+  card.append(body);
+  const footer=el('div',{className:'fx-inspector-footer'});
+  const guides=button('',()=>{showGuides=!showGuides;tool=null;cursor=null;draw();},'fx-guide-button');
+  guides.append(fxIcon('guide'),el('span',{},'Mostrar guías'));guides.setAttribute('aria-pressed',String(showGuides));footer.append(guides);
+  card.append(footer);controls.append(card);refresh();
+ }
+
+ function picker(items,index,label,change){
+  const select=el('select',{className:'fx-picker',ariaLabel:label});
+  items.forEach((_,i)=>select.append(el('option',{value:i,selected:i===index},label+' '+(i+1))));
+  select.onchange=()=>change(Number(select.value));return select;
+ }
+ function drawPaths(s,body){
+  const group=el('div',{className:'fx-control-group'});
+  const head=el('div',{className:'fx-control-head'});head.append(el('h5',{},'Recorrido'));
+  const addPath=button(tool==='curve'?'Cancelar dibujo':'+ Dibujar curva',()=>{tool=tool==='curve'?null:'curve';showGuides=true;draw();},'fx-action');
+  addPath.disabled=s.paths.length>=8;head.append(addPath);group.append(head);
+  const row=el('div',{className:'fx-item-picker'});
+  const remove=iconButton('trash','Eliminar curva seleccionada',()=>mutate((r,s)=>{if(s.paths.length>1){s.paths.splice(pathIndex,1);pathIndex=Math.max(0,pathIndex-1);}}));
+  remove.disabled=s.paths.length<2;remove.classList.add('fx-danger');
+  row.append(picker(s.paths,pathIndex,'Curva',i=>{pathIndex=i;tool=null;draw();}),remove);group.append(row);
+  const p=s.paths[pathIndex];
+  group.append(range(p,'distance','Longitud'),range(p,'influence','Alcance',5,100));body.append(group);
+  body.append(range(s,'sharpness','Conservar nitidez'));
+  if(tool==='curve')body.append(hint('Arrastrá sobre la foto para dibujar. Después mové el punto central para curvar.',true));
+ }
+ function drawBrush(s,body){
+  const brush=button(tool==='brush'?'Terminar pincel':'Activar pincel de nitidez',()=>{tool=tool==='brush'?null:'brush';showGuides=true;draw();},'fx-action fx-primary-action');
+  brush.setAttribute('aria-pressed',String(tool==='brush'));body.append(brush);
+  if(tool==='brush'){
+   const opts={size:Math.round(brushSize*100),feather:brushFeather};const size=range(opts,'size','Tamaño',1,60),soft=range(opts,'feather','Suavidad',5,100);
+   // Brush options do not alter the photograph until the next stroke.
+   for(const [wrap,key]of[[size,'size'],[soft,'feather']]){const input=wrap.querySelector('input'),out=wrap.querySelector('output');input.onpointerdown=null;input.onchange=null;input.onpointerup=null;input.onblur=null;input.oninput=()=>{out.value=input.value;if(key==='size')brushSize=Number(input.value)/100;else brushFeather=Number(input.value);refresh();};}
+   const modes=el('div',{className:'fx-brush-modes',role:'group',ariaLabel:'Modo del pincel'});
+   for(const [value,label] of [[false,'Recuperar nitidez'],[true,'Restaurar efecto']]){
+    const mode=button(label,()=>{erase=value;draw();},'fx-tab');mode.setAttribute('aria-pressed',String(erase===value));modes.append(mode);
+   }
+   body.append(modes,size,soft);
+  }
+  body.append(hint(erase&&tool==='brush'?'Pintá para devolver el desenfoque en las zonas recuperadas.':'Pintá para recuperar nitidez con un borde gradual.',tool==='brush'));
+  if(s.strokes.length>=128||s.strokes.reduce((n,s)=>n+s.points.length,0)>=8192)body.append(hint('Llegaste al límite de pinceladas. Podés deshacer o borrar trazos.'));
+  if(s.strokes.length)body.append(button('Borrar pinceladas',()=>mutate((r,s)=>s.strokes=[]),'fx-action fx-danger'));
+ }
+ function drawWindows(s,body){
+  const add=button(tool==='window'?'Cancelar dibujo':'+ Dibujar ventana',()=>{tool=tool==='window'?null:'window';showGuides=true;draw();},'fx-action fx-primary-action');
+  add.disabled=s.windows.length>=8;body.append(add);
+  if(s.windows.length){
+   const row=el('div',{className:'fx-item-picker'});
+   const remove=iconButton('trash','Eliminar ventana seleccionada',()=>mutate((r,s)=>{s.windows.splice(windowIndex,1);windowIndex=Math.min(windowIndex,s.windows.length-1);}));
+   remove.classList.add('fx-danger');
+   if(windowIndex<0||windowIndex>=s.windows.length)windowIndex=0;
+   row.append(picker(s.windows,windowIndex,'Ventana',i=>{windowIndex=i;draw();}),remove);body.append(row);
+   const w=s.windows[windowIndex];body.append(range(w,'feather','Suavidad del borde'),range(w,'border','Marco blanco',0,24));
+  }
+  body.append(hint(tool==='window'?'Arrastrá sobre la foto para definir el rectángulo.':'Las ventanas conservan zonas nítidas dentro del efecto.',tool==='window'));
+ }
  function active(){return panel.open&&isVisible()&&!!layer()&&showGuides;}
  function refresh(){svg.replaceChildren();svg.toggleAttribute('hidden',!active());if(!active())return;const s=layer(),b=box();if(!b.width||!b.height)return;Object.assign(svg.style,{left:b.x+'px',top:b.y+'px',width:b.width+'px',height:b.height+'px'});svg.setAttribute('viewBox',`0 0 ${b.width} ${b.height}`);svg.style.pointerEvents=tool?'auto':'none';svg.style.cursor=tool==='brush'?'none':tool?'crosshair':'default';
   const shape=(tag,attrs,action,index)=>{const e=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(action&&!tool){e.dataset.fx=action;if(index!==undefined)e.dataset.index=index;e.style.pointerEvents='all';e.style.cursor=action==='rotate'?rotateCursor:action==='band'||action==='fade'?['ew-resize','nwse-resize','ns-resize','nesw-resize'][Math.round((Math.atan2((s.points[1][1]-s.points[0][1])*b.height,(s.points[1][0]-s.points[0][0])*b.width)+Math.PI/2)/(Math.PI/4)+8)%4]:action.startsWith('point')||action==='move'?'grab':action==='resize'?'nwse-resize':'move';const t=document.createElementNS(e.namespaceURI,'title');t.textContent={rotate:'Arrastrar para girar',band:'Arrastrar para ampliar o reducir la franja',fade:'Arrastrar para ajustar la transición',move:'Arrastrar para mover'}[action]||'Arrastrar para modificar';e.append(t);}svg.append(e);return e;};
