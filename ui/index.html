@@ -10,6 +10,7 @@
     <title>Film Lab Professional</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="workspace-dark.css" />
+    <link rel="stylesheet" href="library.css" />
   </head>
   <body>
     <header>
@@ -18,6 +19,7 @@
         ><small>PROFESSIONAL</small></a
       >
       <nav class="workspace-nav" aria-label="Espacio de trabajo">
+        <button id="navLibrary" aria-controls="library" aria-pressed="false">Biblioteca</button>
         <button id="navFiles" aria-controls="filesPanel" aria-expanded="false">Archivos</button>
         <button data-tab="edit" class="active">Revelar</button>
         <button id="navLab" data-tab="effects">Laboratorio</button>
@@ -33,6 +35,65 @@
       </div>
     </header>
     <div id="engineError" class="error-banner" hidden></div>
+    <main id="library" class="library" aria-labelledby="libraryTitle" hidden>
+      <div class="library-bar">
+        <div class="library-title"><h1 id="libraryTitle">Biblioteca</h1><span id="libraryCount"></span></div>
+        <div class="library-filters" role="group" aria-label="Filtrar fotos">
+          <button data-review-filter="all" aria-pressed="true">Todas</button>
+          <button data-review-filter="picked" aria-pressed="false">Elegidas</button>
+          <button data-review-filter="rejected" aria-pressed="false">Descartadas</button>
+          <button data-review-filter="unreviewed" aria-pressed="false">Sin revisar</button>
+        </div>
+        <button id="libraryCompare" class="outline">Comparar dos tomas</button>
+      </div>
+      <div id="libraryBrowse" class="library-browse">
+        <div id="libraryResults" class="library-results">
+          <div id="libraryGrid" class="library-grid" aria-label="Fotos del proyecto"></div>
+          <div id="libraryEmpty" class="library-empty" hidden></div>
+        </div>
+        <aside id="libraryDetail" class="library-detail" aria-label="Toma activa">
+          <div class="library-detail-heading"><h2 id="libraryFilename"></h2><span id="libraryReviewStatus"></span></div>
+          <div id="libraryPreview" class="library-image library-preview"></div>
+          <div class="library-mark-actions" role="group" aria-label="Marcar toma activa">
+            <button class="dark" data-review-mark="picked">⚑ Elegir</button>
+            <button class="outline" data-review-mark="rejected">× Descartar</button>
+            <button class="outline" data-review-mark="unreviewed">Quitar marca</button>
+          </div>
+          <div class="library-detail-footer">
+            <label class="library-switch"><input id="libraryAuto" type="checkbox" role="switch" checked> Avance automático</label>
+            <button id="libraryReveal" class="outline">Revelar toma</button>
+          </div>
+        </aside>
+      </div>
+      <div id="libraryComparison" class="library-comparison" hidden>
+        <div class="library-compare-bar">
+          <button id="libraryBack" class="outline">← Volver a biblioteca</button>
+          <h2>Comparar tomas</h2>
+          <div>
+            <label class="library-switch"><input id="libraryLinked" type="checkbox" role="switch" checked> Zoom vinculado</label>
+            <button id="libraryFit" class="outline">Ajustar</button>
+          </div>
+        </div>
+        <div class="library-pair">
+          <div class="library-pane"><button id="libraryA" class="library-image" aria-pressed="true" aria-describedby="libraryLabelA"></button><div id="libraryLabelA" class="library-frame-label"></div></div>
+          <div class="library-pane"><button id="libraryB" class="library-image" aria-pressed="false" aria-describedby="libraryLabelB"></button><div id="libraryLabelB" class="library-frame-label"></div></div>
+        </div>
+        <div class="library-mark-actions" role="group" aria-label="Marcar toma activa">
+          <button class="dark" data-review-mark="picked">⚑ Elegir</button>
+          <button class="outline" data-review-mark="rejected">× Descartar</button>
+          <button class="outline" data-review-mark="unreviewed">Quitar marca</button>
+        </div>
+        <details id="libraryFiles" class="library-files" open>
+          <summary>Archivos</summary>
+          <div id="libraryStrip" class="library-strip" aria-label="Reemplazar la toma activa"></div>
+        </details>
+      </div>
+      <div class="library-shortcuts">
+        <span><kbd>P</kbd> Elegir</span><span><kbd>X</kbd> Descartar</span><span><kbd>U</kbd> Quitar marca</span><span><kbd>←</kbd> <kbd>→</kbd> Navegar</span>
+        <span id="libraryZoomHint" hidden>Rueda: zoom · Arrastrá para mover</span>
+      </div>
+      <p id="libraryAnnouncement" class="sr-only" role="status"></p>
+    </main>
     <main class="workspace" id="workspace">
       <aside class="filters" aria-label="Filtros">
         <div class="filters-heading">

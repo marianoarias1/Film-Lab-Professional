@@ -7,6 +7,38 @@ async function model() {
       Buffer.from(await fs.readFile("ui/model.js")).toString("base64")
   );
 }
+test("Las marcas de Biblioteca sobreviven al proyecto y no alteran exportación ni ajustes", async () => {
+  const m = await model();
+  const a = m.newFile({ id: "a", kind: "photo", review: "picked" });
+  const b = m.newFile({ id: "b", kind: "photo", review: "unknown" });
+  const c = m.newFile({ id: "c", kind: "video" });
+  b.selected = false;
+  b.review = "rejected";
+  b.settings.exposure = 1.5;
+  const saved = m.projectSnapshot({ files: [a, b, c], activeId: "a" });
+  assert.deepEqual(saved.files.map(f => f.review), ["picked", "rejected", "unreviewed"]);
+  assert.deepEqual(m.selectedIds(saved.files), ["a", "c"]);
+  assert.equal(saved.files[1].settings.exposure, 1.5);
+  assert.equal(m.newFile({ review: "unknown" }).review, "unreviewed");
+});
+
+test("El avance en Sin revisar elige la siguiente foto del orden anterior al marcado", async () => {
+  const m = await model();
+  const files = [
+    { id: "a", kind: "photo" },
+    { id: "b", kind: "video" },
+    { id: "c", kind: "photo", review: "picked" },
+    { id: "d", kind: "photo" },
+  ];
+  const before = m.reviewFiles(files, "unreviewed");
+  files[0].review = "rejected";
+  assert.equal(m.nextReviewFile(before, "a").id, "d");
+  assert.equal(m.nextReviewFile(before, "d"), undefined);
+  assert.deepEqual(m.reviewFiles(files, "unreviewed").map(f => f.id), ["d"]);
+  assert.deepEqual(m.reviewFiles(files, "picked").map(f => f.id), ["c"]);
+  assert.deepEqual(m.reviewFiles(files, "rejected").map(f => f.id), ["a"]);
+});
+
 test("Ajustes e historial independientes por archivo", async () => {
   const m = await model(),
     a = m.newFile({ id: "a" }),
