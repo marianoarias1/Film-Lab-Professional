@@ -171,3 +171,20 @@ test("Una edición posterior protege todo el lote y una nueva edición descarta 
   assert.equal(m.redo(b), false);
   assert.equal(b.settings.exposure, 0);
 });
+
+test("Exportar elegidas usa las fotos disponibles del proyecto y conserva el lote manual", async () => {
+  const m = await model();
+  const files = [
+    { id: "a", kind: "photo", review: "picked", selected: false },
+    { id: "b", kind: "photo", review: "rejected", selected: true },
+    { id: "c", kind: "photo", review: "picked", selected: true, missing: true },
+    { id: "d", kind: "video", review: "picked", selected: true },
+    { id: "e", kind: "photo", review: "picked", selected: true },
+  ];
+  const before = structuredClone(files);
+  const picks = m.exportBatch(files, "picked");
+  assert.deepEqual(picks.items.map(f => f.id), ["a", "e"]);
+  assert.deepEqual(picks.unavailable.map(f => f.id), ["c"]);
+  assert.deepEqual(m.exportBatch(files, "manual").items.map(f => f.id), ["b", "c", "d", "e"]);
+  assert.deepEqual(files, before);
+});

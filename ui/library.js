@@ -162,11 +162,22 @@ export function mountLibrary({ $, state, api, save, reveal, enter, leave, isBusy
     $("libraryZoomHint").hidden = !pair;
     root.classList.toggle("comparing", !!pair);
     $("libraryCount").textContent = filter === "all" ? (all.length === 1 ? "1 foto" : all.length + " fotos") : list.length + " de " + all.length;
+    const pickedCount = all.filter(file => file.review === "picked").length;
+    $("libraryPickedCount").textContent = `· ${pickedCount}`;
+    $("libraryPickedCount").hidden = !pickedCount;
     $("libraryCompare").disabled = isBusy() || list.filter(file => !file.missing).length < 2;
     for (const button of root.querySelectorAll("[data-review-filter]")) button.setAttribute("aria-pressed", String(button.dataset.reviewFilter === filter));
+    const focusedFile = focused(), review = normalizeReview(focusedFile?.review);
     for (const button of root.querySelectorAll("[data-review-mark]")) {
-      button.disabled = isBusy() || !focused();
-      button.setAttribute("aria-pressed", String(!!focused() && normalizeReview(focused().review) === button.dataset.reviewMark));
+      const action = button.dataset.reviewMark;
+      button.disabled = isBusy() || !focusedFile;
+      if (action === "unreviewed") {
+        if (review === "unreviewed" && document.activeElement === button)
+          button.parentElement.querySelector('[data-review-mark="picked"]').focus();
+        button.hidden = review === "unreviewed";
+      } else {
+        button.setAttribute("aria-pressed", String(review === action));
+      }
     }
     if (pair) {
       frames.forEach((node, index) => {
