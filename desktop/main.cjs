@@ -45,6 +45,13 @@ const files = new Map(),
   mediaUrls = new Map();
 let activeExport = null, lastReport = null, cancelExport = false;
 let opQueue = Promise.resolve();
+function sendToWindow(channel, data) {
+  if (!win || win.isDestroyed()) return false;
+  const contents = win.webContents;
+  if (!contents || contents.isDestroyed()) return false;
+  contents.send(channel, data);
+  return true;
+}
 function serial(fn) {
   const job = opQueue.catch(() => {}).then(fn);
   opQueue = job;
@@ -185,9 +192,9 @@ app.whenReady().then(async () => {
         ));
   engine = new Engine(binary);
   engine.on("failure", (message) =>
-    win?.webContents.send("progress", { error: message }),
+    sendToWindow("progress", { error: message }),
   );
-  engine.on("progress", (data) => win?.webContents.send("progress", { ...activeExport, ...data }));
+  engine.on("progress", (data) => sendToWindow("progress", { ...activeExport, ...data }));
   let hello, error;
   try {
     hello = await engine.start();
@@ -246,7 +253,7 @@ app.whenReady().then(async () => {
     if(choice.canceled)return {files:[],failures:[]};
     const controller=new AbortController();googleImport=controller;
     try{
-      const result=await importPhotos({openExternal:url=>shell.openExternal(url),destination:choice.filePaths[0],signal:controller.signal,secret:googleSecret,onStatus:text=>win?.webContents.send("google-status",text)});
+      const result=await importPhotos({openExternal:url=>shell.openExternal(url),destination:choice.filePaths[0],signal:controller.signal,secret:googleSecret,onStatus:text=>sendToWindow("google-status",text)});
       return {...result,paths:undefined,files:await registerImports(result.paths)};
     }finally{googleImport=null;}
   });
@@ -332,7 +339,7 @@ app.whenReady().then(async () => {
         if(cancelExport) throw new Error("Exportación cancelada.");
         const openMs = performance.now() - started;
         activeExport = { fileName:f.name, fileIndex, fileTotal:chosen.length, kind:f.kind };
-        win?.webContents.send("progress", {...activeExport, fraction:0, phase:"preparing", encoder:encoding === "cpu" ? "CPU" : "checking", elapsedSeconds:0});
+        sendToWindow("progress", {...activeExport, fraction:0, phase:"preparing", encoder:encoding === "cpu" ? "CPU" : "checking", elapsedSeconds:0});
         const ext =
           f.kind === "video" ? "mp4" : m.format === "jpg" ? "jpg" : "png";
         const name = m.proxy
@@ -376,7 +383,7 @@ app.whenReady().then(async () => {
           if(cancelExport) throw new Error("Exportación cancelada.");
           await fs.rename(temp, dest);
           await recordExport("completed");
-          win?.webContents.send("progress", {...activeExport, fraction:1, committed:true, elapsedSeconds:(performance.now()-started)/1000, encoder:nativeResult.diagnostics?.actualEncoder});
+          sendToWindow("progress", {...activeExport, fraction:1, committed:true, elapsedSeconds:(performance.now()-started)/1000, encoder:nativeResult.diagnostics?.actualEncoder});
         } catch (e) {
           await recordExport(e.diagnostics?.status || "failed", e.message, {diagnostics:e.diagnostics});
           await fs.rm(temp, { force: true });
@@ -518,11 +525,12 @@ app.whenReady().then(async () => {
   });
   win.on("close", (e) => {
     if (closing) return;
-    e.preventDefault();
-    win.webContents.send("progress", { closing: true });
+    if (sendToWindow("progress", { closing: true })) e.preventDefault();
   });
+  win.on("closed", () => { win = null; });
   ipcMain.handle("close-ready", async () => {
     await store.queue.catch(() => {});
+    if (closing || !win || win.isDestroyed()) return;
     closing = true;
     win.close();
   }); // Renderer flushes recovery before acknowledging close.
