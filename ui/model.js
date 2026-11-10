@@ -141,6 +141,7 @@ export function newFile(f) {
     settings: defaults(),
     recipe: null,
     selected: true,
+    review: normalizeReview(f.review),
     history: [],
     future: [],
   };
@@ -284,4 +285,19 @@ export function projectSnapshot(state) {
 }
 export function selectedIds(files) {
   return files.filter((f) => f.selected).map((f) => f.id);
+}
+
+export function normalizeReview(value) {
+  return value === "picked" || value === "rejected" ? value : "unreviewed";
+}
+
+export function reviewFiles(files, filter) {
+  return files.filter(file => file.kind === "photo" &&
+    (filter === "all" || normalizeReview(file.review) === filter));
+}
+
+// Use the order before marking: the current item can disappear from a filter.
+export function nextReviewFile(files, id, direction = 1) {
+  const index = files.findIndex(file => file.id === id);
+  return index < 0 ? files[0] : files[index + direction];
 }

@@ -1,5 +1,9 @@
 # Editor oscuro y scopes de color
 
+En **Biblioteca**, usá **P** para elegir, **X** para descartar y **U** para quitar la marca. Las flechas cambian de toma. Con **Avance automático** se pasa a la siguiente foto del filtro actual al marcar. Las marcas se guardan en el proyecto y su recuperación local, separadas de la selección de exportación. Descartar no elimina el original. Hacé doble clic en una foto o pulsá **Revelar toma** para editarla.
+
+**Comparar dos tomas** abre la foto activa junto a otra del mismo filtro. El borde verde señala el lado activo; pulsá una miniatura de la tira para reemplazar esa toma. Podés ampliar con la rueda y arrastrar la imagen, vincular el zoom de ambos lados y plegar la tira. **Ajustar** muestra las fotos completas. La comparación usa vistas de los originales de hasta 1800 píxeles por lado largo; no aplica las ediciones ni modifica los archivos.
+
 El botón con ícono de barra lateral en la cabecera fija de Filtros pliega ese panel. La lista se desplaza por separado. La flecha de Archivos pliega la tira inferior. Los dos paneles son independientes, amplían el visor y recuerdan su estado en el equipo. Al revelar un archivo, su miniatura se crea a partir de la vista previa; no se abren originales en segundo plano para poblar la tira.
 
 El inspector separa Revelar, Efectos y Máscaras. Revelar agrupa los controles en Luz, Color, Curva y Textura y grano. Las recetas, los ajustes por archivo y los proyectos siguen usando el mismo motor y formato.

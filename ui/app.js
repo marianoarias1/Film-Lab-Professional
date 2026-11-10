@@ -1,3 +1,4 @@
+import { mountLibrary } from "./library.js";
 import { mountRecipePreviews } from "./recipe-previews.js";
 import { mountScopes } from "./scopes.js";
 import {mountEffects} from "./lab-effects.js";
@@ -252,6 +253,7 @@ function edited({ render = true } = {}) {
   if (render) schedulePreview();
 }
 function updateButtons() {
+  library.refresh();
   const f = current(),
     enabled = !!f && !busy;
   for (const id of ["reset", "before", "resetCurve"]) $(id).disabled = !enabled;
@@ -695,7 +697,7 @@ const previewQueue = new PreviewQueue({
 const recipePreviews = mountRecipePreviews({
   scroll: $("filtersPanel"),
   request: api?.recipePreview,
-  canRender: () => !!previewUrl && !busy && !before && $("playback").hidden
+  canRender: () => !libraryOpen() && !!previewUrl && !busy && !before && $("playback").hidden
     && !previewQueue.running && !previewQueue.pending,
 });
 function syncRecipeContext() {
@@ -708,7 +710,7 @@ function schedulePreview(draft = false) {
   recipePreviews.pause();
   clearTimeout(renderTimer);
   const file = current();
-  if (!file || busy) return;
+  if (!file || busy || libraryOpen()) return;
   const revision = ++previewRevision;
   const inputAt = performance.now();
   const job = {id:file.id,settings:structuredClone(file.settings),time:Number($("scrub").value),revision,inputAt};
@@ -740,6 +742,7 @@ $("recipeScene").onchange = drawRecipes;
 $("recipeLook").onchange = drawRecipes;
 $("catalogCount").textContent = String(webCatalog.visibleCount);
 function selectWorkspaceTab(next) {
+  if (libraryOpen()) showEditor();
   if (tab === next) return;
   endMask(true);
   pendingMask=null;toolOperation="new";$("maskType").value="";
@@ -949,6 +952,7 @@ async function restore(p) {
     selected: f.selected !== false,
   }));
   state.activeId = null;
+  library.reset();
   $("projectName").value = state.name;
   if (state.files.length)
     activate(
@@ -977,6 +981,7 @@ $("newProject").onclick = async () => {
       resetSyncSelection();
       state.files = [];
       state.activeId = null;
+      library.reset();
       state.name = "Sin título";
       $("projectName").value = state.name;
       clearEditor();
@@ -995,6 +1000,7 @@ $("filmstrip").ondblclick = async (e) => {
       updated = await api.relink(f.id);
     if (updated) {
       Object.assign(f, updated);
+      library.invalidate(f);
       recipePreviews.setContext(null);
       activate(f.id);
     }
@@ -1184,12 +1190,14 @@ async function boot() {
     }
   } catch (e) {
     message("No se pudo recuperar la sesión", e.message);
+  } finally {
+    library.ready();
   }
 }
 
 let googleRunning=false;
 $("googleButton").onclick=()=>{if(!busy)$("googleDialog").showModal();};
-api.onGoogleStatus(text=>$("googleStatus").textContent=text);
+api?.onGoogleStatus(text=>$("googleStatus").textContent=text);
 $("googleConfig").onclick=async()=>{try{if(await api.googleConfig())$("googleStatus").textContent="Credenciales cargadas para esta sesión. Podés conectar.";}catch(e){$("googleStatus").textContent=e.message;}};
 function closeGoogle(){if(googleRunning){api.googleCancel();$("googleStatus").textContent="Cancelando…";}else $("googleDialog").close();}
 $("googleClose").onclick=closeGoogle;
@@ -1579,7 +1587,48 @@ function drawWorkspace(){
   for (const id of ['toggleFiles','navFiles']) $(id).setAttribute('aria-expanded',String(panelState.files));
   requestAnimationFrame(queueMaskPaint);
 }
-for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files'],['navFiles','files']])$(id).onclick=()=>{panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
+for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files'],['navFiles','files']])$(id).onclick=()=>{if(libraryOpen()){showEditor();if(id==='navFiles'){panelState.files=true;}else panelState[key]=!panelState[key];}else panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
+const libraryOpen = () => !$("library").hidden;
+function showLibrary() {
+  if (busy) return;
+  endMask(true);
+  endBefore();
+  stopPlayback();
+  previewRevision++;
+  previewQueue.invalidate();
+  clearTimeout(renderTimer);
+  recipePreviews.pause();
+  $("workspace").hidden = true;
+  $("navLibrary").classList.add("active");
+  $("navLibrary").setAttribute("aria-pressed", "true");
+  document.querySelectorAll(".workspace-nav [data-tab]").forEach(button => {
+    button.classList.remove("active");
+    button.setAttribute("aria-pressed", "false");
+  });
+  library.open();
+}
+function showEditor(refresh = true) {
+  if (!libraryOpen()) return;
+  library.close();
+  $("workspace").hidden = false;
+  $("navLibrary").classList.remove("active");
+  $("navLibrary").setAttribute("aria-pressed", "false");
+  document.querySelectorAll(".workspace-nav [data-tab]").forEach(button => {
+    const selected = button.id === "navLab" ? tab !== "edit" : tab === button.dataset.tab;
+    button.classList.toggle("active", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+  if (refresh) schedulePreview();
+}
+const library = mountLibrary({
+  $, state, api, save: saveSoon, isBusy: () => busy, enter: showLibrary, leave: showEditor,
+  reveal(id) {
+    showEditor(false);
+    selectWorkspaceTab("edit");
+    activate(id);
+    document.querySelector('.workspace-nav [data-tab="edit"]').focus();
+  },
+});
 drawWorkspace();
 // Install tools before boot draws their initial state.
 boot();

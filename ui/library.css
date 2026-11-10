@@ -1,0 +1,93 @@
+.library {
+  height: calc(100vh - 62px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 15px;
+  overflow: hidden;
+  scrollbar-color: #464c43 #1a1c19;
+  scrollbar-width: thin;
+}
+.library h1, .library h2 { margin: 0; font: normal 24px/1.15 var(--serif); }
+.library-bar, .library-compare-bar {
+  min-height: 59px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.library-title, .library-filters, .library-compare-bar > div { display: flex; align-items: center; gap: 10px; }
+.library-title span { color: var(--muted); border-left: 1px solid var(--line); padding-left: 10px; white-space: nowrap; }
+.library-filters { gap: 2px; background: var(--well); border: 1px solid var(--line); padding: 3px; border-radius: 8px; }
+.library-filters button { border-radius: 5px; }
+.library-filters button[aria-pressed="true"] { color: var(--accent); background: var(--selected); }
+.library button { white-space: nowrap; }
+.library button.outline { background: var(--paper); }
+.library button.outline:hover:not(:disabled) { background: var(--hover); }
+.library-browse { min-height: 0; flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) clamp(268px, 24vw, 360px); }
+.library-results { min-height: 0; overflow: auto; padding: 14px 14px 14px 0; }
+.library-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.library-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 3px;
+  background: var(--paper);
+  text-align: left;
+}
+.library-card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.library-card-name, .library-frame-name { color: var(--ink); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.library-card-name, .library-card > .library-status { max-width: 100%; padding: 2px 5px; }
+.library-card-name { padding-top: 6px; }
+.library-status { color: var(--muted); font-size: 11px; }
+.library-status[data-review="picked"] { color: var(--accent); }
+.library-status[data-review="rejected"] { color: #efa69e; }
+.library-image { display: grid; place-items: center; min-width: 0; min-height: 0; overflow: hidden; background: var(--well); border-radius: 5px; }
+.library-image img { width: 100%; height: 100%; object-fit: contain; min-height: 0; user-select: none; }
+.library-thumb { width: 100%; aspect-ratio: 4/3; }
+.library-thumb img { object-fit: cover; }
+.library-placeholder { color: var(--muted); font-size: 11px; padding: 8px; white-space: normal; text-align: center; }
+.library-detail { min-width: 0; min-height: 0; overflow: auto; padding: 18px 0 18px 15px; border-left: 1px solid var(--line); }
+.library-detail-heading { margin-bottom: 11px; display: grid; gap: 4px; }
+.library-detail h2 { font-size: 19px; overflow-wrap: anywhere; }
+.library-preview { grid-template: minmax(0, 1fr) / minmax(0, 1fr); height: min(42vh, 400px); border: 1px solid var(--line); }
+.library-mark-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.library-detail .library-mark-actions { margin: 12px 0; }
+.library [data-review-mark="rejected"] { color: #efa69e; }
+.library [data-review-mark][aria-pressed="true"] { box-shadow: 0 0 0 1px var(--selected-line) inset; }
+.library-detail-footer { padding-top: 11px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 9px; }
+.library-switch { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 12px; color: var(--muted); }
+.library-switch input { appearance: none; width: 29px; height: 16px; margin: 0; cursor: pointer; background: var(--hover); border: 1px solid var(--line); border-radius: 12px; }
+.library-switch input::before { content: ""; display: block; width: 10px; height: 10px; margin: 2px; border-radius: 100%; background: var(--muted); }
+.library-switch input:checked { background: var(--selected); border-color: var(--selected-line); }
+.library-switch input:checked::before { transform: translateX(13px); background: var(--accent); }
+.library-shortcuts { display: flex; align-items: center; gap: 13px; min-height: 41px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+.library-shortcuts kbd { padding: 2px 5px; color: var(--ink); border: 1px solid var(--line); border-radius: 4px; }
+.library-empty { min-height: 190px; display: grid; place-items: center; color: var(--muted); }
+.library.comparing .library-bar { display: none; }
+.library-comparison { min-height: 0; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.library-compare-bar { min-height: 49px; }
+.library-compare-bar h2 { font-size: 21px; }
+.library-pair { min-height: 0; flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.library-pane { min-width: 0; min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 6px; }
+.library-pane > button { padding: 0; border: 1px solid var(--line); grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
+.library-pane > button:hover:not(:disabled) { background: var(--well); }
+.library-pane > button[aria-pressed="true"] { border-color: var(--accent); }
+.library-pane > button.zoomed { cursor: grab; }
+.library-pane > button.zoomed:active { cursor: grabbing; }
+.library-frame-label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; min-width: 0; }
+.library-comparison .library-mark-actions { justify-content: center; }
+.library-files { border-top: 1px solid var(--line); padding-top: 5px; }
+.library-files summary { cursor: pointer; padding: 3px 0 6px; }
+.library-strip { display: flex; gap: 7px; overflow-x: auto; padding: 2px 2px 4px; }
+.library-strip .library-card { width: 126px; flex-shrink: 0; }
+.library-strip .library-thumb { aspect-ratio: 2 / 1; }
+@media (max-width: 1200px) { .library-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 840px) {
+  .library-bar { flex-wrap: wrap; padding: 7px 0; }
+  .library-browse { grid-template-columns: minmax(0, 1fr) 230px; }
+  .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -118,6 +118,7 @@ function snapshot(p) {
         settings: f.settings,
         recipe: f.recipe || null,
         selected: f.selected !== false,
+        review: f.review === "picked" || f.review === "rejected" ? f.review : "unreviewed",
       };
     }),
   };
@@ -278,6 +279,21 @@ app.whenReady().then(async () => {
     const output = path.join(cache, crypto.randomUUID() + ".png");
     try {
       await engine.request("preview", { key: id, settings, time, edge: 240, draft: true, output });
+      return "data:image/png;base64," + (await fs.readFile(output)).toString("base64");
+    } finally {
+      await fs.rm(output, { force: true }).catch(() => {});
+    }
+  }));
+  ipcMain.handle("library-preview", (_, { id, detail } = {}) => serial(async () => {
+    const file = ensureFile(id);
+    if (file.kind !== "photo") throw new Error("Solo se pueden revisar fotografías.");
+    const output = path.join(cache, crypto.randomUUID() + ".png");
+    try {
+      await activate(id);
+      await engine.request("preview", {
+        key: id, settings: {}, time: 0, edge: detail === true ? 1800 : 320,
+        draft: detail !== true, output,
+      });
       return "data:image/png;base64," + (await fs.readFile(output)).toString("base64");
     } finally {
       await fs.rm(output, { force: true }).catch(() => {});
