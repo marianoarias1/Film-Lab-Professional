@@ -17,3 +17,7 @@ El histograma pequeño del visor se abre con **Scopes**. Incluye:
 Los gráficos se calculan a partir de los píxeles de la vista visible, incluida la comparación con el original y la reproducción de una copia de video. Analizan la preview SDR, hasta 1500 píxeles por lado largo, en valores de 8 bits. No son una medición del RAW lineal ni de la señal HDR. La lectura se limita a unas nueve actualizaciones por segundo; no se guarda en los proyectos ni se exporta.
 
 Las tarjetas de Filtros muestran miniaturas de la foto activa, o del fotograma seleccionado, reveladas con cada receta por el mismo motor del editor. Se generan al entrar en la zona visible, sin modificar la edición ni aplicar sus máscaras o efectos locales. Sin un archivo activo, la tarjeta muestra un marcador neutro.
+
+En **Archivos → Copiar ajustes**, elegí qué grupos llevar de la toma activa. Abrí otra toma y pulsá **Pegar ajustes** para aplicarlos. **Sincronizar…** permite elegir varios destinos y aplicarles los grupos desde la toma activa, con una selección separada de la de exportación. Se pueden transferir Luz, Color, Curva, Textura y detalle y Grano; las máscaras y los efectos del Laboratorio quedan en cada archivo.
+
+Un solo **Deshacer** (Ctrl+Z) revierte el lote desde el origen o un destino. Si un archivo del lote tiene cambios posteriores, el editor indica qué archivo hay que deshacer primero. Los ajustes aplicados se guardan con el proyecto y el historial de deshacer se conserva durante la sesión.

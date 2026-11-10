@@ -146,27 +146,133 @@ export function newFile(f) {
     future: [],
   };
 }
+export const adjustmentGroups = [
+  { id: "light", label: "Luz", keys: ["exposure", "contrast", "highlights", "shadows", "whites", "blacks"] },
+  { id: "color", label: "Color", keys: ["temperature", "tint", "saturation", "vibrance", "hsl", "mono"] },
+  { id: "curve", label: "Curva", keys: ["curve"] },
+  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "sharpness", "denoise", "vignette"] },
+  { id: "grain", label: "Grano", keys: ["grain", "grainSize"] },
+];
+
+export function copyAdjustments(settings, groups) {
+  const fallback = defaults();
+  return Object.fromEntries(adjustmentGroups.filter(g => groups.includes(g.id)).flatMap(g =>
+    g.keys.map(key => [key, structuredClone(settings[key] ?? fallback[key])])
+  ));
+}
+
+// A batch is one shared entry in the histories of its targets and the active
+// file that initiated it. History stays in memory and is never in a project.
+const batchEntries = new WeakMap();
+function removeEntry(list, entry) {
+  const index = list.indexOf(entry);
+  if (index !== -1) list.splice(index, 1);
+}
+function discardBatch(entry, records) {
+  batchEntries.delete(entry);
+  for (const file of records.keys()) {
+    removeEntry(file.history, entry);
+    const index = file.future.indexOf(entry);
+    if (index === -1) continue;
+    // Later redo snapshots include the batch and cannot replay without it.
+    for (const dependent of file.future.splice(0, index + 1)) {
+      const dependentRecords = batchEntries.get(dependent);
+      if (dependentRecords) discardBatch(dependent, dependentRecords);
+    }
+  }
+}
+function clearFuture(file) {
+  for (const entry of [...file.future]) {
+    const records = batchEntries.get(entry);
+    if (records) discardBatch(entry, records);
+  }
+  file.future = [];
+}
+function trimHistory(file) {
+  while (file.history.length > 80) {
+    const entry = file.history.shift(), records = batchEntries.get(entry);
+    if (records) discardBatch(entry, records);
+  }
+}
+export function forgetFileHistory(file) {
+  for (const entry of [...file.history, ...file.future]) {
+    const records = batchEntries.get(entry);
+    if (!records) continue;
+    records.delete(file);
+    if (![...records.values()].some(Boolean)) discardBatch(entry, records);
+  }
+  file.history = [];
+  file.future = [];
+}
+export function applyAdjustments(files, patch, anchor = null) {
+  const records = new Map(), keys = adjustmentGroups.flatMap(g => g.keys)
+    .filter(key => Object.hasOwn(patch, key));
+  for (const file of new Set(files)) {
+    const after = { ...file.settings };
+    let changed = false;
+    for (const key of keys) {
+      if (JSON.stringify(after[key]) === JSON.stringify(patch[key])) continue;
+      after[key] = structuredClone(patch[key]);
+      changed = true;
+    }
+    if (changed) records.set(file, {
+      before: structuredClone(file.settings), recipe: file.recipe, after: structuredClone(after),
+    });
+  }
+  const count = records.size;
+  if (!count) return 0;
+  if (anchor && !records.has(anchor)) records.set(anchor, null);
+  const entry = {};
+  batchEntries.set(entry, records);
+  for (const [file, change] of records) {
+    clearFuture(file);
+    if (change) {
+      file.settings = structuredClone(change.after);
+      file.recipe = null;
+    }
+    file.history.push(entry);
+  }
+  for (const file of records.keys()) trimHistory(file);
+  return count;
+}
+export function historyBlocker(file, direction) {
+  const list = direction === "redo" ? "future" : "history";
+  const entry = file?.[list].at(-1), records = batchEntries.get(entry);
+  if (!records) return null;
+  for (const participant of records.keys())
+    if (participant[list].at(-1) !== entry) return participant;
+  return null;
+}
 export function commitEdit(file, before) {
   if (JSON.stringify(before) === JSON.stringify(file.settings)) return false;
+  clearFuture(file);
   file.history.push(structuredClone(before));
-  if (file.history.length > 80) file.history.shift();
-  file.future = [];
+  trimHistory(file);
   return true;
 }
-export function undo(file) {
-  if (!file?.history.length) return false;
-  file.future.push(structuredClone(file.settings));
-  file.settings = file.history.pop();
-  file.recipe = null;
+function stepHistory(file, direction) {
+  const from = direction === "redo" ? "future" : "history";
+  const to = direction === "redo" ? "history" : "future";
+  if (!file?.[from].length || historyBlocker(file, direction)) return false;
+  const entry = file[from].at(-1), records = batchEntries.get(entry);
+  if (records) {
+    for (const [participant, change] of records) {
+      participant[from].pop();
+      participant[to].push(entry);
+      if (change) {
+        participant.settings = structuredClone(direction === "redo" ? change.after : change.before);
+        participant.recipe = direction === "redo" ? null : change.recipe;
+      }
+    }
+  } else {
+    file[to].push(structuredClone(file.settings));
+    file.settings = file[from].pop();
+    file.recipe = null;
+  }
   return true;
 }
-export function redo(file) {
-  if (!file?.future.length) return false;
-  file.history.push(structuredClone(file.settings));
-  file.settings = file.future.pop();
-  file.recipe = null;
-  return true;
-}
+export const undo = file => stepHistory(file, "undo");
+export const redo = file => stepHistory(file, "redo");
 export function projectSnapshot(state) {
   return {
     schemaVersion: 1,

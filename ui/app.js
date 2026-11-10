@@ -21,6 +21,11 @@ import {
   redo,
   projectSnapshot,
   selectedIds,
+  adjustmentGroups,
+  copyAdjustments,
+  applyAdjustments,
+  historyBlocker,
+  forgetFileHistory,
 } from "./model.js";
 installCatalog(webCatalog);
 let mixerBand=0;
@@ -109,6 +114,107 @@ const definitions = {
   ],
 };
 const current = () => state.files.find((f) => f.id === state.activeId);
+let copiedAdjustments = null;
+let syncSelecting = false;
+const syncSelection = new Set();
+let adjustmentAction = "copy";
+let adjustmentSource = null;
+const syncEligible = file => file.id !== state.activeId && !file.missing;
+const syncTargets = () => state.files.filter(file => syncEligible(file) && syncSelection.has(file.id));
+function resetSyncSelection() {
+  syncSelecting = false;
+  syncSelection.clear();
+}
+function drawAdjustmentActions() {
+  const file = current(), enabled = !!file && !busy;
+  const count = syncTargets().length;
+  $("copyAdjustments").hidden = syncSelecting;
+  $("pasteAdjustments").hidden = syncSelecting;
+  $("copyAdjustments").disabled = !enabled;
+  $("pasteAdjustments").disabled = !enabled || !copiedAdjustments;
+  $("pasteAdjustments").title = copiedAdjustments ? "Ajustes de " + copiedAdjustments.name : "Primero copiá los ajustes de un archivo";
+  $("startSync").disabled = !enabled || (syncSelecting ? !count : !state.files.some(syncEligible));
+  $("startSync").textContent = syncSelecting ? `Sincronizar ${count}…` : "Sincronizar…";
+  $("cancelSync").hidden = !syncSelecting;
+  $("cancelSync").disabled = busy;
+  $("fileSelectionLabel").textContent = syncSelecting ? "Selección para sincronizar" : "Selección para exportar";
+  $("syncSelectionStatus").textContent = syncSelecting ? `Origen: ${file?.name ?? ""}` : "";
+}
+function setSyncTarget(file, checked) {
+  if (!syncEligible(file)) return;
+  if (checked) syncSelection.add(file.id);
+  else syncSelection.delete(file.id);
+  drawAdjustmentActions();
+}
+function showAdjustmentDialog(action) {
+  const file = current();
+  if (!file || busy || (action === "sync" && !syncTargets().length)) return;
+  adjustmentAction = action;
+  adjustmentSource = file;
+  const copying = action === "copy";
+  $("adjustmentTitle").textContent = copying ? "Copiar ajustes" : "Sincronizar ajustes";
+  const count = syncTargets().length;
+  $("adjustmentSource").textContent = copying ? `Origen: ${file.name}` :
+    `De ${file.name} a ${count} ${count === 1 ? "archivo" : "archivos"}.`;
+  $("confirmAdjustment").textContent = copying ? "Copiar" : "Sincronizar";
+  $("confirmAdjustment").disabled = false;
+  const groupBox = $("adjustmentGroups");
+  groupBox.replaceChildren(makeEl("legend", {}, "Ajustes a incluir"));
+  for (const group of adjustmentGroups) {
+    const label = makeEl("label", { className: "adjustment-group" });
+    const check = makeEl("input", { type: "checkbox", value: group.id, checked: true });
+    check.onchange = () => {
+      $("confirmAdjustment").disabled = !groupBox.querySelector("input:checked");
+    };
+    label.append(check, document.createTextNode(group.label));
+    groupBox.append(label);
+  }
+  $("adjustmentDialog").showModal();
+}
+function refreshSyncedFiles() {
+  drawFiles();
+  drawControls();
+  edited();
+}
+$("copyAdjustments").onclick = () => showAdjustmentDialog("copy");
+$("pasteAdjustments").onclick = () => {
+  const file = current();
+  if (busy || !file || !copiedAdjustments || syncSelecting) return;
+  endMask(true);
+  const count = applyAdjustments([file], copiedAdjustments.patch);
+  if (count) refreshSyncedFiles();
+  toast(count ? "Ajustes pegados" : "El archivo ya tenía esos ajustes");
+};
+$("startSync").onclick = () => {
+  if (busy || !current()) return;
+  if (syncSelecting) { showAdjustmentDialog("sync"); return; }
+  syncSelecting = true;
+  drawFiles();
+};
+$("cancelSync").onclick = () => {
+  resetSyncSelection();
+  drawFiles();
+};
+$("cancelAdjustment").onclick = () => $("adjustmentDialog").close();
+$("confirmAdjustment").onclick = () => {
+  if (busy || current() !== adjustmentSource) return;
+  const groups = [...$("adjustmentGroups").querySelectorAll("input:checked")].map(input => input.value);
+  if (!groups.length) return;
+  $("adjustmentDialog").close();
+  endMask(true);
+  const patch = copyAdjustments(adjustmentSource.settings, groups);
+  if (adjustmentAction === "copy") {
+    copiedAdjustments = { name: adjustmentSource.name, patch };
+    drawAdjustmentActions();
+    toast("Ajustes copiados");
+  } else {
+    const count = applyAdjustments(syncTargets(), patch, adjustmentSource);
+    resetSyncSelection();
+    if (count) refreshSyncedFiles();
+    else drawFiles();
+    toast(count ? `Ajustes sincronizados en ${count} ${count === 1 ? "archivo" : "archivos"}` : "Los archivos ya tenían esos ajustes");
+  }
+};
 function toast(message) {
   $("toast").textContent = message;
   $("toast").hidden = false;
@@ -163,6 +269,10 @@ function updateButtons() {
   $("emptyImport").disabled = busy;
   $("projectButton").disabled = busy;
   $("scrub").disabled = busy;
+  drawAdjustmentActions();
+  $("filmstrip").querySelectorAll(".file > input").forEach((check, index) => {
+    check.disabled = busy || (syncSelecting && !syncEligible(state.files[index]));
+  });
   document
     .querySelectorAll(
       ".controls input,.controls button:not([data-tab]):not([data-group])",
@@ -176,10 +286,12 @@ function updateButtons() {
 }
 function drawFiles() {
   const list = $("filmstrip");
+  const scrollLeft = list.scrollLeft;
   list.replaceChildren();
   for (const f of state.files) {
     const item = makeEl("div", {
-      className: "file" + (f.id === state.activeId ? " active" : ""),
+      className: "file" + (f.id === state.activeId ? " active" : "") +
+        (syncSelecting && syncSelection.has(f.id) ? " sync-target" : ""),
       tabIndex: 0,
       role: "button",
       title: f.path,
@@ -187,15 +299,22 @@ function drawFiles() {
     item.setAttribute("aria-label", `Editar ${f.name}`);
     const check = makeEl("input", {
       type: "checkbox",
-      checked: !!f.selected,
-      title: "Seleccionar para exportar",
+      checked: syncSelecting ? syncSelection.has(f.id) : !!f.selected,
+      disabled: busy || (syncSelecting && !syncEligible(f)),
+      title: syncSelecting ? "Seleccionar para sincronizar" : "Seleccionar para exportar",
     });
-    check.setAttribute("aria-label", `Exportar ${f.name}`);
-    check.onclick = (e) => e.stopPropagation();
+    check.setAttribute("aria-label", `${syncSelecting ? "Sincronizar" : "Exportar"} ${f.name}`);
+    check.onclick = e => e.stopPropagation();
+    check.onkeydown = e => e.stopPropagation();
     check.onchange = () => {
-      f.selected = check.checked;
-      updateButtons();
-      saveSoon();
+      if (syncSelecting) {
+        setSyncTarget(f, check.checked);
+        item.classList.toggle("sync-target", check.checked);
+      } else {
+        f.selected = check.checked;
+        updateButtons();
+        saveSoon();
+      }
     };
     item.append(
       check,
@@ -220,15 +339,19 @@ function drawFiles() {
     remove.setAttribute('aria-label','Quitar '+f.name+' del proyecto');
     remove.onclick=e=>{e.stopPropagation();removeFileId=f.id;$('removeFileName').textContent=f.name;$('removeFileDialog').showModal();};
     remove.onkeydown=e=>e.stopPropagation();item.append(remove);
-    item.onclick = () => activate(f.id);
+    item.onclick = () => {
+      if (!syncSelecting) { activate(f.id); return; }
+      if (!check.disabled) check.click();
+    };
     item.onkeydown = (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        activate(f.id);
+        item.onclick();
       }
     };
     list.append(item);
   }
+  list.scrollLeft = scrollLeft;
   updateButtons();
 }
 function drawRecipes() {
@@ -486,6 +609,7 @@ $("resetCurve").onclick = () => {
 };
 function activate(id) {
   if (busy) return;
+  if (id !== state.activeId && syncSelecting) resetSyncSelection();
   endMask(true);
   maskPicker=null;hoverMask=null;
   pendingMask=null;toolOperation="new";$("maskType").value="";activeComponent=0;resetZoom();
@@ -641,20 +765,19 @@ document.querySelectorAll("[data-group]").forEach(
       drawControls();
     }),
 );
-$("undo").onclick = () => {
+function stepEditorHistory(direction) {
+  if (busy) return;
   endMask(true);pendingMask=null;toolOperation="new";$("maskType").value="";
-  if (!busy && undo(current())) {
-    drawControls();
-    edited();
+  const file = current(), blockedBy = historyBlocker(file, direction);
+  if (blockedBy) {
+    const action = direction === "redo" ? "Rehacé" : "Deshacé";
+    toast(`${action} primero los cambios pendientes de ${blockedBy.name}.`);
+    return;
   }
-};
-$("redo").onclick = () => {
-  endMask(true);pendingMask=null;toolOperation="new";$("maskType").value="";
-  if (!busy && redo(current())) {
-    drawControls();
-    edited();
-  }
-};
+  if ((direction === "redo" ? redo : undo)(file)) refreshSyncedFiles();
+}
+$("undo").onclick = () => stepEditorHistory("undo");
+$("redo").onclick = () => stepEditorHistory("redo");
 $("reset").onclick = () => {
   const f = current(),
     old = structuredClone(f.settings);
@@ -775,11 +898,19 @@ function flushSave() {
   return savePromise;
 }
 $("selectAll").onclick = () => {
+  if (busy) return;
+  if (syncSelecting) {
+    state.files.filter(syncEligible).forEach(file => syncSelection.add(file.id));
+    drawFiles();
+    return;
+  }
   state.files.forEach((f) => (f.selected = true));
   drawFiles();
   saveSoon();
 };
 $("selectNone").onclick = () => {
+  if (busy) return;
+  if (syncSelecting) { syncSelection.clear(); drawFiles(); return; }
   state.files.forEach((f) => (f.selected = false));
   drawFiles();
   saveSoon();
@@ -812,6 +943,7 @@ $("saveProject").onclick = async () => {
 async function restore(p) {
   if (!p) return;
   clearTimeout(saveTimer);
+  resetSyncSelection();
   state.name = p.name;
   state.files = p.files.map((f) => ({
     ...newFile(f),
@@ -846,6 +978,7 @@ $("newProject").onclick = async () => {
   try {
     await flushSave();
     if (await api.newProject()) {
+      resetSyncSelection();
       state.files = [];
       state.activeId = null;
       library.reset();
@@ -860,7 +993,7 @@ $("newProject").onclick = async () => {
 };
 $("filmstrip").ondblclick = async (e) => {
   const card = e.target.closest(".file");
-  if (!card || busy) return;
+  if (!card || busy || syncSelecting) return;
   const i = [...$("filmstrip").children].indexOf(card);
   try {
     const f = state.files[i],
@@ -986,7 +1119,9 @@ async function doExport(proxy) {
   }
 }
 window.addEventListener("keydown", (e) => {
+  if ($("adjustmentDialog").open) return;
   if (e.key === "Escape") {
+    if (syncSelecting) { resetSyncSelection(); drawFiles(); }
     endMask(true);
     cancelMaskTool();
     closeProject();
@@ -1409,7 +1544,10 @@ $('confirmRemoveFile').onclick=async()=>{
   busy=true;updateButtons();
   try{
     const file=state.files[index];await api.removeFile(file.id);
+    forgetFileHistory(file);
     const wasActive=file.id===state.activeId;state.files.splice(index,1);busy=false;
+    syncSelection.delete(file.id);
+    if (wasActive) resetSyncSelection();
     if(wasActive){if(state.files.length)activate(state.files[Math.min(index,state.files.length-1)].id);else{state.activeId=null;clearEditor();saveSoon();}}
     else{drawFiles();saveSoon();schedulePreview();}
     toast('Archivo quitado del proyecto. El original permanece en disco.');

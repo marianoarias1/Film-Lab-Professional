@@ -201,13 +201,20 @@
         <div class="film-drawer">
         <button id="toggleFiles" class="files-tab" aria-controls="filesPanel" aria-expanded="false"><span>Archivos <b id="workspaceFileCount">0</b></span><svg class="panel-chevron" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
         <section id="filesPanel" hidden><div class="filmstrip-heading">
-          <span>ARCHIVOS DEL PROYECTO <b id="fileCount">0</b></span>
+          <span><span id="fileSelectionLabel">Selección para exportar</span> · <b id="fileCount">0</b> archivos</span>
           <div>
             <button id="selectAll" class="plain">Seleccionar todos</button
             ><button id="selectNone" class="plain">Ninguno</button>
           </div>
         </div>
-        <div id="filmstrip" class="filmstrip"></div></section>
+        <div id="filmstrip" class="filmstrip"></div>
+        <div class="adjustment-actions" aria-label="Ajustes entre archivos">
+          <button id="copyAdjustments" class="outline" disabled>Copiar ajustes</button>
+          <button id="pasteAdjustments" class="outline" disabled>Pegar ajustes</button>
+          <button id="startSync" class="outline" disabled>Sincronizar…</button>
+          <button id="cancelSync" class="plain" hidden>Salir de selección</button>
+          <span id="syncSelectionStatus" role="status"></span>
+        </div></section>
         </div>
         <footer>
           <span id="saveStatus">Sesión local</span
@@ -324,6 +331,16 @@
       </p>
     </div>
     <dialog id="removeFileDialog"><h2>Quitar del proyecto</h2><p id="removeFileName"></p><p>Se quitará este archivo y sus ajustes del proyecto. El original permanece en tu disco.</p><div class="dialog-actions"><button id="cancelRemoveFile" class="outline">Cancelar</button><button id="confirmRemoveFile" class="dark">Quitar del proyecto</button></div></dialog>
+    <dialog id="adjustmentDialog" aria-labelledby="adjustmentTitle">
+      <div class="dialog-title"><h2 id="adjustmentTitle">Copiar ajustes</h2></div>
+      <p id="adjustmentSource"></p>
+      <fieldset id="adjustmentGroups"><legend>Ajustes a incluir</legend></fieldset>
+      <p class="help">Se conservan las máscaras y los efectos del Laboratorio de cada archivo.</p>
+      <div class="dialog-actions">
+        <button id="cancelAdjustment" class="outline">Cancelar</button>
+        <button id="confirmAdjustment" class="dark">Copiar</button>
+      </div>
+    </dialog>
     <dialog id="exportDialog">
       <div class="dialog-title">
         <h2>Tu mirada, lista.</h2>
