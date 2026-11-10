@@ -131,3 +131,5 @@ La app Standard y su repositorio no fueron modificados.
 ## Laboratorio creativo y entrega 0.8
 
 Capas combinables de movimiento y franja nítida; múltiples curvas con influencia local, pincel suave de nitidez y controles directos sobre las líneas. Deshacer/rehacer por archivo. Presets editables para redes en foto y video; detalle de uso, límites y validación en [docs/creative-lab.md](docs/creative-lab.md). Requiere reconstruir el motor nativo con `npm run build:engine`.
+
+La guía del [editor oscuro y sus scopes de color](docs/WORKSPACE.md) explica los paneles plegables y las lecturas RGB de la vista previa.

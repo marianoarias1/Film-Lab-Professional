@@ -1,3 +1,4 @@
+import { mountScopes } from "./scopes.js";
 import {mountEffects} from "./lab-effects.js";
 import {mountDelivery} from "./delivery.js";
 import {fittedPreview, colorTrack} from "./display-controls.js";
@@ -24,7 +25,36 @@ let mixerBand=0;
 let activeMaskId=null, brushSize=.05, brushFeather=60, brushErase=false, maskDrag=null;
 const $ = (id) => document.getElementById(id),
   api = window.filmLab;
+mountScopes($);
 const state = { name: "Sin título", files: [], activeId: null };
+const thumbnails = new WeakMap();
+const thumbnailCanvas = document.createElement("canvas");
+thumbnailCanvas.width = 112;
+thumbnailCanvas.height = 72;
+function thumbnailNode(file) {
+  const src = thumbnails.get(file);
+  return src ? makeEl("img", { className: "file-thumb", src, alt: "", draggable: false })
+    : makeEl("span", { className: "file-icon" }, file.kind === "video" ? "▷" : "▧");
+}
+function updateThumbnail(file, image) {
+  const ctx = thumbnailCanvas.getContext("2d");
+  const { width, height } = thumbnailCanvas;
+  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+  const w = image.naturalWidth * scale, h = image.naturalHeight * scale;
+  try {
+    ctx.fillStyle = "#0c0d0c";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, (width - w) / 2, (height - h) / 2, w, h);
+    const src = thumbnailCanvas.toDataURL("image/jpeg", .72);
+    thumbnails.set(file, src);
+    const card = $("filmstrip").children[state.files.indexOf(file)];
+    const icon = card?.querySelector(".file-icon, .file-thumb");
+    if (icon?.tagName === "IMG") icon.src = src;
+    else if (icon) icon.replaceWith(thumbnailNode(file));
+  } catch {
+    // A thumbnail is optional. It must not interrupt the editor preview.
+  }
+}
 let busy = false,
   group = "light",
   tab = "edit",
@@ -170,11 +200,7 @@ function drawFiles() {
         { className: "type" },
         f.kind === "video" ? "VIDEO" : f.name.split(".").pop().toUpperCase(),
       ),
-      makeEl(
-        "span",
-        { className: "file-icon" },
-        f.kind === "video" ? "▷" : "▧",
-      ),
+      thumbnailNode(f),
       makeEl("strong", {}, f.name),
       makeEl(
         "small",
@@ -216,6 +242,7 @@ function drawRecipes() {
       disabled: !current() || busy,
     });
     button.dataset.recipe=r.id;
+    button.title=[r.name,r.creator,r.description].filter(Boolean).join(" · ");
     button.setAttribute("aria-pressed", String(current()?.recipe === r.id));
     const swatch = makeEl("span", { className: "swatch" });
     swatch.style.setProperty("--sky", r.sky);
@@ -236,7 +263,7 @@ function drawRecipes() {
       edited();
     };
     const row=makeEl("div",{className:"recipe-row"});row.append(button);
-    if(r.source){const source=makeEl("button",{className:"plain recipe-source"},"Ver fuente ↗");source.onclick=async()=>{try{await api.openRecipeSource(r.id);}catch(error){message("Fuente",error.message);}};row.append(source);}
+    if(r.source){const source=makeEl("button",{className:"plain recipe-source"},"Ver fuente");source.onclick=async()=>{try{await api.openRecipeSource(r.id);}catch(error){message("Fuente",error.message);}};row.append(source);}
     list.append(row);
   }
   if(!list.children.length)list.append(makeEl("p",{className:"help"},"No hay recetas para esa búsqueda."));
@@ -319,8 +346,10 @@ function slider(def, scope = "") {
 function drawControls() {
   const f = current();
   $("editPanel").hidden = tab !== "edit";
-  $("labPanel").hidden = tab !== "lab";
-  $("panelTitle").textContent = tab === "lab" ? "Laboratorio." : "A tu manera.";
+  $("labPanel").hidden = tab === "edit";
+  $("maskPanel").hidden = tab !== "masks";
+  $("effectsPanel").hidden = tab !== "effects";
+  $("panelTitle").textContent = { edit: "A tu manera.", effects: "Laboratorio.", masks: "Máscaras." }[tab];
   $("sliders").replaceChildren(
     ...(definitions[group] || []).map((def) => slider(def)),
   );
@@ -334,6 +363,12 @@ function drawControls() {
     select.onchange=()=>{mixerBand=Number(select.value);drawControls();};box.append(select);$("sliders").append(box);
     ["Tono","Saturación","Luminosidad"].forEach((name,i)=>$("sliders").append(slider([`hsl.${mixerBand}.${i}`,name,-100,100])));
   }
+  document.querySelectorAll("[data-group]").forEach(button => {
+    const active = button.dataset.group === group;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-expanded", String(active));
+    if (active && button.nextElementSibling !== $("groupContent")) button.after($("groupContent"));
+  });
   $("sliders").hidden = group === "curve";
   $("curvePanel").hidden = group !== "curve";
   drawCurve();
@@ -488,7 +523,7 @@ const previewQueue = new PreviewQueue({
   },
   present: async (result, job, isCurrent) => {
     // Decode before replacing the visible image, retaining the previous preview meanwhile.
-    const image = new Image(); image.src = result.url;
+    const image = new Image(); image.crossOrigin = "anonymous"; image.src = result.url;
     await image.decode();
     if (!isCurrent() || job.id !== state.activeId || busy) return false;
     previewAspect??=image.naturalWidth/image.naturalHeight;
@@ -500,6 +535,7 @@ const previewQueue = new PreviewQueue({
     $("renderTime").textContent = `${Math.round(result.ms)} ms${job.draft ? " · vista rápida" : ""}`;
     $("engineStatus").textContent = "CPU · float32 · preview reducida";
     const file = current();
+    if (!job.draft || !thumbnails.has(file)) updateThumbnail(file, image);
     Object.assign(file, {width:result.meta.width,height:result.meta.height,duration:result.meta.duration,raw:result.meta.raw});
     $("precision").textContent = file.raw ? "RAW → 32 bits lineales" : "32 bits · color lineal";
     if (file.kind === "video") $("scrub").max = Math.max(0.01,(file.duration || 0)-0.04);
@@ -558,25 +594,26 @@ $("search").oninput = drawRecipes;
 $("recipeScene").onchange = drawRecipes;
 $("recipeLook").onchange = drawRecipes;
 $("catalogCount").textContent = String(webCatalog.visibleCount);
-document.querySelectorAll("[data-tab]").forEach(
-  (b) =>
-    (b.onclick = () => {
-      endMask(true);
-      pendingMask=null;toolOperation="new";$("maskType").value="";
-      tab = b.dataset.tab;
-      document
-        .querySelectorAll("[data-tab]")
-        .forEach((x) => x.classList.toggle("active", x === b));
-      drawControls();
-    }),
-);
+function selectWorkspaceTab(next) {
+  if (tab === next) return;
+  endMask(true);
+  pendingMask=null;toolOperation="new";$("maskType").value="";
+  tab = next;
+  document.querySelectorAll("[data-tab]").forEach(button => {
+    const active = button.id === "navLab" ? tab !== "edit" : tab === button.dataset.tab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  drawControls();
+}
+document.querySelectorAll("[data-tab]").forEach(button => {
+  button.setAttribute("aria-pressed", String(button.dataset.tab === tab));
+  button.onclick = () => selectWorkspaceTab(button.dataset.tab);
+});
 document.querySelectorAll("[data-group]").forEach(
   (b) =>
     (b.onclick = () => {
       group = b.dataset.group;
-      document
-        .querySelectorAll("[data-group]")
-        .forEach((x) => x.classList.toggle("active", x === b));
       drawControls();
     }),
 );
@@ -647,7 +684,7 @@ function endBefore() {
   before = false;
   drawMaskOutline();
   beforeToken++;
-  $("before").textContent = "Mantener para ver original";
+  $("before").textContent = "Antes / Después";
   if (previewUrl) $("preview").src = previewUrl;
 }
 $("before").onpointerup = endBefore;
@@ -656,7 +693,7 @@ $("before").onlostpointercapture = endBefore;
 $("before").oncontextmenu = (e) => e.preventDefault();
 let leakGesture = null;
 $("preview").onpointerdown = (e) => {
-  if (effects.active() || chosenMask() || tab !== "lab" || !current() || busy || current().settings.lightLeak === 0)
+  if (effects.active() || tab !== "effects" || !current() || busy || current().settings.lightLeak === 0)
     return;
   leakGesture = structuredClone(current().settings);
   $("preview").setPointerCapture(e.pointerId);
@@ -937,7 +974,7 @@ window.addEventListener("keydown", (e) => {
   }
 });
 const delivery = mountDelivery();
-const effects = mountEffects({current, commit:(old)=>{const f=current();if(f&&commitEdit(f,old))f.recipe=null;}, preview:()=>schedulePreview(true), finished:()=>edited(), box:maskBox, isVisible:()=>tab==='lab'&&!before&&!$('preview').hidden&&$('playback').hidden, exclusive:()=>{activeMaskId=-1;pendingMask=null;maskPicker=null;drawMasks();}});
+const effects = mountEffects({current, commit:(old)=>{const f=current();if(f&&commitEdit(f,old))f.recipe=null;}, preview:()=>schedulePreview(true), finished:()=>edited(), box:maskBox, isVisible:()=>tab==='effects'&&!before&&!$('preview').hidden&&$('playback').hidden, exclusive:()=>{activeMaskId=-1;pendingMask=null;maskPicker=null;drawMasks();}});
 async function boot() {
   drawFiles();
   drawRecipes();
@@ -1118,7 +1155,7 @@ function maskGroupCard(m){
   return card;
 }
 function drawMasks(){
-  if(pendingMask || (typeof activeMaskId==='number'&&activeMaskId>=0)) $('motionPanel').open=false;
+  if(tab==='masks' && (pendingMask || (typeof activeMaskId==='number'&&activeMaskId>=0))) $('motionPanel').open=false;
   requestAnimationFrame(drawMaskOutline);
   const f=current(),masks=f?.settings.masks||[];
   $('addMask').disabled=!f||busy;$('maskType').disabled=!f||busy;
@@ -1131,7 +1168,7 @@ function drawMasks(){
   if(maskPicker?.op==='new')$('newMaskTools').append(maskToolPicker('new'));
   $('maskList').replaceChildren(...masks.map(m=>maskGroupCard(m)));
   const global=makeEl('button',{className:'plain global-mask-action',disabled:!f||busy},'Película y color global');
-  global.onclick=()=>{maskPicker=null;hoverMask=null;pendingMask=null;toolOperation='new';activeMaskId=-1;$('labPanel').querySelector('details.global-effects').open=true;drawMasks();};$('maskList').append(global);
+  global.onclick=()=>{selectWorkspaceTab('effects');maskPicker=null;hoverMask=null;pendingMask=null;toolOperation='new';activeMaskId=-1;$('labPanel').querySelector('details.global-effects').open=true;drawMasks();};$('maskList').append(global);
   const box=$('maskControls');box.replaceChildren();
   if(pendingMask){
     const help=makeEl('div',{className:'mask-tool-hint'});
@@ -1203,7 +1240,7 @@ function queueMaskPaint(){if(!maskPaintFrame)maskPaintFrame=requestAnimationFram
 function drawMaskOutline(){
   effects.refresh();
   const svg=$('maskOverlay'),canvas=$('maskTint'),selected=chosenMask(),hovered=hoverMask&&current()?.settings.masks?.find(m=>m.id===hoverMask.maskId),m=hovered||selected,img=$('preview');
-  const hidden=effects.active()||tab!=='lab'||(!m&&!pendingMask)||img.hidden||before||!$('playback').hidden;
+  const hidden=effects.active()||tab!=='masks'||(!m&&!pendingMask)||img.hidden||before||!$('playback').hidden;
   svg.toggleAttribute('hidden',hidden);canvas.hidden=hidden;svg.replaceChildren();if(hidden)return;
   const b=maskBox();if(b.width<=0||b.height<=0)return;
   for(const el of [svg,canvas])Object.assign(el.style,{left:b.x+'px',top:b.y+'px',width:b.width+'px',height:b.height+'px'});
@@ -1370,15 +1407,16 @@ $('imageWrap').parentElement.addEventListener('wheel',e=>{
   viewPan.x+=(e.clientX-(b.left+b.width/2))*(1-ratio);viewPan.y+=(e.clientY-(b.top+b.height/2))*(1-ratio);
   viewZoom=next;if(viewZoom===1)viewPan={x:0,y:0};applyZoom();
 },{passive:false});
-let panelState={filters:false,files:false};
+let panelState={filters:true,files:true};
 try{const saved=JSON.parse(localStorage.getItem('filmlab.workspace.panels'));if(saved)panelState={filters:saved.filters===true,files:saved.files===true};}catch{}
 function drawWorkspace(){
   $('workspace').classList.toggle('filters-open',panelState.filters);$('filtersPanel').hidden=!panelState.filters;$('filesPanel').hidden=!panelState.files;
   $('toggleFilters').setAttribute('aria-expanded',String(panelState.filters));$('toggleFilters').title=panelState.filters?'Ocultar filtros':'Mostrar filtros';
-  $('toggleFiles').setAttribute('aria-expanded',String(panelState.files));
+  $('toggleFilters').setAttribute('aria-label',$('toggleFilters').title);
+  for (const id of ['toggleFiles','navFiles']) $(id).setAttribute('aria-expanded',String(panelState.files));
   requestAnimationFrame(queueMaskPaint);
 }
-for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files']])$(id).onclick=()=>{panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
+for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files'],['navFiles','files']])$(id).onclick=()=>{panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
 drawWorkspace();
 // Install tools before boot draws their initial state.
 boot();

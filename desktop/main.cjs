@@ -28,6 +28,7 @@ protocol.registerSchemesAsPrivileged([
       standard: true,
       secure: true,
       supportFetchAPI: true,
+      corsEnabled: true,
       stream: true,
     },
   },
@@ -193,12 +194,17 @@ app.whenReady().then(async () => {
   } catch (e) {
     error = e.message;
   }
-  protocol.handle("filmlab", (req) => {
+  protocol.handle("filmlab", async (req) => {
     const u = new URL(req.url);
     const file = mediaUrls.get(u.pathname.slice(1));
     if (u.hostname !== "media" || !file)
       return new Response("Not found", { status: 404 });
-    return net.fetch(pathToFileURL(file).href, { headers: req.headers });
+    const response = await net.fetch(pathToFileURL(file).href, { headers: req.headers });
+    const headers = new Headers(response.headers);
+    // The sandboxed file:// editor has an opaque origin. Only tokenized media
+    // can be read back into the scope canvas; byte-range responses are preserved.
+    headers.set("Access-Control-Allow-Origin", "null");
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
   });
   ipcMain.handle("open-recipe-source",async(_,id)=>{
     const catalog=require("../ui/catalog/web-recipes.json");
@@ -466,7 +472,7 @@ app.whenReady().then(async () => {
     height: 980,
     minWidth: 1100,
     minHeight: 700,
-    backgroundColor: "#f3f3eb",
+    backgroundColor: "#151615",
     title: "Film Lab Professional",
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
