@@ -62,8 +62,35 @@ header {
 }
 header .actions { gap: 6px; }
 header .actions button { font-size: 11px; padding: 7px 9px; white-space: nowrap; }
-#exportButton svg { vertical-align: -2px; }
-#selectedCount { background: #18271d20; }
+.export-actions { position: relative; display: inline-flex; align-items: stretch; flex-shrink: 0; }
+.export-actions #exportButton { border-radius: 7px 0 0 7px; }
+.export-actions #exportOptions { display: grid; place-items: center; border-radius: 0 7px 7px 0; border-left: 1px solid #18271d33; }
+.export-actions #exportOptions[aria-expanded="true"] { background: #c0e0c7; }
+.export-actions #exportOptions[aria-expanded="true"] svg { transform: rotate(180deg); }
+#selectedCount { background: #18271d20; margin: 0 0 0 4px; }
+.export-options-panel {
+  position: absolute;
+  z-index: 31;
+  top: calc(100% + 5px);
+  right: 0;
+  width: 230px;
+  padding: 4px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px #0006;
+}
+header .actions .export-options-panel button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 15px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  text-align: left;
+}
+.export-options-panel svg, .export-option-count { color: var(--muted); }
+.export-option-count { font-variant-numeric: tabular-nums; }
 main.workspace, main.workspace.filters-open {
   position: relative;
   display: grid;

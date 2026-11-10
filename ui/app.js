@@ -260,8 +260,7 @@ function updateButtons() {
   for (const id of ["reset", "before", "resetCurve"]) $(id).disabled = !enabled;
   $("undo").disabled = !enabled || !f.history.length;
   $("redo").disabled = !enabled || !f.future.length;
-  $("exportButton").disabled = busy || !selectedIds(state.files).length;
-  $("selectedCount").textContent = selectedIds(state.files).length;
+  drawExportActions();
   $("fileCount").textContent = state.files.length;
   $("workspaceFileCount").textContent = state.files.length;
   $("controlsEmpty").hidden = !!f;
@@ -1033,6 +1032,46 @@ function clearEditor() {
   drawControls();
 }
 let pendingExport = [];
+function closeExportOptions({ restoreFocus = false } = {}) {
+  $("exportOptionsPanel").hidden = true;
+  $("exportOptions").setAttribute("aria-expanded", "false");
+  if (restoreFocus) $("exportOptions").focus();
+}
+function drawExportActions() {
+  const manual = selectedIds(state.files).length;
+  const picked = exportBatch(state.files, "picked").items.length;
+  $("selectedCount").textContent = manual;
+  $("exportManualCount").textContent = `${manual} ${manual === 1 ? "archivo" : "archivos"}`;
+  $("exportPickedCount").textContent = `${picked} ${picked === 1 ? "foto" : "fotos"}`;
+  $("exportButton").disabled = $("exportManualOption").disabled = busy || !manual;
+  $("exportPickedOption").disabled = busy || !picked;
+  $("exportOptions").disabled = busy || (!manual && !picked);
+  if ($("exportOptions").disabled) closeExportOptions();
+}
+$("exportOptions").onclick = () => {
+  if (!$("exportOptionsPanel").hidden) {
+    closeExportOptions();
+    return;
+  }
+  closeProject();
+  $("exportOptionsPanel").hidden = false;
+  $("exportOptions").setAttribute("aria-expanded", "true");
+  $("exportOptionsPanel").querySelector("button:not(:disabled)")?.focus();
+};
+$("exportActions").addEventListener("focusout", (e) => {
+  if (!$("exportActions").contains(e.relatedTarget)) closeExportOptions();
+});
+$("exportActions").addEventListener("keydown", (e) => {
+  if ($("exportOptionsPanel").hidden) return;
+  if (e.key === "Escape") {
+    e.preventDefault();
+    e.stopPropagation();
+    closeExportOptions({ restoreFocus: true });
+  }
+});
+document.addEventListener("pointerdown", (e) => {
+  if (!$("exportActions").contains(e.target)) closeExportOptions();
+});
 function openExport(source) {
   if (busy || $("exportDialog").open) return;
   const { items, unavailable } = exportBatch(state.files, source);
@@ -1052,7 +1091,16 @@ function openExport(source) {
     : "";
   $("exportDialog").showModal();
 }
-$("exportButton").onclick = () => openExport("manual");
+$("exportButton").onclick = () => {
+  closeExportOptions();
+  openExport("manual");
+};
+for (const [id, source] of [["exportManualOption", "manual"], ["exportPickedOption", "picked"]]) {
+  $(id).onclick = () => {
+    closeExportOptions({ restoreFocus: true });
+    openExport(source);
+  };
+}
 $("closeExport").onclick = () => $("exportDialog").close();
 $("exportDialog").addEventListener("close", () => {
   if (!$("exportDialog").open) pendingExport = [];
@@ -1649,8 +1697,11 @@ function showEditor(refresh = true) {
   if (refresh) schedulePreview();
 }
 const library = mountLibrary({
-  $, state, api, save: saveSoon, isBusy: () => busy, enter: showLibrary, leave: showEditor,
-  exportPicked: () => openExport("picked"),
+  $, state, api, isBusy: () => busy, enter: showLibrary, leave: showEditor,
+  save() {
+    saveSoon();
+    drawExportActions();
+  },
   reveal(id) {
     showEditor(false);
     selectWorkspaceTab("edit");
