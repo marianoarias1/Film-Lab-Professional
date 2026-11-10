@@ -1,6 +1,17 @@
-export const ENGINE = "filmlab-pro-0.5-lc-d999e382-fc-6c3948a3";
+export const effectLayerDefaults=()=>({enabled:true,mode:'motion',amount:70,distance:15,bandWidth:20,transition:30,sharpness:0,dissolve:0,particleSize:1,points:[[.3,.5],[.7,.5],[.5,.35]],windows:[],paths:[],strokes:[]});
+export const effectDefaults=()=>({...effectLayerDefaults(),enabled:false,stack:true,layers:[]});
+export function normalizeEffects(value){
+ if(value?.stack)return {...effectDefaults(),...structuredClone(value),layers:(value.layers||[]).map(x=>({...effectLayerDefaults(),...structuredClone(x)}))};
+ if(!value)return effectDefaults();
+ const legacy={...effectLayerDefaults(),...structuredClone(value)};
+ const baseline={...effectLayerDefaults(),enabled:false};
+ const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
+ return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
+}
+export const ENGINE = "filmlab-pro-0.8-lc-d999e382-fc-6c3948a3";
 export const defaults = () => ({
   masks: [],
+  labEffects: effectDefaults(),
   exposure: 0,
   contrast: 0,
   highlights: 0,

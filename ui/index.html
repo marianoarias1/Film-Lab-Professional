@@ -9,30 +9,39 @@
     />
     <title>Film Lab Professional</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="workspace-dark.css" />
   </head>
   <body>
     <header>
       <a class="brand" href="#"
-        ><span class="mark">◉</span><b>film</b><span>lab</span
+        ><b>film</b><span>lab</span
         ><small>PROFESSIONAL</small></a
       >
-      <div class="header-center">
-        <span class="dot"></span>Tu equipo. Tus originales.
-      </div>
+      <nav class="workspace-nav" aria-label="Espacio de trabajo">
+        <button id="navFiles" aria-controls="filesPanel" aria-expanded="false">Archivos</button>
+        <button data-tab="edit" class="active">Revelar</button>
+        <button id="navLab" data-tab="effects">Laboratorio</button>
+      </nav>
       <div class="actions">
         <button id="projectButton" class="plain">Proyecto <span>⌄</span></button
         ><button id="importButton" class="outline">+ Agregar archivos</button
         ><button id="googleButton" class="outline">Google Fotos</button
         ><button id="exportButton" class="dark" disabled>
-          Exportar <span id="selectedCount">0</span> ↗
+          Exportar <span id="selectedCount">0</span>
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg>
         </button>
       </div>
     </header>
     <div id="engineError" class="error-banner" hidden></div>
-    <main>
-      <aside class="filters">
-        <div class="eyebrow">TU MIRADA, EN OTRO TONO</div>
-        <h1>Filtros</h1>
+    <main class="workspace" id="workspace">
+      <aside class="filters" aria-label="Filtros">
+        <div class="filters-heading">
+          <h1>Filtros</h1>
+          <button id="toggleFilters" class="panel-icon" aria-controls="filtersPanel" aria-expanded="true" aria-label="Ocultar filtros" title="Ocultar filtros">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14"/></svg>
+          </button>
+        </div>
+        <div class="filters-scroll" id="filtersPanel" hidden>
         <p class="intro">Un punto de partida.<br />El resto lo decidís vos.</p>
         <label class="search"
           ><span>⌕</span
@@ -56,9 +65,10 @@
           </p>
         </div>
         <div class="local-label">◈ Procesamiento local · sin nube</div>
+        </div>
       </aside>
       <section class="stage">
-        <div class="stage-top">
+        <div class="stage-top" hidden aria-hidden="true">
           <div>
             <span class="eyebrow" id="fileKind">TU ESPACIO DE TRABAJO</span
             ><strong id="fileName">Empezá con una fotografía o un video</strong>
@@ -70,9 +80,10 @@
             <img
               id="preview"
               alt="Previsualización editada"
+              crossorigin="anonymous"
               draggable="false"
               hidden
-            /><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><video id="playback" controls hidden></video>
+            /><canvas id="maskTint" aria-hidden="true" hidden></canvas><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><svg id="fxOverlay" aria-label="Guías de desenfoque creativo" hidden></svg><video id="playback" crossorigin="anonymous" controls hidden></video>
             <div id="emptyState">
               <div class="empty-mark">◉</div>
               <h2>Tu próximo revelado.</h2>
@@ -81,7 +92,7 @@
                 en tu disco.
               </p>
               <button id="emptyImport" class="dark">+ Abrir archivos</button
-              ><small>Professional 0.5 · Windows</small>
+              ><small>Professional 0.8 · Windows</small>
             </div>
           </div>
           <div class="image-toolbar">
@@ -91,12 +102,26 @@
               <span>Rehacer</span> ↷
             </button>
           </div>
-          <div id="renderStatus" class="render-status" hidden>
-            <span class="spinner"></span> Aplicando ajustes…
+          <div class="viewer-controls" aria-label="Controles de vista">
+            <button id="before" class="compare" title="Mantener pulsado para ver el original" disabled>Antes / Después</button>
+            <button id="zoomReset" class="zoom-reset" title="Volver al encuadre completo">100%</button>
           </div>
-          <button id="before" class="compare" disabled>
-            Mantener para ver original</button
-          ><span id="renderTime" class="render-time"></span>
+          <span id="renderTime" class="render-time"></span>
+          <section id="scopes" class="scopes" aria-label="Scopes de color" hidden>
+            <button id="scopeToggle" class="scope-toggle" aria-controls="scopePanel" aria-expanded="false">
+              <span>Scopes</span><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
+              <canvas id="scopeMini" width="270" height="64" aria-hidden="true"></canvas>
+            </button>
+            <div id="scopePanel" class="scope-panel" hidden>
+              <div id="scopeModes" class="scope-modes" role="group" aria-label="Tipo de scope">
+                <button data-scope="histogram" aria-pressed="true">Histograma</button>
+                <button data-scope="waveform" aria-pressed="false">Forma de onda</button>
+                <button data-scope="parade" aria-pressed="false">Parade RGB</button>
+              </div>
+              <canvas id="scopePlot" role="img" aria-label="Histograma RGB de la vista previa"></canvas>
+              <div class="scope-legend" aria-hidden="true"><span class="scope-red">R</span><span class="scope-green">G</span><span class="scope-blue">B</span><span id="scopeSource">Vista previa · SDR</span></div>
+            </div>
+          </section>
         </div>
         <div id="videoControls" class="video-controls" hidden>
           <button id="playProxy" class="outline">▷ Generar reproducción</button
@@ -112,38 +137,42 @@
           ><span class="muted">Con audio</span>
         </div>
         <div id="warning" class="warning" hidden></div>
-        <div class="filmstrip-heading">
+        <div class="film-drawer">
+        <button id="toggleFiles" class="files-tab" aria-controls="filesPanel" aria-expanded="false"><span>Archivos <b id="workspaceFileCount">0</b></span><svg class="panel-chevron" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+        <section id="filesPanel" hidden><div class="filmstrip-heading">
           <span>ARCHIVOS DEL PROYECTO <b id="fileCount">0</b></span>
           <div>
             <button id="selectAll" class="plain">Seleccionar todos</button
             ><button id="selectNone" class="plain">Ninguno</button>
           </div>
         </div>
-        <div id="filmstrip" class="filmstrip"></div>
+        <div id="filmstrip" class="filmstrip"></div></section>
+        </div>
         <footer>
           <span id="saveStatus">Sesión local</span
-          ><span id="engineStatus">Preparando motor…</span>
+          ><span class="engine-info"><span id="renderStatus" class="render-status" role="status" aria-label="Procesando ajustes" title="Procesando ajustes" hidden><span class="spinner"></span><span class="sr-only">Procesando ajustes</span></span><span id="engineStatus">Preparando motor…</span></span>
         </footer>
       </section>
       <aside class="controls">
-        <nav class="editor-tabs">
-          <button data-tab="edit" class="active">Editar</button
-          ><button data-tab="lab">Laboratorio</button>
-        </nav>
         <div class="controls-head">
           <h2 id="panelTitle">A tu manera.</h2>
           <button id="reset" class="plain" disabled>Restablecer</button>
         </div>
+        <nav class="editor-tabs" aria-label="Herramientas">
+          <button data-tab="edit" class="active">Revelar</button>
+          <button data-tab="effects">Efectos</button>
+          <button data-tab="masks">Máscaras</button>
+        </nav>
         <p id="controlsEmpty" class="intro">
           Cargá un archivo para ajustar luz, color y textura.
         </p>
         <div id="editPanel">
-          <nav class="groups">
-            <button data-group="light" class="active">☼<span>Luz</span></button
-            ><button data-group="color">♧<span>Color</span></button
-            ><button data-group="detail">◌<span>Textura</span></button
-            ><button data-group="curve">⌁<span>Curva</span></button>
-          </nav>
+          <section class="groups" aria-label="Ajustes de revelado">
+            <button data-group="light" class="active" aria-controls="groupContent" aria-expanded="true">Luz <span>Exposición y contraste</span></button>
+            <button data-group="color" aria-controls="groupContent" aria-expanded="false">Color <span>Temp · Matiz · HSL</span></button>
+            <button data-group="curve" aria-controls="groupContent" aria-expanded="false">Curva <span>Tonos</span></button>
+            <button data-group="detail" aria-controls="groupContent" aria-expanded="false">Textura y grano <span>Detalle</span></button>
+            <div id="groupContent">
           <div id="sliders"></div>
           <div id="curvePanel" hidden>
             <p class="help">
@@ -163,14 +192,14 @@
                   height="60"
                   patternUnits="userSpaceOnUse"
                 >
-                  <path d="M75 0H0V60" fill="none" stroke="#dfe4d8" />
+                  <path d="M75 0H0V60" fill="none" stroke="var(--line)" />
                 </pattern>
               </defs>
               <rect x="0" y="0" width="300" height="240" fill="url(#grid)" />
               <path
                 id="curvePath"
                 fill="none"
-                stroke="#405a47"
+                stroke="var(--green)"
                 stroke-width="2.5"
               />
               <g id="curvePoints"></g>
@@ -181,18 +210,21 @@
             <div class="curve-inputs" id="curveInputs"></div>
             <button id="resetCurve" class="outline">Restablecer curva</button>
           </div>
+            </div>
+          </section>
         </div>
         <div id="labPanel" hidden>
           <section id="maskPanel" class="mask-panel">
-            <h3>Máscaras · Ajustes locales</h3>
-            <p class="help">Elegí una zona y ajustá solo su luz y color. Cada archivo conserva sus máscaras.</p>
-            <select id="maskType" aria-label="Tipo de máscara">
-              <option value="brush">Pincel · pintar / borrar</option><option value="radial" selected>Radial · óvalo</option><option value="vertical">Degradado vertical</option><option value="horizontal">Degradado horizontal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
+            <h3>Máscaras</h3><button id="newMaskGroup" class="outline new-mask-group">+ Nueva máscara</button><div id="newMaskTools"></div>
+            <select hidden tabindex="-1" id="maskType" aria-label="Tipo de máscara">
+              <option value="" selected>Elegí una herramienta…</option><option value="brush">Pincel · pintar / borrar</option><option value="radial">Radial · óvalo</option><option value="linear">Degradado lineal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
             </select>
-            <button id="addMask" class="outline">+ Crear máscara</button>
-            <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar contorno y guías</label><div id="maskList"></div><div id="maskControls"></div>
+            <button tabindex="-1" id="addMask" class="outline" hidden>+ Crear máscara</button>
+            <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar zona y guías</label><div id="maskList"></div><div id="maskControls"></div>
           </section>
-          <details><summary>Película y color global</summary>
+          <div id="effectsPanel" hidden>
+          <details id="motionPanel" class="creative-effects"><summary>Desenfoque y movimiento</summary><div id="motionControls"></div></details>
+          <details class="global-effects"><summary>Película y color global</summary>
           <div class="lab-card">
             <span>✳</span><strong>Película y luz</strong>
             <p>Textura y color, sin alterar tu original.</p>
@@ -203,6 +235,7 @@
             posición se conserva por archivo.
           </p>
           </details>
+          </div>
         </div>
         <div class="control-bottom">
           <span>◈</span> El original siempre queda intacto.
@@ -229,16 +262,25 @@
         archivos en tu disco.
       </p>
     </div>
+    <dialog id="removeFileDialog"><h2>Quitar del proyecto</h2><p id="removeFileName"></p><p>Se quitará este archivo y sus ajustes del proyecto. El original permanece en tu disco.</p><div class="dialog-actions"><button id="cancelRemoveFile" class="outline">Cancelar</button><button id="confirmRemoveFile" class="dark">Quitar del proyecto</button></div></dialog>
     <dialog id="exportDialog">
       <div class="dialog-title">
         <h2>Tu mirada, lista.</h2>
         <button id="closeExport" class="plain" aria-label="Cerrar">×</button>
       </div>
       <p id="exportSummary"></p>
+      <label>Destino<select id="deliveryPreset"><option value="original">Original · máxima flexibilidad</option><option value="reel">Reels / Stories · vertical 9:16</option><option value="portrait">Publicación vertical · 4:5</option><option value="square">Publicación cuadrada · 1:1</option><option value="youtube">Video horizontal · Full HD</option><option value="youtube4k">Video horizontal · 4K</option></select></label>
+      <div class="delivery-grid">
+        <label>Ancho · px (0 = original)<input id="delivery-width" type="number" min="0" max="7680" step="2"></label><label>Alto · px (0 = original)<input id="delivery-height" type="number" min="0" max="7680" step="2"></label>
+        <label>Encuadre<select id="delivery-fit"><option value="contain">Completa · márgenes negros</option><option value="cover">Recortar para llenar</option></select></label><label>Calidad JPEG · 1–100<input id="delivery-jpegQuality" type="number" min="1" max="100"></label>
+        <label>Encuadre horizontal · 0–1<input id="delivery-cropX" type="number" min="0" max="1" step="0.05"></label><label>Encuadre vertical · 0–1<input id="delivery-cropY" type="number" min="0" max="1" step="0.05"></label>
+        <label>FPS · 0 conserva original<input id="delivery-fps" type="number" min="0" max="120" step="0.001"></label><label>Video · Mbps<input id="delivery-bitrateMbps" type="number" min="1" max="200"></label>
+        <label>Audio AAC · kbps<input id="delivery-audioKbps" type="number" min="64" max="320"></label><label class="report-option"><input id="delivery-upscale" type="checkbox"> Permitir ampliar resolución</label>
+      </div><p id="deliveryInfo" class="help"></p>
       <label
         >Formato de fotografías<select id="photoFormat">
           <option value="png">PNG · 16 bits</option>
-          <option value="jpg">JPEG · calidad 95 · 4:4:4</option>
+          <option value="jpg">JPEG · sRGB · 4:4:4</option>
         </select></label
       >
       <label>Codificación de video<select id="videoEncoding">
@@ -248,7 +290,7 @@
       <p class="help">NVENC acelera la codificación. Los ajustes se procesan en CPU. Si NVIDIA no está disponible, se usa CPU automáticamente.</p>
       <label class="report-option"><input id="saveExportReport" type="checkbox" checked> Guardar diagnóstico JSON junto a cada archivo</label>
       <div class="export-info">
-        <span>Videos</span><b>MP4 · H.264 + audio · tamaño original</b>
+        <span>Videos</span><b>MP4 · H.264 SDR + audio AAC</b>
       </div>
       <p class="help">
         Cada archivo usa sus propios ajustes. Exportación SDR; no conserva

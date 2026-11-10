@@ -1,4 +1,6 @@
+mod delivery;
 mod export_diagnostics;
+mod lab_effects;
 use filmcraft_frame::{AudioBuffer, VideoFrame};
 use filmcraft_media::{FrameRequest, MediaInfo, MediaSource, SharedSource};
 use filmcraft_project::{
@@ -22,7 +24,7 @@ use std::{
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.5-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.8-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -42,6 +44,7 @@ struct Settings {
     grain: f64,
     grain_size: f64,
     masks: Vec<lightcraft_develop::Mask>,
+    lab_effects: lab_effects::Effects,
     hsl: [[f64; 3]; 8],
     sharpness: f64,
     denoise: f64,
@@ -77,6 +80,7 @@ impl Default for Settings {
             grain: 0.,
             grain_size: 25.,
             masks: Vec::new(),
+            lab_effects: Default::default(),
             hsl: [[0.; 3]; 8],
             sharpness: 0.,
             denoise: 0.,
@@ -97,11 +101,12 @@ impl Default for Settings {
 }
 impl Settings {
     fn validate(&self) -> Result<()> {
+        self.lab_effects.validate()?;
         if self.masks.len() > 32 {
             return Err("Máximo 32 máscaras por archivo".into());
         }
         for m in &self.masks {
-            if m.components.len() != 1 || m.name.len() > 160 {
+            if m.components.is_empty() || m.components.len() > 16 || m.name.len() > 160 {
                 return Err("Máscara inválida".into());
             }
             let a = &m.adjust;
@@ -142,66 +147,68 @@ impl Settings {
                 return Err("Ajuste local inválido".into());
             }
             let unit = |v: f64| v.is_finite() && (0. ..=1.).contains(&v);
-            match &m.components[0].shape {
-                lightcraft_develop::MaskShape::Radial {
-                    center,
-                    rx,
-                    ry,
-                    angle,
-                    feather,
-                    ..
-                } => {
-                    if !unit(center.x)
-                        || !unit(center.y)
-                        || !(*rx >= 0.01 && *rx <= 2.)
-                        || !(*ry >= 0.01 && *ry <= 2.)
-                        || !angle.is_finite()
-                        || !(-180. ..=180.).contains(angle)
-                        || !(0. ..=100.).contains(feather)
-                    {
-                        return Err("Geometría radial inválida".into());
+            for component in &m.components {
+                match &component.shape {
+                    lightcraft_develop::MaskShape::Radial {
+                        center,
+                        rx,
+                        ry,
+                        angle,
+                        feather,
+                        ..
+                    } => {
+                        if !unit(center.x)
+                            || !unit(center.y)
+                            || !(*rx >= 0.01 && *rx <= 2.)
+                            || !(*ry >= 0.01 && *ry <= 2.)
+                            || !angle.is_finite()
+                            || !(-180. ..=180.).contains(angle)
+                            || !(0. ..=100.).contains(feather)
+                        {
+                            return Err("Geometría radial inválida".into());
+                        }
                     }
-                }
-                lightcraft_develop::MaskShape::Linear { start, end } => {
-                    if !unit(start.x)
-                        || !unit(start.y)
-                        || !unit(end.x)
-                        || !unit(end.y)
-                        || (start.x - end.x).abs() + (start.y - end.y).abs() < 0.001
-                    {
-                        return Err("El degradado necesita dos puntos distintos".into());
+                    lightcraft_develop::MaskShape::Linear { start, end } => {
+                        if !unit(start.x)
+                            || !unit(start.y)
+                            || !unit(end.x)
+                            || !unit(end.y)
+                            || (start.x - end.x).abs() + (start.y - end.y).abs() < 0.001
+                        {
+                            return Err("El degradado necesita dos puntos distintos".into());
+                        }
                     }
-                }
-                lightcraft_develop::MaskShape::LuminanceRange {
-                    lo,
-                    hi,
-                    lo_feather,
-                    hi_feather,
-                } => {
-                    if !unit(*lo)
-                        || !unit(*hi)
-                        || lo > hi
-                        || !unit(*lo_feather)
-                        || !unit(*hi_feather)
-                    {
-                        return Err("Rango de luminancia inválido".into());
+                    lightcraft_develop::MaskShape::LuminanceRange {
+                        lo,
+                        hi,
+                        lo_feather,
+                        hi_feather,
+                    } => {
+                        if !unit(*lo)
+                            || !unit(*hi)
+                            || lo > hi
+                            || !unit(*lo_feather)
+                            || !unit(*hi_feather)
+                        {
+                            return Err("Rango de luminancia inválido".into());
+                        }
                     }
-                }
-                lightcraft_develop::MaskShape::Brush { strokes } => {
-                    if strokes.len() > 128
-                        || strokes.iter().map(|s| s.points.len()).sum::<usize>() > 10000
-                        || strokes.iter().any(|s| {
-                            s.points.iter().any(|p| !unit(p.x) || !unit(p.y))
-                                || !(0.001..=1.).contains(&s.size)
-                                || !(0. ..=100.).contains(&s.feather)
-                                || !(0. ..=100.).contains(&s.flow)
-                                || !(0. ..=100.).contains(&s.density)
-                        })
-                    {
-                        return Err("Pincel inválido o demasiado extenso".into());
+                    lightcraft_develop::MaskShape::Brush { strokes } => {
+                        if strokes.len() > 128
+                            || strokes.iter().map(|s| s.points.len()).sum::<usize>() > 10000
+                            || strokes.iter().any(|s| {
+                                s.points.iter().any(|p| !unit(p.x) || !unit(p.y))
+                                    || !(0.001..=1.).contains(&s.size)
+                                    || !(0. ..=100.).contains(&s.feather)
+                                    || !(0. ..=100.).contains(&s.flow)
+                                    || !(0. ..=100.).contains(&s.density)
+                            })
+                        {
+                            return Err("Pincel inválido o demasiado extenso".into());
+                        }
                     }
+                    _ => return Err("Tipo de máscara no admitido en esta versión".into()),
                 }
-                _ => return Err("Tipo de máscara no admitido en esta versión".into()),
             }
         }
         let value = serde_json::to_value(self).map_err(|e| e.to_string())?;
@@ -565,9 +572,10 @@ fn render_quality(
     };
     req.depth = deep;
     let mut r = lightcraft_pipeline::render_cached(pixels, info, &s.develop(info), &req, cache);
-    if s.light_leak > 0. {
+    if s.light_leak > 0. || s.lab_effects.enabled {
         if let Some(deep) = r.deep.as_mut() {
             apply_leak(deep, s);
+            lab_effects::apply(deep, &s.lab_effects);
             r.image = deep.to_rgba8();
         }
     }
@@ -610,6 +618,7 @@ fn render_export(
         lightcraft_pipeline::render_deep_cached(pixels, info, &s.develop(info), &request, cache)
             .ok_or("Sin salida de alta precisión")?;
     apply_leak(&mut deep, s);
+    lab_effects::apply(&mut deep, &s.lab_effects);
     Ok(deep)
 }
 
@@ -621,6 +630,7 @@ fn png(r: &lightcraft_raster::Rgba8) -> Result<Vec<u8>> {
     .map_err(|e| e.to_string())
 }
 struct Graded {
+    delivery: delivery::Delivery,
     metrics: Arc<export_diagnostics::Metrics>,
     src: SharedSource,
     settings: Settings,
@@ -632,7 +642,8 @@ impl MediaSource for Graded {
     }
     fn video_frame(&self, req: FrameRequest) -> filmcraft_media::Result<Arc<VideoFrame>> {
         let edge = (self
-            .info
+            .src
+            .info()
             .video
             .as_ref()
             .map_or(1, |v| v.width.max(v.height)) as f32
@@ -651,6 +662,10 @@ impl MediaSource for Graded {
             edge,
         )
         .map_err(filmcraft_media::MediaError::Decode)?;
+        let deep = self
+            .delivery
+            .transform(deep, req.scale)
+            .map_err(filmcraft_media::MediaError::Decode)?;
         export_diagnostics::record(&self.metrics.grade_ns, grade_start);
         let packing_start = Instant::now();
         let DeepSamples::F32(rgb) = deep.samples else {
@@ -674,6 +689,7 @@ impl MediaSource for Graded {
 fn export_video(
     src: &SharedSource,
     settings: Settings,
+    delivery: delivery::Delivery,
     out: &str,
     proxy: bool,
     encoding: &str,
@@ -688,8 +704,14 @@ fn export_video(
     export_diagnostics::clear_decline();
     let metrics = Arc::new(export_diagnostics::Metrics::default());
     let mut p = Project::new("Film Lab Professional");
-    let info = src.info();
-    let v = info.video.as_ref().ok_or("Sin video")?;
+    let mut output_info = src.info().clone();
+    let original = output_info.video.as_ref().ok_or("Sin video")?;
+    let (w, h) = delivery.size(original.width as usize, original.height as usize, true);
+    let output_video = output_info.video.as_mut().unwrap();
+    output_video.width = w as u32;
+    output_video.height = h as u32;
+    let info = &output_info;
+    let v = info.video.as_ref().unwrap();
     if info.duration <= Tick::ZERO {
         return Err("Duración inválida".into());
     }
@@ -743,6 +765,7 @@ fn export_video(
             .push(clip);
     }
     let graded: SharedSource = Arc::new(Graded {
+        delivery: delivery.clone(),
         metrics: metrics.clone(),
         src: src.clone(),
         settings,
@@ -815,10 +838,12 @@ fn export_video(
                 std::thread::sleep(std::time::Duration::from_millis(200));
             }
         });
+        let mut encode_settings = export_diagnostics::settings(&mode, out, scale);
+        delivery.configure_video(&mut encode_settings);
         let attempt_result = filmcraft_export::export(
             &Arc::new(p.clone()),
             seq,
-            &export_diagnostics::settings(&mode, out, scale),
+            &encode_settings,
             &sources,
             &progress,
         );
@@ -868,7 +893,7 @@ fn export_video(
     } else {
         "CPU"
     };
-    let diagnostics = json!({"schemaVersion":1,"appVersion":"0.4.0","engine":ENGINE,
+    let diagnostics = json!({"schemaVersion":1,"appVersion":env!("CARGO_PKG_VERSION"),"engine":ENGINE,
         "status":if final_report.is_some(){"completed"}else if cancel.load(Ordering::Relaxed){"cancelled"}else{"failed"},
         "source":{"width":v.width,"height":v.height,"frameRate":v.frame_rate,"durationSeconds":info.duration.seconds(),"hasAudio":info.has_audio()},
         "precision":"float32","effectsBackend":"CPU","displayPreviewGenerated":false,"histogramGenerated":false,"requestedEncoding":requested,"actualEncoder":actual,
@@ -1029,12 +1054,17 @@ fn run(
         if cancel.load(Ordering::Relaxed) {
             return Err("Exportación cancelada".into());
         }
+        let delivery: delivery::Delivery =
+            serde_json::from_value(r.get("delivery").cloned().unwrap_or(json!({})))
+                .map_err(|e| e.to_string())?;
+        delivery.validate()?;
         let target = r["output"].as_str().ok_or("Missing output")?;
         let source = state.sources.get(key).ok_or("Archivo no abierto")?;
         match source {
             Source::Video(v) => export_video(
                 v,
                 settings,
+                delivery,
                 target,
                 r["proxy"].as_bool().unwrap_or(false),
                 encoding,
@@ -1054,6 +1084,9 @@ fn run(
                     &settings,
                     p.width.max(p.height),
                 )?;
+                let deep = delivery.transform(deep, 1.)?;
+                let output_width = deep.width;
+                let output_height = deep.height;
                 let grade_ms = grade_started.elapsed().as_secs_f64() * 1000.;
                 let encode_started = Instant::now();
                 let ext = Path::new(target)
@@ -1069,7 +1102,7 @@ fn run(
                 let bytes = if ext == "jpg" || ext == "jpeg" {
                     lightcraft_codecs::encode_jpeg(
                         &lightcraft_codecs::EncodeImage::rgba8(&deep.to_rgba8()),
-                        95,
+                        delivery.jpeg_quality,
                         lightcraft_codecs::ChromaSubsampling::S444,
                         &meta,
                     )
@@ -1102,7 +1135,7 @@ fn run(
                 }
                 let write_started = Instant::now();
                 std::fs::write(target, bytes).map_err(|e| e.to_string())?;
-                let diagnostics = json!({"schemaVersion":1,"appVersion":"0.4.0","status":"completed","format":ext,"width":p.width,"height":p.height,
+                let diagnostics = json!({"schemaVersion":1,"appVersion":env!("CARGO_PKG_VERSION"),"status":"completed","format":ext,"width":output_width,"height":output_height,"delivery":delivery,
                     "revealMs":reveal_ms,"gradeMs":grade_ms,"encodeMs":encode_ms,"writeMs":write_started.elapsed().as_secs_f64()*1000.,
                     "wallMs":photo_started.elapsed().as_secs_f64()*1000.,"displayPreviewGenerated":ext=="jpg"||ext=="jpeg","histogramGenerated":false,"settings":settings});
                 export_diagnostics::save_last(diagnostics.clone());
@@ -1276,6 +1309,56 @@ mod tests {
         s.exposure = 0.;
         s.curve = vec![[0.5, 0.5], [0.1, 0.2]];
         assert!(s.validate().is_err());
+    }
+    #[test]
+    fn compound_masks_validate_all_zones_and_render_distinct_operations() {
+        let pixels = Arc::new(Rgb32f {
+            width: 32,
+            height: 24,
+            data: vec![[0.18, 0.2, 0.12]; 768],
+        });
+        let info = SourceInfo::default();
+        let radial = json!({"kind":"radial","center":{"x":0.4,"y":0.5},"rx":0.35,"ry":0.3,"angle":0,"feather":30,"invert":false});
+        let linear = json!({"kind":"linear","start":{"x":0.0,"y":0.0},"end":{"x":1.0,"y":1.0}});
+        let mut outputs = Vec::new();
+        for op in ["add", "subtract", "intersect"] {
+            let mut settings = Settings::default();
+            settings.masks=serde_json::from_value(json!([{"id":1,"components":[{"op":"add","shape":radial.clone()},{"op":op,"shape":linear.clone()}],"adjust":{"exposure":1.0}}])).unwrap();
+            settings.validate().unwrap();
+            let normal = render(
+                &pixels,
+                &info,
+                &StageCache::default(),
+                &settings,
+                32,
+                OutputDepth::F32Linear,
+            )
+            .deep
+            .unwrap();
+            let direct =
+                render_export(&pixels, &info, &StageCache::default(), &settings, 32).unwrap();
+            let (DeepSamples::F32(a), DeepSamples::F32(b)) = (normal.samples, direct.samples)
+            else {
+                panic!("depth")
+            };
+            assert_eq!(a, b, "Compound preview/export mismatch");
+            outputs.push(a);
+            settings.masks[0].components[1].shape=serde_json::from_value(json!({"kind":"luminanceRange","lo":0.8,"hi":0.2,"lo_feather":0.1,"hi_feather":0.1})).unwrap();
+            assert!(
+                settings.validate().is_err(),
+                "Must validate every component"
+            );
+        }
+        assert_ne!(outputs[0], outputs[1]);
+        assert_ne!(outputs[1], outputs[2]);
+        assert_ne!(outputs[0], outputs[2]);
+        let mut settings = Settings::default();
+        settings.masks = serde_json::from_value(json!([{"id":1,"components":[]}])).unwrap();
+        assert!(settings.validate().is_err());
+        settings.masks[0].components = serde_json::from_value(json!([{"shape":radial}])).unwrap();
+        let c = settings.masks[0].components[0].clone();
+        settings.masks[0].components = vec![c; 17];
+        assert!(settings.validate().is_err());
     }
     #[test]
     fn masks_reach_float_preview_and_export_and_disabled_masks_do_nothing() {

@@ -28,6 +28,7 @@ protocol.registerSchemesAsPrivileged([
       standard: true,
       secure: true,
       supportFetchAPI: true,
+      corsEnabled: true,
       stream: true,
     },
   },
@@ -189,15 +190,21 @@ app.whenReady().then(async () => {
   let hello, error;
   try {
     hello = await engine.start();
+    if((hello.engineVersion||hello.engine)!==ENGINE)throw new Error("El motor necesita actualizarse. Ejecutá npm run build:engine y volvé a abrir Professional.");
   } catch (e) {
     error = e.message;
   }
-  protocol.handle("filmlab", (req) => {
+  protocol.handle("filmlab", async (req) => {
     const u = new URL(req.url);
     const file = mediaUrls.get(u.pathname.slice(1));
     if (u.hostname !== "media" || !file)
       return new Response("Not found", { status: 404 });
-    return net.fetch(pathToFileURL(file).href, { headers: req.headers });
+    const response = await net.fetch(pathToFileURL(file).href, { headers: req.headers });
+    const headers = new Headers(response.headers);
+    // The sandboxed file:// editor has an opaque origin. Only tokenized media
+    // can be read back into the scope canvas; byte-range responses are preserved.
+    headers.set("Access-Control-Allow-Origin", "null");
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
   });
   ipcMain.handle("open-recipe-source",async(_,id)=>{
     const catalog=require("../ui/catalog/web-recipes.json");
@@ -265,6 +272,17 @@ app.whenReady().then(async () => {
       return {...result,url:token,meta:f,traceId};
     });
   });
+  ipcMain.handle("recipe-preview", (_, { id, settings, time } = {}) => serial(async () => {
+    // Background tiles may not reopen an original after the user switched files.
+    if (opened !== id || !files.has(id)) return null;
+    const output = path.join(cache, crypto.randomUUID() + ".png");
+    try {
+      await engine.request("preview", { key: id, settings, time, edge: 240, draft: true, output });
+      return "data:image/png;base64," + (await fs.readFile(output)).toString("base64");
+    } finally {
+      await fs.rm(output, { force: true }).catch(() => {});
+    }
+  }));
   ipcMain.handle("preview-metrics", (_, message) => previewMetrics.acknowledge(message));
   ipcMain.handle("save-preview-diagnostics", async () => {
     if(!previewMetrics.samples.length) throw new Error("Cargá una foto o video y probá algunos ajustes primero.");
@@ -337,6 +355,7 @@ app.whenReady().then(async () => {
             output: temp,
             proxy: !!m.proxy,
             encoding,
+            delivery: m.proxy ? {} : (m.delivery || {}),
           });
           if(cancelExport) throw new Error("Exportación cancelada.");
           await fs.rename(temp, dest);
@@ -370,6 +389,12 @@ app.whenReady().then(async () => {
     return true;
   });
   ipcMain.on("cancel", () => { cancelExport=true; engine.cancel(); });
+  ipcMain.handle("remove-file", (_, id) => serial(async () => {
+    ensureFile(id);
+    if(opened===id){await engine.request("release",{key:id});opened=null;}
+    files.delete(id);dirty=true;
+    return true;
+  }));
   ipcMain.handle("autosave", async (_, p) => {
     const copy = snapshot(p);
     dirty = true;
@@ -458,7 +483,7 @@ app.whenReady().then(async () => {
     height: 980,
     minWidth: 1100,
     minHeight: 700,
-    backgroundColor: "#f3f3eb",
+    backgroundColor: "#151615",
     title: "Film Lab Professional",
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
