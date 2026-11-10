@@ -1,3 +1,4 @@
+import { mountRecipePreviews } from "./recipe-previews.js";
 import { mountScopes } from "./scopes.js";
 import {mountEffects} from "./lab-effects.js";
 import {mountDelivery} from "./delivery.js";
@@ -131,6 +132,7 @@ function stopPlayback() {
   v.hidden = true;
   v.removeAttribute("src");
   v.load();
+  recipePreviews.wake();
   if (previewUrl) {
     $("preview").hidden = false;
   }
@@ -230,6 +232,8 @@ function drawFiles() {
 function drawRecipes() {
   const list = $("recipeList");
   list.replaceChildren();
+  const items = [];
+  syncRecipeContext();
   const term = $("search").value.toLowerCase();
   for (const r of recipes.filter((r) =>
     (!r.hiddenFromCatalog || r.id===current()?.recipe) &&
@@ -244,14 +248,14 @@ function drawRecipes() {
     button.dataset.recipe=r.id;
     button.title=[r.name,r.creator,r.description].filter(Boolean).join(" · ");
     button.setAttribute("aria-pressed", String(current()?.recipe === r.id));
-    const swatch = makeEl("span", { className: "swatch" });
-    swatch.style.setProperty("--sky", r.sky);
-    swatch.style.setProperty("--earth", r.earth);
+    const tile = makeEl("span", { className: "recipe-preview" });
+    tile.setAttribute("aria-hidden", "true");
+    items.push([tile, r]);
     const text = makeEl("span");
     text.append(makeEl("strong", {}, r.name), makeEl("p", {}, r.description));
     if(r.creator) text.append(makeEl("small",{className:"recipe-credit"},r.creator));
     if(r.adaptation) text.append(makeEl("small",{className:"recipe-credit"},"Adaptación Professional"));
-    button.append(swatch, text);
+    button.append(tile, text);
     button.onclick = () => {
       const f = current();
       const old = structuredClone(f.settings);
@@ -267,6 +271,7 @@ function drawRecipes() {
     list.append(row);
   }
   if(!list.children.length)list.append(makeEl("p",{className:"help"},"No hay recetas para esa búsqueda."));
+  recipePreviews.setItems(items);
 }
 function format(v, step = 1, suffix = "") {
   return Number(v).toFixed(step < 0.1 ? 2 : step < 1 ? 1 : 0) + suffix;
@@ -513,7 +518,10 @@ function activate(id) {
 const nextPaint = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 const previewQueue = new PreviewQueue({
   render: job => api.preview(job),
-  onBusy: active => { $("renderStatus").hidden = !active; },
+  onBusy: active => {
+    $("renderStatus").hidden = !active;
+    if (!active) recipePreviews.wake();
+  },
   onError: (error, job) => {
     if (job.id !== state.activeId) return;
     $("warning").textContent = error.message;
@@ -560,7 +568,20 @@ const previewQueue = new PreviewQueue({
 
   },
 });
+const recipePreviews = mountRecipePreviews({
+  scroll: $("filtersPanel"),
+  request: api?.recipePreview,
+  canRender: () => !!previewUrl && !busy && !before && $("playback").hidden
+    && !previewQueue.running && !previewQueue.pending,
+});
+function syncRecipeContext() {
+  const file = current();
+  recipePreviews.setContext(file && !file.missing
+    ? { id: file.id, file, time: file.kind === "video" ? Number($("scrub").value) : 0 }
+    : null);
+}
 function schedulePreview(draft = false) {
+  recipePreviews.pause();
   clearTimeout(renderTimer);
   const file = current();
   if (!file || busy) return;
@@ -644,6 +665,7 @@ $("scrub").oninput = () => {
   stopPlayback();
   originalUrl = null;
   $("timecode").textContent = timeLabel(Number($("scrub").value));
+  syncRecipeContext();
   schedulePreview(true);
 };
 $("scrub").onchange = () => schedulePreview();
@@ -682,6 +704,7 @@ $("before").onpointerdown = async (e) => {
 };
 function endBefore() {
   before = false;
+  recipePreviews.wake();
   drawMaskOutline();
   beforeToken++;
   $("before").textContent = "Antes / Después";
@@ -839,6 +862,7 @@ $("filmstrip").ondblclick = async (e) => {
       updated = await api.relink(f.id);
     if (updated) {
       Object.assign(f, updated);
+      recipePreviews.setContext(null);
       activate(f.id);
     }
   } catch (e) {
@@ -1411,6 +1435,7 @@ let panelState={filters:true,files:true};
 try{const saved=JSON.parse(localStorage.getItem('filmlab.workspace.panels'));if(saved)panelState={filters:saved.filters===true,files:saved.files===true};}catch{}
 function drawWorkspace(){
   $('workspace').classList.toggle('filters-open',panelState.filters);$('filtersPanel').hidden=!panelState.filters;$('filesPanel').hidden=!panelState.files;
+  recipePreviews.setEnabled(panelState.filters);
   $('toggleFilters').setAttribute('aria-expanded',String(panelState.filters));$('toggleFilters').title=panelState.filters?'Ocultar filtros':'Mostrar filtros';
   $('toggleFilters').setAttribute('aria-label',$('toggleFilters').title);
   for (const id of ['toggleFiles','navFiles']) $(id).setAttribute('aria-expanded',String(panelState.files));

@@ -34,13 +34,14 @@
     </header>
     <div id="engineError" class="error-banner" hidden></div>
     <main class="workspace" id="workspace">
-      <nav class="workspace-rail" aria-label="Panel de filtros">
-        <button id="toggleFilters" class="panel-icon" aria-controls="filtersPanel" aria-expanded="true" aria-label="Ocultar filtros" title="Ocultar filtros">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14"/></svg>
-        </button>
-      </nav>
-      <aside class="filters" id="filtersPanel" hidden>
-        <h1>Filtros</h1>
+      <aside class="filters" aria-label="Filtros">
+        <div class="filters-heading">
+          <h1>Filtros</h1>
+          <button id="toggleFilters" class="panel-icon" aria-controls="filtersPanel" aria-expanded="true" aria-label="Ocultar filtros" title="Ocultar filtros">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14"/></svg>
+          </button>
+        </div>
+        <div class="filters-scroll" id="filtersPanel" hidden>
         <p class="intro">Un punto de partida.<br />El resto lo decidís vos.</p>
         <label class="search"
           ><span>⌕</span
@@ -64,6 +65,7 @@
           </p>
         </div>
         <div class="local-label">◈ Procesamiento local · sin nube</div>
+        </div>
       </aside>
       <section class="stage">
         <div class="stage-top" hidden aria-hidden="true">

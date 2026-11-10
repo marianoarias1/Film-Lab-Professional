@@ -272,6 +272,17 @@ app.whenReady().then(async () => {
       return {...result,url:token,meta:f,traceId};
     });
   });
+  ipcMain.handle("recipe-preview", (_, { id, settings, time } = {}) => serial(async () => {
+    // Background tiles may not reopen an original after the user switched files.
+    if (opened !== id || !files.has(id)) return null;
+    const output = path.join(cache, crypto.randomUUID() + ".png");
+    try {
+      await engine.request("preview", { key: id, settings, time, edge: 240, draft: true, output });
+      return "data:image/png;base64," + (await fs.readFile(output)).toString("base64");
+    } finally {
+      await fs.rm(output, { force: true }).catch(() => {});
+    }
+  }));
   ipcMain.handle("preview-metrics", (_, message) => previewMetrics.acknowledge(message));
   ipcMain.handle("save-preview-diagnostics", async () => {
     if(!previewMetrics.samples.length) throw new Error("Cargá una foto o video y probá algunos ajustes primero.");
