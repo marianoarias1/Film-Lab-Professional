@@ -7,11 +7,10 @@ class Engine extends EventEmitter {
     this.binary = binary;
     this.pending = new Map();
     this.nextId = 0;
-    this.running = false;
   }
   async start() {
     if (this.child) return this.request("hello");
-    this.child = spawn(this.binary, [], {
+    const child = this.child = spawn(this.binary, [], {
       stdio: ["pipe", "pipe", "pipe"],
       windowsHide: true,
       env: {
@@ -24,19 +23,28 @@ class Engine extends EventEmitter {
         ),
       },
     });
-    this.child.on("error", (e) => this.fail(e));
-    this.child.on("exit", (code) => {
+    child.on("error", (error) => {
+      if (this.child !== child) return;
+      this.child = null;
+      this.fail(error);
+    });
+    child.on("exit", (code) => {
+      if (this.child !== child) return;
       this.child = null;
       this.fail(
         new Error(`El motor se cerró (${code}). Volvé a abrir la aplicación.`),
       );
     });
-    this.child.stderr.on("data", (chunk) =>
-      this.emit("log", chunk.toString().slice(-4000)),
-    );
+    // A write can fail while the child is exiting. Request callbacks handle
+    // their own rejection; retain a listener for the stream's error event.
+    child.stdin.on("error", () => {});
+    child.stderr.on("data", (chunk) => {
+      if (this.child === child) this.emit("log", chunk.toString().slice(-4000));
+    });
     readline
-      .createInterface({ input: this.child.stdout })
+      .createInterface({ input: child.stdout })
       .on("line", (line) => {
+        if (this.child !== child) return;
         let msg;
         try {
           msg = JSON.parse(line);
@@ -59,7 +67,8 @@ class Engine extends EventEmitter {
   }
   request(op, data = {}) {
     return new Promise((resolve, reject) => {
-      if (!this.child) {
+      const child = this.child;
+      if (!child) {
         reject(
           new Error(
             "No se encontró el motor. Ejecutá npm run build:engine primero.",
@@ -76,12 +85,12 @@ class Engine extends EventEmitter {
               "El motor superó el tiempo de espera. Reiniciá la aplicación.",
             ),
           );
-          this.child?.kill();
+          if (this.child === child) child.kill();
         },
         op === "export" ? 24 * 60 * 60 * 1000 : 5 * 60 * 1000,
       );
       this.pending.set(id, { resolve, reject, timer, op });
-      this.child.stdin.write(
+      child.stdin.write(
         JSON.stringify({ ...data, id, op }) + "\n",
         (e) => {
           if (e) {
@@ -97,16 +106,21 @@ class Engine extends EventEmitter {
     const request = [...this.pending].find(([,p])=>p.op === "export");
     if(request)this.child?.stdin.write(JSON.stringify({ op: "cancel", id: request[0] }) + "\n");
   }
-  fail(error) {
+  fail(error, { notify = true } = {}) {
     for (const p of this.pending.values()) {
       clearTimeout(p.timer);
       p.reject(error);
     }
     this.pending.clear();
-    this.emit("failure", error.message);
+    if (notify) this.emit("failure", error.message);
   }
   stop() {
-    this.child?.kill();
+    const child = this.child;
+    if (!child) return;
+    // A normal stop must release pending work without reporting a crash.
+    this.child = null;
+    this.fail(new Error("La aplicación se está cerrando."), { notify: false });
+    child.kill();
   }
 }
 module.exports = { Engine };
