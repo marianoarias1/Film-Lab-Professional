@@ -21,6 +21,7 @@ import {
   redo,
   projectSnapshot,
   selectedIds,
+  exportBatch,
   adjustmentGroups,
   copyAdjustments,
   applyAdjustments,
@@ -1031,20 +1032,48 @@ function clearEditor() {
   drawRecipes();
   drawControls();
 }
-$("exportButton").onclick = () => {
-  $("exportSummary").textContent =
-    `Vas a exportar ${selectedIds(state.files).length} archivo(s) seleccionados.`;
+let pendingExport = [];
+function openExport(source) {
+  if (busy || $("exportDialog").open) return;
+  const { items, unavailable } = exportBatch(state.files, source);
+  if (!items.length) return;
+  pendingExport = items;
+  const picked = source === "picked", singular = items.length === 1;
+  $("exportTitle").textContent = picked ? "Exportar elegidas" : "Exportar archivos";
+  $("exportSummary").textContent = picked
+    ? `Vas a exportar ${items.length} ${singular ? "foto elegida" : "fotos elegidas"} del proyecto.`
+    : `Vas a exportar ${items.length} ${singular ? "archivo seleccionado" : "archivos seleccionados"} manualmente.`;
+  $("exportBatch").open = false;
+  $("exportBatchList").replaceChildren(...items.map(file => makeEl("li", {}, file.name)));
+  const skipped = $("exportUnavailable");
+  skipped.hidden = !unavailable.length;
+  skipped.textContent = unavailable.length
+    ? `Fuera del lote porque no se encontró el original: ${unavailable.map(file => file.name).join(", ")}.`
+    : "";
   $("exportDialog").showModal();
-};
+}
+$("exportButton").onclick = () => openExport("manual");
 $("closeExport").onclick = () => $("exportDialog").close();
+$("exportDialog").addEventListener("close", () => {
+  if (!$("exportDialog").open) pendingExport = [];
+});
 $("confirmExport").onclick = () => {
+  if (!$("exportDialog").open || busy) return;
   const invalid=$("exportDialog").querySelector(":invalid"); if (invalid) {invalid.reportValidity(); return;}
   const d=delivery.read();
   if ((d.width===0)!==(d.height===0)) {message("Dimensiones", "Indicá ancho y alto, o dejá ambos en cero para conservar el original."); return;}
+  const files = pendingExport;
   $("exportDialog").close();
-  doExport(false);
+  if (files.some(file => !state.files.includes(file))) {
+    message("El lote cambió", "Volvé a abrir la exportación para revisar los archivos del proyecto.");
+    return;
+  }
+  void doExport(files);
 };
-$("playProxy").onclick = () => doExport(true);
+$("playProxy").onclick = () => {
+  const file = current();
+  if (file) void doExport([file], true);
+};
 $("savePreviewDiagnostics").onclick = async () => {
   try { if(await api.savePreviewDiagnostics()) toast("Diagnóstico de respuesta guardado"); }
   catch(error) { message("Diagnóstico de respuesta",error.message); }
@@ -1063,8 +1092,8 @@ $("progressDialog").addEventListener("cancel", (event) => {
   event.preventDefault();
   if (!cancelPending) $("cancelExport").click();
 });
-async function doExport(proxy) {
-  if (busy) return;
+async function doExport(files, proxy = false) {
+  if (busy || !files.length) return;
   endMask();
   pendingMask=null;
   drawMaskOutline();
@@ -1085,11 +1114,10 @@ async function doExport(proxy) {
   $("cancelExport").disabled = false;
   $("progressDialog").showModal();
   try {
-    const ids = proxy ? [current().id] : selectedIds(state.files);
     const result = await api.exportFiles({
-      ids,
+      ids: files.map(file => file.id),
       settings: Object.fromEntries(
-        state.files.map((f) => [f.id, structuredClone(f.settings)]),
+        files.map((f) => [f.id, structuredClone(f.settings)]),
       ),
       format: $("photoFormat").value,
       delivery: proxy ? {} : delivery.read(),
@@ -1119,7 +1147,7 @@ async function doExport(proxy) {
   }
 }
 window.addEventListener("keydown", (e) => {
-  if ($("adjustmentDialog").open) return;
+  if ($("adjustmentDialog").open || $("exportDialog").open) return;
   if (e.key === "Escape") {
     if (syncSelecting) { resetSyncSelection(); drawFiles(); }
     endMask(true);
@@ -1622,6 +1650,7 @@ function showEditor(refresh = true) {
 }
 const library = mountLibrary({
   $, state, api, save: saveSoon, isBusy: () => busy, enter: showLibrary, leave: showEditor,
+  exportPicked: () => openExport("picked"),
   reveal(id) {
     showEditor(false);
     selectWorkspaceTab("edit");

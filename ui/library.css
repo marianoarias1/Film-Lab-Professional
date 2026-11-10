@@ -91,3 +91,5 @@
   .library-browse { grid-template-columns: minmax(0, 1fr) 230px; }
   .library-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+.library-bar-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }

@@ -44,7 +44,10 @@
           <button data-review-filter="rejected" aria-pressed="false">Descartadas</button>
           <button data-review-filter="unreviewed" aria-pressed="false">Sin revisar</button>
         </div>
-        <button id="libraryCompare" class="outline">Comparar dos tomas</button>
+        <div class="library-bar-actions">
+          <button id="libraryCompare" class="outline">Comparar dos tomas</button>
+          <button id="libraryExportPicked" class="dark" disabled>Exportar elegidas · 0</button>
+        </div>
       </div>
       <div id="libraryBrowse" class="library-browse">
         <div id="libraryResults" class="library-results">
@@ -341,12 +344,17 @@
         <button id="confirmAdjustment" class="dark">Copiar</button>
       </div>
     </dialog>
-    <dialog id="exportDialog">
+    <dialog id="exportDialog" aria-labelledby="exportTitle" aria-describedby="exportSummary">
       <div class="dialog-title">
-        <h2>Tu mirada, lista.</h2>
+        <h2 id="exportTitle">Exportar archivos</h2>
         <button id="closeExport" class="plain" aria-label="Cerrar">×</button>
       </div>
       <p id="exportSummary"></p>
+      <details id="exportBatch">
+        <summary>Ver archivos del lote</summary>
+        <ul id="exportBatchList"></ul>
+      </details>
+      <p id="exportUnavailable" class="help" hidden></p>
       <label>Destino<select id="deliveryPreset"><option value="original">Original · máxima flexibilidad</option><option value="reel">Reels / Stories · vertical 9:16</option><option value="portrait">Publicación vertical · 4:5</option><option value="square">Publicación cuadrada · 1:1</option><option value="youtube">Video horizontal · Full HD</option><option value="youtube4k">Video horizontal · 4K</option></select></label>
       <div class="delivery-grid">
         <label>Ancho · px (0 = original)<input id="delivery-width" type="number" min="0" max="7680" step="2"></label><label>Alto · px (0 = original)<input id="delivery-height" type="number" min="0" max="7680" step="2"></label>

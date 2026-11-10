@@ -1,4 +1,4 @@
-import { nextReviewFile, normalizeReview, reviewFiles } from "./model.js";
+import { exportBatch, nextReviewFile, normalizeReview, reviewFiles } from "./model.js";
 
 const label = { picked: "⚑ Elegida", rejected: "× Descartada", unreviewed: "Sin revisar" };
 const fit = () => ({ scale: 1, x: 0, y: 0 });
@@ -9,7 +9,7 @@ const el = (tag, className, text) => {
   return node;
 };
 
-export function mountLibrary({ $, state, api, save, reveal, enter, leave, isBusy }) {
+export function mountLibrary({ $, state, api, save, reveal, exportPicked, enter, leave, isBusy }) {
   const root = $("library"), grid = $("libraryGrid"), strip = $("libraryStrip");
   const frames = [$("libraryA"), $("libraryB")];
   const thumbnails = new Map(), details = new Map(), revisions = new WeakMap();
@@ -162,6 +162,13 @@ export function mountLibrary({ $, state, api, save, reveal, enter, leave, isBusy
     $("libraryZoomHint").hidden = !pair;
     root.classList.toggle("comparing", !!pair);
     $("libraryCount").textContent = filter === "all" ? (all.length === 1 ? "1 foto" : all.length + " fotos") : list.length + " de " + all.length;
+    const { items, unavailable } = exportBatch(state.files, "picked");
+    const exportButton = $("libraryExportPicked");
+    exportButton.textContent = `Exportar elegidas · ${items.length}`;
+    exportButton.disabled = isBusy() || !items.length;
+    exportButton.title = unavailable.length
+      ? `Originales no disponibles: ${unavailable.length}`
+      : "Exportar las fotos elegidas en todo el proyecto";
     $("libraryCompare").disabled = isBusy() || list.filter(file => !file.missing).length < 2;
     for (const button of root.querySelectorAll("[data-review-filter]")) button.setAttribute("aria-pressed", String(button.dataset.reviewFilter === filter));
     for (const button of root.querySelectorAll("[data-review-mark]")) {
@@ -290,6 +297,7 @@ export function mountLibrary({ $, state, api, save, reveal, enter, leave, isBusy
   }
   $("navLibrary").onclick = () => shown() ? leave() : enter();
   $("libraryBack").onclick = back;
+  $("libraryExportPicked").onclick = exportPicked;
   $("libraryCompare").onclick = () => {
     const list = filtered().filter(file => !file.missing);
     if (isBusy() || list.length < 2) return;

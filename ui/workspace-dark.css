@@ -294,3 +294,8 @@ dialog::backdrop { background: #0009; }
 .adjustment-group input { accent-color: var(--accent); }
 #adjustmentDialog .dialog-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 13px; }
 #adjustmentDialog .dialog-actions button { width: auto; margin: 0; }
+
+#exportBatch { margin: 0 0 12px; }
+#exportBatch summary { cursor: pointer; color: var(--muted); }
+#exportBatchList { max-height: 110px; overflow: auto; margin: 8px 0 0; padding-left: 20px; overflow-wrap: anywhere; }
+#exportUnavailable { max-height: 76px; overflow: auto; overflow-wrap: anywhere; }

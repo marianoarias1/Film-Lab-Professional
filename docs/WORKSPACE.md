@@ -21,3 +21,5 @@ Las tarjetas de Filtros muestran miniaturas de la foto activa, o del fotograma s
 En **Archivos → Copiar ajustes**, elegí qué grupos llevar de la toma activa. Abrí otra toma y pulsá **Pegar ajustes** para aplicarlos. **Sincronizar…** permite elegir varios destinos y aplicarles los grupos desde la toma activa, con una selección separada de la de exportación. Se pueden transferir Luz, Color, Curva, Textura y detalle y Grano; las máscaras y los efectos del Laboratorio quedan en cada archivo.
 
 Un solo **Deshacer** (Ctrl+Z) revierte el lote desde el origen o un destino. Si un archivo del lote tiene cambios posteriores, el editor indica qué archivo hay que deshacer primero. Los ajustes aplicados se guardan con el proyecto y el historial de deshacer se conserva durante la sesión.
+
+**Exportar elegidas** abre la exportación con todas las fotos elegidas del proyecto, sin importar el filtro actual. El diálogo permite revisar los nombres antes de elegir la carpeta y avisa si falta algún original elegido. El botón **Exportar** de la cabecera sigue usando la selección manual, que puede incluir videos. Abrir, cancelar o confirmar un lote no modifica las dos selecciones.
