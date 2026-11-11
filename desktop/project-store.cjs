@@ -25,6 +25,20 @@ function validateProject(p) {
       typeof f.settings !== "object"
     )
       throw new Error("El proyecto contiene un archivo inválido.");
+    if (f.versions !== undefined) {
+      if (!Array.isArray(f.versions)) throw new Error("La lista de versiones es inválida.");
+      const versionIds = new Set();
+      for (const version of f.versions) {
+        if (!version || typeof version.id !== "string" || !version.id ||
+            versionIds.has(version.id) || typeof version.name !== "string" ||
+            !version.name.trim() || version.name.length > 80 ||
+            typeof version.savedAt !== "string" || !Number.isFinite(Date.parse(version.savedAt)) ||
+            !version.settings || typeof version.settings !== "object" || Array.isArray(version.settings) ||
+            (version.recipe != null && typeof version.recipe !== "string"))
+          throw new Error("El proyecto contiene una versión de edición inválida.");
+        versionIds.add(version.id);
+      }
+    }
     ids.add(f.id);
   }
   return {...p,engineVersion:ENGINE};
@@ -53,6 +67,8 @@ class ProjectStore {
   }
   save(file, value) {
     const validated = validateProject(value);
+    if (Buffer.byteLength(JSON.stringify(validated, null, 2), "utf8") > 16 * 1024 * 1024)
+      throw new Error("El proyecto supera el tamaño permitido (16 MB). No se reemplazó el guardado anterior.");
     this.queue = this.queue
       .catch(() => {})
       .then(() => atomicWrite(file, validated));

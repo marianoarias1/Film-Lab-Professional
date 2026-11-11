@@ -142,6 +142,7 @@ export function newFile(f) {
     recipe: null,
     selected: true,
     review: normalizeReview(f.review),
+    versions: structuredClone(f.versions ?? []),
     history: [],
     future: [],
   };
@@ -261,7 +262,7 @@ function stepHistory(file, direction) {
       participant[to].push(entry);
       if (change) {
         participant.settings = structuredClone(direction === "redo" ? change.after : change.before);
-        participant.recipe = direction === "redo" ? null : change.recipe;
+        participant.recipe = direction === "redo" ? (change.afterRecipe ?? null) : change.recipe;
       }
     }
   } else {
@@ -309,4 +310,37 @@ export function exportBatch(files, source) {
 export function nextReviewFile(files, id, direction = 1) {
   const index = files.findIndex(file => file.id === id);
   return index < 0 ? files[0] : files[index + direction];
+}
+
+export function saveEditVersion(file, name, id, savedAt = new Date().toISOString()) {
+  name = name.trim();
+  if (!name || name.length > 80) throw new Error("Escribí un nombre de hasta 80 caracteres.");
+  const versions = file.versions ?? [];
+  if (versions.some(version => version.name.toLocaleLowerCase() === name.toLocaleLowerCase()))
+    throw new Error("Ya hay una versión con ese nombre en este archivo.");
+  const version = {
+    id, name, savedAt, settings: structuredClone(file.settings), recipe: file.recipe ?? null,
+  };
+  file.versions = [...versions, version];
+  return version;
+}
+
+export function restoreEditVersion(file, id) {
+  const version = file.versions?.find(item => item.id === id);
+  if (!version) throw new Error("No se encontró esa versión en este archivo.");
+  const after = { ...defaults(), ...structuredClone(version.settings) };
+  const recipe = version.recipe ?? null;
+  if (JSON.stringify(file.settings) === JSON.stringify(after) && file.recipe === recipe) return false;
+  const change = {
+    before: structuredClone(file.settings), recipe: file.recipe,
+    after: structuredClone(after), afterRecipe: recipe,
+  };
+  clearFuture(file);
+  const entry = {};
+  batchEntries.set(entry, new Map([[file, change]]));
+  file.settings = after;
+  file.recipe = recipe;
+  file.history.push(entry);
+  trimHistory(file);
+  return true;
 }

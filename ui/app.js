@@ -1,3 +1,4 @@
+import { mountEditVersions } from "./edit-versions.js";
 import { mountLibrary } from "./library.js";
 import { mountRecipePreviews } from "./recipe-previews.js";
 import { mountScopes } from "./scopes.js";
@@ -280,6 +281,7 @@ function updateButtons() {
     .forEach((el) => {
       el.disabled = !enabled;
     });
+  editVersions.draw();
   for (const id of ["undo", "redo"])
     $(id).disabled =
       !enabled || !(id === "undo" ? f?.history.length : f?.future.length);
@@ -1195,7 +1197,7 @@ async function doExport(files, proxy = false) {
   }
 }
 window.addEventListener("keydown", (e) => {
-  if ($("adjustmentDialog").open || $("exportDialog").open) return;
+  if ($("adjustmentDialog").open || $("exportDialog").open || $("versionDialog").open) return;
   if (e.key === "Escape") {
     if (syncSelecting) { resetSyncSelection(); drawFiles(); }
     endMask(true);
@@ -1708,6 +1710,22 @@ const library = mountLibrary({
     activate(id);
     document.querySelector('.workspace-nav [data-tab="edit"]').focus();
   },
+});
+const editVersions = mountEditVersions({
+  $, current, isBusy: () => busy,
+  prepare() {
+    endMask(true);
+    pendingMask = null;
+    toolOperation = "new";
+    $("maskType").value = "";
+    if (gesture && gesture.id === current()?.id) {
+      commitEdit(current(), gesture.before);
+      gesture = null;
+    }
+  },
+  saved: saveSoon,
+  restored: refreshSyncedFiles,
+  notify: toast,
 });
 drawWorkspace();
 // Install tools before boot draws their initial state.

@@ -123,6 +123,7 @@ function snapshot(p) {
         kind: known.kind,
         identity: known.identity,
         settings: f.settings,
+        versions: f.versions ?? [],
         recipe: f.recipe || null,
         selected: f.selected !== false,
         review: f.review === "picked" || f.review === "rejected" ? f.review : "unreviewed",
