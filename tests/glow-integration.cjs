@@ -9,7 +9,7 @@ const decoded=async(e,file,video)=>{
  return fs.readFile(output);
 };
 (async()=>{const bin=process.env.FILMLAB_ENGINE||path.resolve('native/target/release/filmlab-professional-engine'+(process.platform==='win32'?'.exe':''));const e=new Engine(bin),decoder=new Engine(bin),out=path.resolve('tests/fixtures/results/glow');await fs.mkdir(out,{recursive:true});
-try{await decoder.start();const hello=await e.start();assert.match(hello.engine,/filmlab-pro-0.12/);
+try{await decoder.start();const hello=await e.start();assert.match(hello.engine,/filmlab-pro-0.13/);
 for(const [name,kind] of [['gradient.jpg','photo'],['synthetic.dng','photo'],['clip.mp4','video']]){
  const source=path.resolve('tests/fixtures',name);await e.request('open',{key:name,path:source,kind});
  const render=async(settings,label)=>{const output=path.join(out,name+'-'+label+'.png');await e.request('preview',{key:name,settings,edge:320,time:.5,output});return fs.readFile(output);};

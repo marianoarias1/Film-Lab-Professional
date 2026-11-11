@@ -1,46 +1,36 @@
-# Proceso fotográfico V2 — primer bloque (Professional 0.12)
+# Proceso fotográfico V2 — Professional 0.13
 
-## Alcance
+Todas las fotografías usan V2. El selector V1/V2 de 0.12 fue retirado a pedido del usuario. Los proyectos anteriores, sus versiones guardadas y el historial se normalizan a V2 al restaurar o guardar; el backend fuerza V2 en preview, lupa y exportación aunque una petición antigua envíe `processVersion: 1`. El marcador permanece en los diagnósticos para identificar el procesamiento, sin funcionar como opción de interfaz. Los videos mantienen su ruta previa.
 
-Esta entrega implementa el primer bloque de V2: reducción de ruido y versionado del proceso. No es la totalidad del plan de la auditoría ni una afirmación de paridad con otros reveladores. RAW/perfiles, reconstrucción de luces, tone mapping, nitidez de salida, GPU y planificación por presupuesto de memoria quedan para bloques posteriores.
+Esto constituye una migración intencional: un proyecto antiguo con ajustes de luz/color puede cambiar de aspecto en 0.13. Las exportaciones V1 conservadas y el ejecutable anterior sirven como referencia de comparación; 0.13 no ofrece un modo para reproducir V1 en fotografías. Los originales no se modifican.
 
-Con reducción de ruido de luminancia y color desactivada, V2 mantiene el procesamiento de V1. No se agrega un look ni un cambio de color general. Conservar nitidez/textura es un criterio de evaluación, no una promesa para toda imagen.
+## Reducción de ruido (bloque integrado en PR #9)
 
-## Algoritmo
+V2 utiliza dos escalas de filtrado guiado en log-luminancia. La escala gruesa usa regularización menor y aporte del 25 %. La cromaticidad se suaviza con pesos conjuntos de posición, luminancia y color para limitar la contaminación en fronteras cromáticas. Se aplica antes de nitidez y grano creativo, comparte implementación entre preview refinada/lupa/exportación y respeta la escala de píxeles del original. No es un modelo de ruido medido por cámara/ISO ni utiliza IA.
 
-- V1 conserva sin cambios su filtrado guiado en log-luminancia y suavizado gaussiano de cromaticidad.
-- V2 filtra log-luminancia a dos escalas. La segunda usa regularización menor y un aporte del 25 % para limitar la pérdida de bordes y textura. El control Detalle sigue afectando la regularización. La corrección se aplica como una ganancia RGB común, acotada a ±2 EV por seguridad numérica.
-- V2 reemplaza el desenfoque indiscriminado de cromaticidad por un filtro de nueve muestras con pesos espaciales, de luminancia y cromaticidad. De este modo protege también fronteras de color con luminancia similar. Mantiene la luminancia y evita recortar independientemente canales negativos del espacio de trabajo.
-- Se aplica antes de la nitidez y del grano creativo. Preview refinada, lupa y exportación utilizan la misma implementación; Draft mantiene su política de aproximación existente.
-- Conserva la escala respecto de los píxeles del original. El filtro de color usa un buffer RGB auxiliar y contexto máximo de ocho píxeles por eje; la lupa mantiene el halo existente. La etapa de luminancia usa las estructuras de planos y filtros existentes. No es un perfil de ruido medido por cámara/ISO ni un método basado en IA.
+## Luces y color (0.13)
 
-Implementación independiente sobre las utilidades de LightCraft bajo MIT OR Apache-2.0. No se copió código de los proyectos GPL estudiados. La extensión se mantiene en `third-party/patches/lightcraft-process-v2.patch`, aplicada después de los dos parches existentes sobre la revisión fijada. El setup comprueba la aplicación previa para permitir ejecuciones repetidas.
+Altas luces y Sombras ajustan la base existente en pasos de exposición mediante funciones softplus. La combinación está acotada para que la derivada de la transformación de base sea al menos 0.35 dentro del rango de controles. La finalidad es evitar inversiones tonales con valores extremos y conseguir una respuesta suave. También se utiliza en las contribuciones de máscaras. Esta propiedad matemática del ajuste se verifica además con rampas completas del pipeline; no demuestra ausencia de cualquier halo en toda fotografía posible.
 
-## Compatibilidad
+En salida sRGB SDR se retira la desaturación intermedia al blanco de Rec.2020 y se realiza una proyección de los colores fuera del gamut de destino a luminosidad y ángulo de tono constantes en OkLab, reduciendo cromaticidad. La búsqueda tiene 14 iteraciones máximas y se ejecuta solo en píxeles fuera de gamut; los representables pasan sin cambios por esta función. Blanco/negro y entradas no finitas tienen tratamiento explícito. El resto del pipeline (curvas, calibración, looks y efectos) conserva su orden.
 
-`settings.processVersion` distingue 1 y 2. Los ajustes sin el campo se interpretan como V1 tanto en el motor como al restaurar proyectos y versiones de edición. Las fotos nuevas usan V2; los videos nuevos siguen en V1. Reiniciar ajustes conserva el proceso elegido. La versión se guarda en el proyecto, historial, versiones y diagnósticos de preview/exportación. Se puede copiar con el grupo de ajustes de detalle.
+La proyección puede reducir saturación y, cuando la luminosidad queda fuera de su rango físico, limitarla. No conserva simultáneamente todos los atributos de un color no representable ni recupera detalle quemado. No añade espacios de entrega, reconstrucción de canales RAW, perfiles nuevos ni GPU. El nuevo camino de acabado está limitado a sRGB SDR sin soft proofing ni transformación explícita de monitor; otros destinos conservan la ruta de LightCraft existente.
 
-La clave de caché incluye el proceso, incluso para la reutilización parcial de Draft. Cambiar V1 → V2 → V1 no reutiliza planos de otro proceso. La interfaz exige el protocolo de motor 0.12, evitando que un ejecutable viejo acepte silenciosamente ajustes V2. Se siguen abriendo proyectos 0.11 y anteriores admitidos por el lector.
+## Comparación con la referencia del usuario
 
-## Cómo comparar con las fotos guardadas
+1. Conservar los JPG originales, las exportaciones anteriores y sus JSON.
+2. Usar el ejecutable 0.13 (o recompilar), abrir el mismo original y reproducir los ajustes/tamaño/calidad de exportación. No reutilizar la exportación editada como entrada.
+3. Exportar a una carpeta nueva y guardar diagnóstico. Revisar especialmente sombras levantadas, luces, colores intensos y transiciones al blanco, además de ruido al 100 %.
+4. Registrar diferencias deseadas y regresiones por imagen. Los JSON de diagnóstico contienen ajustes; esta entrega no añade un importador de esos archivos.
 
-1. Conservar intactos los JPG originales, las exportaciones V1 y sus JSON de diagnóstico.
-2. Instalar el nuevo ejecutable 0.12 generado por la PR o recompilar el motor. Abrir el mismo original y conservar los ajustes, tamaño y opciones de exportación de la referencia.
-3. En Revelar → Detalle → Proceso fotográfico, elegir V1 para verificar la referencia. Elegir V2 para procesar la comparación. Los proyectos anteriores abren en V1 deliberadamente: requieren esta selección explícita.
-4. Exportar V2 a otra carpeta y guardar su diagnóstico. El JSON de exportación informa `processVersion` tanto junto al estado como dentro de `settings`.
-5. Comparar al 100 %, especialmente sombras, piel, pelo y bordes de color. Si ambos controles de reducción de ruido están en cero, este bloque no debería cambiar la imagen. Para valorar el algoritmo, conservar también un caso con reducción activa en ambos procesos.
+La versión de motor es 0.13; `processVersion` continúa siendo 2. Ambos identificadores están en los diagnósticos. Se requiere nuevo ejecutable; los clientes 0.13 rechazan el motor anterior para evitar ignorar las nuevas instrucciones.
 
-Los JSON de diagnóstico contienen ajustes pero esta entrega no añade un importador de esos JSON. Si no se guardó un proyecto, reproducir sus valores antes de comparar. No editar una exportación V1 para obtener V2.
+## Implementación y validación
 
-## Validación realizada
+Las dependencias continúan fijadas. La nueva capa está en `third-party/patches/lightcraft-photo-tones.patch`, aplicada después de `lightcraft-process-v2.patch` y de las dos extensiones anteriores. Código propio sobre las utilidades MIT OR Apache-2.0 de LightCraft; no se incorporó código GPL de los programas estudiados.
 
-- 60 pruebas JavaScript: modelo, persistencia, compatibilidad, versiones y suites existentes.
-- 38 pruebas Rust: 9 pruebas nuevas incluyen identidad al desactivar NR, escala cero, neutros/HDR y componentes negativos constantes, reducción de ruido de luminancia y crominancia, conservación del escalón y de luminancia, menor contaminación en una frontera cromática sintética, caché V1/V2 en Full y Draft, y equivalencia float32 entre preview completa y exportación.
-- `test:process`: protocolo real, PNG de ruido generado de forma determinista, preview Full/Draft, cambio reversible de caché, exportación PNG16 con ICC, reapertura y lupa. Rechazo de procesos desconocidos.
-- Integraciones existentes `test:engine`, `test:detail` y `test:glow`: JPEG, TIFF16, RAW sintético y video; preservación de rutas existentes.
-- Sintaxis JS, `git diff --check` y aplicación repetida del setup.
-- Comprobación de tiempo de humo (una muestra por proceso, contenedor Linux, preview refinada 1800 de carta 2200×1500, NR 65/85): aproximadamente 319 ms V1 y 316 ms V2 totales. No es benchmark, p95, prueba de aceleración ni medición en la PC del usuario.
+Validación local: 61 pruebas JavaScript y 46 Rust. Incluye migración desde ajustes ausentes/V1/V2, versiones e historial; exclusión del proceso de las opciones copiables; más de 600.000 pasos de rampas para combinaciones extremas; rampas renderizadas completas; identidad de colores representables; continuidad de frontera; conservación de tono/luminosidad OkLab y comparación de error de tono con la proyección lineal anterior en colores sintéticos. La equivalencia float32 entre preview completa y exportación se mantiene.
 
-La verificación de Chromium local quedó bloqueada por una restricción del entorno al crear sockets; no se presenta como una prueba visual superada. El selector y su persistencia tienen cobertura de modelo y sintaxis, pero requieren verificación de interacción en el ejecutable de Windows.
+Integración del protocolo real: `test:process`, `test:engine`, `test:detail` y `test:glow`. Fotos nuevas y peticiones antiguas convergen a V2 en Full/Draft/lupa/exportación; PNG16 con ICC y reapertura verificados; video conserva proceso 1. También se verifican JPEG, TIFF16 y RAW sintético. Sintaxis y setup repetible comprobados. La interacción visual del ejecutable Windows y la comparación con las fotos del usuario quedan pendientes; no se afirma una mejora universal ni paridad con otro editor.
 
-Las fotos y JSON que guardó el usuario no se adjuntaron a esta sesión; su comparación visual y los tiempos en Windows siguen pendientes. Las pruebas sintéticas no establecen calidad profesional universal ni una mejora en cada fotografía.
+Este bloque no cierra las fases restantes de la auditoría: integración RAW/perfiles, reconstrucción de luces de sensor, refinamiento de detalle, memoria/planificación y GPU siguen pendientes.

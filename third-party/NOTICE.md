@@ -11,3 +11,5 @@ Film Lab Professional 0.4 modifica localmente LightCraft `crates/pipeline/src/li
 Film Lab Professional 0.9 extiende además el radio de nitidez en LightCraft crates/pipeline/src/{lib,local,finish}.rs. La modificación está identificada en patches/lightcraft-detail-radius.patch, conservando sus licencias MIT OR Apache-2.0.
 
 Film Lab Professional 0.12 extiende LightCraft con una versión de proceso en Detail, invalidación de caché por proceso y reducción de ruido V2 (luminancia en dos escalas y crominancia con pesos conjuntos). Modificaciones en crates/develop/src/settings.rs y crates/pipeline/src/{lib,local}.rs, identificadas en patches/lightcraft-process-v2.patch. Se conservan las licencias MIT OR Apache-2.0; V1 permanece disponible.
+
+Film Lab Professional 0.13 agrega ajustes tonales suaves y proyección de gamut sRGB en OkLab en LightCraft crates/pipeline/src/finish.rs, identificados en patches/lightcraft-photo-tones.patch. Se conservan las licencias MIT OR Apache-2.0. Todas las fotografías se migran al proceso V2; el video mantiene su ruta anterior.

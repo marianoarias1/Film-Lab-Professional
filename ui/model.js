@@ -8,9 +8,9 @@ export function normalizeEffects(value){
  const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
  return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
 }
-export const ENGINE = "filmlab-pro-0.12-lc-d999e382-fc-6c3948a3";
+export const ENGINE = "filmlab-pro-0.13-lc-d999e382-fc-6c3948a3";
 export const defaults = (file = {}) => ({
-  processVersion: file.settings?.processVersion ?? (file.kind === "video" ? 1 : 2),
+  processVersion: file.kind === "video" ? 1 : 2,
   masks: [],
   glow: {enabled:false,style:"soft",amount:35,range:35,spread:35,angle:0,softness:50,temperature:0,maskId:null},
   labEffects: effectDefaults(),
@@ -141,9 +141,9 @@ export function setSettingValue(settings,key,value) {
   for(const part of parts)target=target[part];
   target[last]=value;
 }
-// Files/versions without a process marker predate V2.
+// All photographs now use V2, including old projects and saved edit versions.
 export function restoreSettings(file, settings = {}) {
-  return { ...defaults(file), ...structuredClone(settings), processVersion: settings.processVersion ?? 1 };
+  return { ...defaults(file), ...structuredClone(settings), processVersion: file.kind === "video" ? 1 : 2 };
 }
 export function newFile(f) {
   return {
@@ -162,7 +162,7 @@ export const adjustmentGroups = [
   { id: "light", label: "Luz", keys: ["exposure", "contrast", "highlights", "shadows", "whites", "blacks"] },
   { id: "color", label: "Color", keys: ["temperature", "tint", "saturation", "vibrance", "hsl", "mono"] },
   { id: "curve", label: "Curva", keys: ["curve"] },
-  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "processVersion", "sharpness", "denoise", "sharpenRadius", "sharpenMasking", "denoiseDetail", "denoiseColor", "vignette"] },
+  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "sharpness", "denoise", "sharpenRadius", "sharpenMasking", "denoiseDetail", "denoiseColor", "vignette"] },
   { id: "grain", label: "Grano", keys: ["grain", "grainSize"] },
 ];
 
@@ -239,7 +239,7 @@ export function applyAdjustments(files, patch, anchor = null) {
   for (const [file, change] of records) {
     clearFuture(file);
     if (change) {
-      file.settings = structuredClone(change.after);
+      file.settings = restoreSettings(file, change.after);
       file.recipe = null;
     }
     file.history.push(entry);
@@ -272,13 +272,13 @@ function stepHistory(file, direction) {
       participant[from].pop();
       participant[to].push(entry);
       if (change) {
-        participant.settings = structuredClone(direction === "redo" ? change.after : change.before);
+        participant.settings = restoreSettings(participant, direction === "redo" ? change.after : change.before);
         participant.recipe = direction === "redo" ? (change.afterRecipe ?? null) : change.recipe;
       }
     }
   } else {
     file[to].push(structuredClone(file.settings));
-    file.settings = file[from].pop();
+    file.settings = restoreSettings(file, file[from].pop());
     file.recipe = null;
   }
   return true;
@@ -292,7 +292,10 @@ export function projectSnapshot(state) {
     name: state.name || "Sin título",
     savedAt: new Date().toISOString(),
     activeId: state.activeId,
-    files: state.files.map(({ history, future, ...f }) => structuredClone(f)),
+    files: state.files.map(({ history, future, ...f }) => ({
+      ...structuredClone(f), settings: restoreSettings(f, f.settings),
+      versions: (f.versions ?? []).map(v => ({...structuredClone(v), settings: restoreSettings(f, v.settings)})),
+    })),
   };
 }
 export function selectedIds(files) {
