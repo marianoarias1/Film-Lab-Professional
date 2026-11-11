@@ -217,3 +217,15 @@ test("El ruido de color conserva los valores iniciales RAW y JPEG al abrir proye
  assert.equal(raw.settings.denoiseColor,25);
  assert.equal(raw.settings.sharpenRadius,0);
 });
+
+test('Proceso V2 para fotos nuevas, V1 para video y ajustes antiguos, con migración explícita reversible',async()=>{
+ const m=await model(),photo=m.newFile({id:'photo',kind:'photo'}),video=m.newFile({id:'video',kind:'video'});
+ assert.equal(photo.settings.processVersion,2);assert.equal(video.settings.processVersion,1);
+ const old={exposure:0.8,denoise:55};const saved=structuredClone(old);
+ photo.settings=m.restoreSettings(photo,old);assert.equal(photo.settings.processVersion,1);assert.deepEqual(old,saved);
+ const before=structuredClone(photo.settings);photo.settings.processVersion=2;m.commitEdit(photo,before);
+ m.undo(photo);assert.equal(photo.settings.processVersion,1);m.redo(photo);assert.equal(photo.settings.processVersion,2);
+ const snapshot=m.projectSnapshot({files:[photo],activeId:photo.id});assert.equal(snapshot.files[0].settings.processVersion,2);
+ photo.versions=[{id:'old',settings:old}];m.restoreEditVersion(photo,'old');assert.equal(photo.settings.processVersion,1);
+ assert.equal(m.defaults(photo).processVersion,1,'reset preserves the chosen process');
+});

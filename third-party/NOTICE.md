@@ -9,3 +9,5 @@ El puente y la interfaz propios de Film Lab no heredan automáticamente una lice
 Film Lab Professional 0.4 modifica localmente LightCraft `crates/pipeline/src/lib.rs` para exportar alta precisión sin preview/histograma intermedios. Modificación identificada y parche en `patches/lightcraft-deep-export.patch`. El catálogo deriva del repositorio Film Lab del usuario, conservando créditos y referencias.
 
 Film Lab Professional 0.9 extiende además el radio de nitidez en LightCraft crates/pipeline/src/{lib,local,finish}.rs. La modificación está identificada en patches/lightcraft-detail-radius.patch, conservando sus licencias MIT OR Apache-2.0.
+
+Film Lab Professional 0.12 extiende LightCraft con una versión de proceso en Detail, invalidación de caché por proceso y reducción de ruido V2 (luminancia en dos escalas y crominancia con pesos conjuntos). Modificaciones en crates/develop/src/settings.rs y crates/pipeline/src/{lib,local}.rs, identificadas en patches/lightcraft-process-v2.patch. Se conservan las licencias MIT OR Apache-2.0; V1 permanece disponible.

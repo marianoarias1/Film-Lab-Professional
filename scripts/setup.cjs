@@ -43,4 +43,13 @@ if (git(["-C", lightcraft, "apply", "--reverse", "--check", detailPatch], true).
   const result = git(["-C", lightcraft, "apply", detailPatch]);
   if (result.status !== 0) process.exit(result.status || 1);
 }
+const v2Patch = path.join(root, "third-party", "patches", "lightcraft-process-v2.patch");
+if (git(["-C", lightcraft, "apply", "--reverse", "--check", v2Patch], true).status !== 0) {
+  if (git(["-C", lightcraft, "apply", "--check", v2Patch], true).status !== 0) {
+    console.error("La extensión V2 no coincide con las fuentes fijadas de LightCraft.");
+    process.exit(1);
+  }
+  const result = git(["-C", lightcraft, "apply", v2Patch]);
+  if (result.status !== 0) process.exit(result.status || 1);
+}
 console.log("Fuentes listas. Ejecutá npm run build:engine y después npm start.");

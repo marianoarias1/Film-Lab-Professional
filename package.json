@@ -1,6 +1,6 @@
 {
   "name": "filmlab-professional",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "private": true,
   "description": "Film Lab Professional \u00b7 prototipo de escritorio local",
   "author": "Film Lab",
@@ -20,7 +20,8 @@
     "test:preview": "node tests/preview-integration.cjs",
     "test:catalog": "node tests/catalog-integration.cjs",
     "test:masks": "node tests/masks-engine-integration.cjs",
-    "test:creative": "node tests/creative-engine-integration.cjs"
+    "test:creative": "node tests/creative-engine-integration.cjs",
+    "test:process": "node tests/process-v2-integration.cjs"
   },
   "devDependencies": {
     "electron": "44.9.0",

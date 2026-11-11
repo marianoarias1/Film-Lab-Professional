@@ -1,3 +1,5 @@
+#[cfg(test)]
+mod process_v2_tests;
 mod delivery;
 mod detail;
 mod glow;
@@ -26,10 +28,12 @@ use std::{
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.11-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.12-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
+    // Missing in saved V1 settings: never silently change a previous render.
+    process_version: u8,
     exposure: f64,
     contrast: f64,
     highlights: f64,
@@ -71,6 +75,7 @@ struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            process_version: 1,
             exposure: 0.,
             contrast: 0.,
             highlights: 0.,
@@ -113,6 +118,9 @@ impl Default for Settings {
 }
 impl Settings {
     fn validate(&self) -> Result<()> {
+        if !matches!(self.process_version, 1 | 2) {
+            return Err("Versión de proceso no compatible".into());
+        }
         self.lab_effects.validate()?;
         self.glow.validate()?;
         if self.masks.len() > 32 {
@@ -270,6 +278,7 @@ impl Settings {
         } else {
             DevelopSettings::default()
         };
+        d.detail.process_version = self.process_version;
         d.masks = self.masks.clone();
         d.light.exposure = self.exposure;
         d.light.contrast = self.contrast;
@@ -1136,7 +1145,7 @@ fn run(
         let input = input_metrics.json();
         return Ok(
             json!({"path":target,"width":rendered.image.width,"height":rendered.image.height,"ms":total_ms,
-            "previewDiagnostics":{"totalMs":total_ms,"inputPreparationMs":input_ms,"decodeMs":input["decodeMs"],
+            "previewDiagnostics":{"processVersion":settings.process_version,"totalMs":total_ms,"inputPreparationMs":input_ms,"decodeMs":input["decodeMs"],
                 "inputColorAndResizeMs":input["inputColorAndResizeMs"],"renderMs":render_ms,"pngEncodeAndWriteMs":png_ms,
                 "inputCacheHit":input_cache_hit,"videoCacheEntries":state.video_previews.len(),"draft":draft,"edge":edge}}),
         );
@@ -1231,7 +1240,7 @@ fn run(
                 }
                 let write_started = Instant::now();
                 std::fs::write(target, bytes).map_err(|e| e.to_string())?;
-                let diagnostics = json!({"schemaVersion":1,"appVersion":env!("CARGO_PKG_VERSION"),"status":"completed","format":ext,"width":output_width,"height":output_height,"delivery":delivery,
+                let diagnostics = json!({"schemaVersion":1,"appVersion":env!("CARGO_PKG_VERSION"),"processVersion":settings.process_version,"status":"completed","format":ext,"width":output_width,"height":output_height,"delivery":delivery,
                     "revealMs":reveal_ms,"gradeMs":grade_ms,"encodeMs":encode_ms,"writeMs":write_started.elapsed().as_secs_f64()*1000.,
                     "wallMs":photo_started.elapsed().as_secs_f64()*1000.,"displayPreviewGenerated":ext=="jpg"||ext=="jpeg","histogramGenerated":false,"settings":settings});
                 export_diagnostics::save_last(diagnostics.clone());

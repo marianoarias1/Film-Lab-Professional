@@ -280,6 +280,10 @@
             <button data-group="precision" aria-controls="groupContent" aria-expanded="false">Detalle <span>Nitidez y ruido</span></button>
             <div id="groupContent">
           <div id="detailIntro" class="detail-intro" hidden>
+            <label class="mixer-label" for="photoProcess">Proceso fotográfico
+              <select id="photoProcess"><option value="1">V1 · Original</option><option value="2">V2 · Ruido y detalle</option></select>
+            </label>
+            <p class="help">V2 protege bordes al reducir ruido de color y trabaja la luminancia en dos escalas. Podés alternar sin perder tus ajustes.</p>
             <button id="detailToggle" type="button" class="outline" aria-controls="detailInspector" aria-expanded="false">Ver detalle · 100 %</button>
             <p class="help">Radio 0: automático. La máscara de nitidez protege zonas suaves. El ruido de color se ajusta por separado.</p>
           </div>

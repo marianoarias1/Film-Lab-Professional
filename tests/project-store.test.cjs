@@ -72,3 +72,10 @@ test("Abre proyectos 0.10 conservando el resplandor direccional anterior",()=>{
  p.files[0].settings.glow={enabled:true,style:"directional",amount:47};
  validateProject(p);assert.equal(p.files[0].settings.glow.style,"directional");assert.equal(p.files[0].settings.glow.amount,47);
 });
+
+test('Abre proyectos 0.11 sin cambiar ajustes ni versiones antes de elegir V2',()=>{
+ const p=doc('/source/photo.jpg');p.engineVersion='filmlab-pro-0.11-lc-d999e382-fc-6c3948a3';
+ p.files[0].settings={denoise:55,denoiseColor:35};
+ const original=structuredClone(p.files);const restored=validateProject(p);
+ assert.equal(restored.engineVersion,ENGINE);assert.deepEqual(restored.files,original);
+});

@@ -8,8 +8,9 @@ export function normalizeEffects(value){
  const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
  return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
 }
-export const ENGINE = "filmlab-pro-0.11-lc-d999e382-fc-6c3948a3";
+export const ENGINE = "filmlab-pro-0.12-lc-d999e382-fc-6c3948a3";
 export const defaults = (file = {}) => ({
+  processVersion: file.settings?.processVersion ?? (file.kind === "video" ? 1 : 2),
   masks: [],
   glow: {enabled:false,style:"soft",amount:35,range:35,spread:35,angle:0,softness:50,temperature:0,maskId:null},
   labEffects: effectDefaults(),
@@ -140,6 +141,10 @@ export function setSettingValue(settings,key,value) {
   for(const part of parts)target=target[part];
   target[last]=value;
 }
+// Files/versions without a process marker predate V2.
+export function restoreSettings(file, settings = {}) {
+  return { ...defaults(file), ...structuredClone(settings), processVersion: settings.processVersion ?? 1 };
+}
 export function newFile(f) {
   return {
     ...f,
@@ -157,7 +162,7 @@ export const adjustmentGroups = [
   { id: "light", label: "Luz", keys: ["exposure", "contrast", "highlights", "shadows", "whites", "blacks"] },
   { id: "color", label: "Color", keys: ["temperature", "tint", "saturation", "vibrance", "hsl", "mono"] },
   { id: "curve", label: "Curva", keys: ["curve"] },
-  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "sharpness", "denoise", "sharpenRadius", "sharpenMasking", "denoiseDetail", "denoiseColor", "vignette"] },
+  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "processVersion", "sharpness", "denoise", "sharpenRadius", "sharpenMasking", "denoiseDetail", "denoiseColor", "vignette"] },
   { id: "grain", label: "Grano", keys: ["grain", "grainSize"] },
 ];
 
@@ -334,7 +339,7 @@ export function saveEditVersion(file, name, id, savedAt = new Date().toISOString
 export function restoreEditVersion(file, id) {
   const version = file.versions?.find(item => item.id === id);
   if (!version) throw new Error("No se encontró esa versión en este archivo.");
-  const after = { ...defaults(file), ...structuredClone(version.settings) };
+  const after = restoreSettings(file, version.settings);
   const recipe = version.recipe ?? null;
   if (JSON.stringify(file.settings) === JSON.stringify(after) && file.recipe === recipe) return false;
   const change = {

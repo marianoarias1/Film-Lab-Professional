@@ -1,0 +1,112 @@
+--- a/crates/develop/src/settings.rs
++++ b/crates/develop/src/settings.rs
+@@ -613,6 +613,8 @@
+ #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
+ #[serde(default)]
+ pub struct Detail {
++    /// FilmLab process: 1 keeps the legacy render, 2 enables edge-aware multiscale NR.
++    pub process_version: u8,
+     pub sharpen_amount: f64,
+     pub sharpen_radius: f64,
+     pub sharpen_detail: f64,
+@@ -630,6 +632,7 @@
+     /// values for rendered files and apply raw defaults at import time (`DevelopSettings::for_raw`).
+     fn default() -> Self {
+         Self {
++            process_version: 1,
+             sharpen_amount: 0.0,
+             sharpen_radius: 1.0,
+             sharpen_detail: 25.0,
+--- a/crates/pipeline/src/lib.rs
++++ b/crates/pipeline/src/lib.rs
+@@ -450,11 +450,13 @@
+         // and the local tone mapping
+         local_tone::enabled(info, s),
+         src_long,
++        d.process_version,
+     ));
+     let lin_key = hash_of((
+         pre_nr_key,
+         [d.nr_luminance, d.nr_detail, d.nr_color, d.nr_color_detail, d.nr_color_smoothness].map(f64::to_bits),
+         detail_scale.to_bits(),
++        d.process_version,
+     ));
+     Plan { settings, frame, w, h, px_per_long, src_long, detail_scale, geo, lin_key, pre_nr_key, eyes, fixed_air, keep, mattes: info.mattes.clone() }
+ }
+--- a/crates/pipeline/src/local.rs
++++ b/crates/pipeline/src/local.rs
+@@ -359,7 +359,73 @@
+ /// `scale`: output pixels per pixel of the original ([`nr_params`]).
+ pub fn denoise(img: &mut Rgb32f, s: &DevelopSettings, scale: f32) {
+     let (lum, col) = nr_params(s, scale);
+-    apply_nr(img, lum, col);
++    if s.detail.process_version == 2 {
++        apply_nr_v2(img, lum, col);
++    } else {
++        apply_nr(img, lum, col);
++    }
++}
++
++/// V2 uses two edge-aware scales for luminance and a joint chroma filter.
++/// Runs before sharpening/creative grain, with the same original-pixel scale as V1.
++/// No camera/ISO noise profile is claimed: epsilon comes from the user's controls.
++pub fn apply_nr_v2(img: &mut Rgb32f, lum: Option<NrLum>, col: Option<NrColor>) {
++    let w = img.width;
++    if let Some(nr) = lum {
++        let l = img.map(log_lum);
++        let fine = guided(&l, nr.sigma, nr.eps);
++        // Coarse residual uses a smaller regularizer: edges and meaningful texture
++        // must not be classified as noise merely because the radius is larger.
++        let coarse = guided(&fine, nr.sigma * 2.0, nr.eps * 0.35);
++        for_rows(&mut img.data, w, |y, row| {
++            for (x, p) in row.iter_mut().enumerate() {
++                let i = y * w + x;
++                let base = fine.data[i] + 0.25 * (coarse.data[i] - fine.data[i]);
++                let gain = ((base - l.data[i]) * nr.k).clamp(-2.0, 2.0).exp2();
++                *p = p.map(|c| c * gain);
++            }
++        });
++    }
++    if let Some(nr) = col {
++        // One image-sized scratch buffer; each tile's context must include this
++        // radius. A 3x3 Gaussian blur remains fast but bleeds chroma over edges;
++        // joint luminance + chroma weights protect both kinds of boundary.
++        let source = img.clone();
++        let h = source.height;
++        let step = (nr.sigma * 0.5).round().clamp(1.0, 8.0) as isize;
++        let chroma = |p: [f32; 3]| {
++            let y = luminance_2020(p).max(1e-5);
++            (y, p.map(|c| c / y))
++        };
++        let chroma_variance = 0.015 + 0.20 * nr.t;
++        for_rows(&mut img.data, w, |y, row| {
++            for (x, p) in row.iter_mut().enumerate() {
++                let (yp, cp) = chroma(source.data[y * w + x]);
++                let mut sum = [0.0; 3];
++                let mut weight_sum = 0.0;
++                for dy in -1isize..=1 {
++                    for dx in -1isize..=1 {
++                        let nx = (x as isize + dx * step).clamp(0, w as isize - 1) as usize;
++                        let ny = (y as isize + dy * step).clamp(0, h as isize - 1) as usize;
++                        let (yq, cq) = chroma(source.data[ny * w + nx]);
++                        let dl = (yq / yp).log2();
++                        let dc = (0..3).map(|k| (cq[k] - cp[k]).powi(2)).sum::<f32>();
++                        let spatial = if dx == 0 && dy == 0 { 1.0 } else if dx == 0 || dy == 0 { 0.6 } else { 0.36 };
++                        let weight = spatial * (-dl * dl / 0.125 - dc / chroma_variance).exp();
++                        for k in 0..3 { sum[k] += cq[k] * weight; }
++                        weight_sum += weight;
++                    }
++                }
++                // Normalization of each chromaticity makes its luminance one;
++                // interpolating them retains the input's luminance, including
++                // negative wide-gamut components (no independent RGB clipping).
++                let original_y = luminance_2020(*p);
++                if original_y > 1e-5 {
++                    *p = std::array::from_fn(|k| (cp[k] + nr.t * (sum[k] / weight_sum - cp[k])) * original_y);
++                }
++            }
++        });
++    }
+ }
+ 
+ /// Noise reduction with explicit parameters (see [`denoise`]).
