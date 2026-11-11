@@ -7,3 +7,5 @@ Las bibliotecas Rust externas conservan sus avisos en rust-licenses y sus refere
 El puente y la interfaz propios de Film Lab no heredan automáticamente una licencia de publicación; el titular de Film Lab debe decidir cómo distribuirlos. Este paquete se entrega como prototipo para su evaluación.
 
 Film Lab Professional 0.4 modifica localmente LightCraft `crates/pipeline/src/lib.rs` para exportar alta precisión sin preview/histograma intermedios. Modificación identificada y parche en `patches/lightcraft-deep-export.patch`. El catálogo deriva del repositorio Film Lab del usuario, conservando créditos y referencias.
+
+Film Lab Professional 0.9 extiende además el radio de nitidez en LightCraft crates/pipeline/src/{lib,local,finish}.rs. La modificación está identificada en patches/lightcraft-detail-radius.patch, conservando sus licencias MIT OR Apache-2.0.

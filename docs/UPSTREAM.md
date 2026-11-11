@@ -16,3 +16,7 @@ Antes de una distribución comercial amplia hay que revisar las obligaciones de 
 ## Modificación local en 0.4
 
 El 24-10-2026 se agregó `render_deep_cached` y una bandera privada para omitir la imagen de display cuando solo se solicita salida de alta precisión. El cálculo y sus muestras se mantienen; la API existente sigue generando preview e histograma. Parche contra la revisión fijada: `third-party/patches/lightcraft-deep-export.patch`. No se modificó FilmCraft. Se conservan licencias y avisos upstream.
+
+## Extensión de detalle 0.9
+
+El parche third-party/patches/lightcraft-detail-radius.patch añade un plano de nitidez independiente de la textura en crates/pipeline/src/{lib,local,finish}.rs. Su radio usa la escala del original. Un radio 0 conserva el plano automático anterior. Se reutilizan el filtrado gaussiano y la máscara de nitidez de LightCraft, sin modificar los algoritmos de reducción de ruido. El comando npm run setup aplica primero la extensión de exportación y luego esta extensión. Las fuentes fijadas y ambos parches reproducen el código compilado.

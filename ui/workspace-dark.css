@@ -342,3 +342,23 @@ dialog::backdrop { background: #0009; }
 .version-error { color: #efa69e; font-size: 12px; }
 .version-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
 #versionDialog .version-dialog-actions button { width: auto; margin: 0; }
+
+.detail-intro { margin: 8px 0 14px; }
+.detail-intro button { width: 100%; padding: 7px; font-size: 11px; }
+.detail-intro .help { font-size: 10px; margin: 7px 0; }
+.detail-inspector {
+  position: absolute; z-index: 12; left: 10px; bottom: 48px;
+  width: min(322px, calc(100% - 20px)); padding: 8px;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 9px;
+  box-shadow: 0 4px 16px #0005; user-select: none;
+}
+.detail-inspector-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-size: 11px; }
+.detail-inspector-heading button { padding: 3px 6px; }
+.detail-viewport { position: relative; height: 196px; overflow: hidden; display: grid; place-items: center; background: var(--well); touch-action: none; cursor: grab; }
+.detail-viewport img { max-width: none; max-height: none; pointer-events: none; }
+#detailLoading { position: absolute; padding: 8px; background: #141514dd; font-size: 11px; }
+.detail-inspector-footer { display: flex; align-items: center; justify-content: space-between; min-height: 28px; gap: 5px; }
+.detail-inspector-footer button { font-size: 10px; padding: 5px 2px; }
+#detailState { font-size: 9px; color: var(--muted); }
+.detail-inspector p { font-size: 9px; margin: 2px 0 0; color: var(--muted); }
+.inspecting-detail { cursor: crosshair; }

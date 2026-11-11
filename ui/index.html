@@ -171,9 +171,21 @@
                 en tu disco.
               </p>
               <button id="emptyImport" class="dark">+ Abrir archivos</button
-              ><small>Professional 0.8 · Windows</small>
+              ><small>Professional 0.9 · Windows</small>
             </div>
           </div>
+          <section id="detailInspector" class="detail-inspector" aria-label="Detalle al 100 %" hidden>
+            <div class="detail-inspector-heading"><b>Detalle · 100 %</b><button id="detailClose" type="button" aria-label="Cerrar detalle">×</button></div>
+            <div id="detailViewport" class="detail-viewport" aria-label="Arrastrar para mover el recorte">
+              <img id="detailImage" alt="Recorte a resolución original" draggable="false" hidden>
+              <span id="detailLoading" role="status">Cargando detalle…</span>
+            </div>
+            <div class="detail-inspector-footer">
+              <button id="detailBefore" type="button" aria-pressed="false">Mantener: sin nitidez ni reducción</button>
+              <span id="detailState" role="status"></span>
+            </div>
+            <p>Arrastrá el recorte o hacé clic en la foto. Vista técnica sin efectos de Laboratorio.</p>
+          </section>
           <div class="image-toolbar">
             <button id="undo" title="Deshacer (Ctrl+Z)" disabled>
               ↶ <span>Deshacer</span></button
@@ -264,8 +276,13 @@
             <button data-group="light" class="active" aria-controls="groupContent" aria-expanded="true">Luz <span>Exposición y contraste</span></button>
             <button data-group="color" aria-controls="groupContent" aria-expanded="false">Color <span>Temp · Matiz · HSL</span></button>
             <button data-group="curve" aria-controls="groupContent" aria-expanded="false">Curva <span>Tonos</span></button>
-            <button data-group="detail" aria-controls="groupContent" aria-expanded="false">Textura y grano <span>Detalle</span></button>
+            <button data-group="detail" aria-controls="groupContent" aria-expanded="false">Textura y grano <span>Acabado</span></button>
+            <button data-group="precision" aria-controls="groupContent" aria-expanded="false">Detalle <span>Nitidez y ruido</span></button>
             <div id="groupContent">
+          <div id="detailIntro" class="detail-intro" hidden>
+            <button id="detailToggle" type="button" class="outline" aria-controls="detailInspector" aria-expanded="false">Ver detalle · 100 %</button>
+            <p class="help">Radio 0: automático. La máscara de nitidez protege zonas suaves. El ruido de color se ajusta por separado.</p>
+          </div>
           <div id="sliders"></div>
           <div id="curvePanel" hidden>
             <p class="help">

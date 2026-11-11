@@ -38,4 +38,9 @@ if (git(["-C", lightcraft, "apply", "--reverse", "--check", patch], true).status
   if (result.status !== 0) process.exit(result.status || 1);
   console.log("LightCraft: extensión de exportación aplicada.");
 }
+const detailPatch = path.join(root, "third-party", "patches", "lightcraft-detail-radius.patch");
+if (git(["-C", lightcraft, "apply", "--reverse", "--check", detailPatch], true).status !== 0) {
+  const result = git(["-C", lightcraft, "apply", detailPatch]);
+  if (result.status !== 0) process.exit(result.status || 1);
+}
 console.log("Fuentes listas. Ejecutá npm run build:engine y después npm start.");

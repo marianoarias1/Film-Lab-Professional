@@ -1,0 +1,93 @@
+--- a/crates/pipeline/src/lib.rs
++++ b/crates/pipeline/src/lib.rs
+@@ -208,6 +208,7 @@
+     pub base: Arc<Plane>,
+     pub clarity_blur: Option<Arc<Plane>>,
+     pub texture_blur: Option<Arc<Plane>>,
++    pub sharpen_blur: Option<Arc<Plane>>,
+     pub dark: Option<Arc<Plane>>,
+     /// Blurred chromaticity (`rgb / Y`) for local Moiré / Noise.
+     pub chroma_blur: Option<Arc<Rgb32f>>,
+@@ -595,7 +596,7 @@
+         Some(p) if req.quality == Quality::Draft && p.pre_nr == plan.pre_nr_key => p.for_other_nr(),
+         _ => local::Planes { key: lin_key, pre_nr: plan.pre_nr_key, ..Default::default() },
+     };
+-    let mut prep = local::prepare(lin.clone(), s, frame, px_per_long, req.quality, &mut planes, plan.mattes.as_deref());
++    let mut prep = local::prepare(lin.clone(), s, frame, px_per_long, detail_scale, req.quality, &mut planes, plan.mattes.as_deref());
+     if let Some(a) = plan.fixed_air {
+         prep.air = a;
+     }
+--- a/crates/pipeline/src/local.rs
++++ b/crates/pipeline/src/local.rs
+@@ -419,6 +419,7 @@
+     pub base: Option<(BaseKey, Arc<Plane>)>,
+     pub clarity: Option<(u32, Arc<Plane>)>,
+     pub texture: Option<(u32, Arc<Plane>)>,
++    pub sharpen: Option<(u32, Arc<Plane>)>,
+     /// Dark channel and its airlight.
+     pub dark: Option<(u32, Arc<Plane>, f32)>,
+     /// Blurred chromaticity (local Moiré / Noise).
+@@ -430,7 +431,7 @@
+     /// enough for a draft: the wide blurs (base, clarity, dehaze, chromaticity). Its `key` matches
+     /// no image, so only another draft takes them.
+     pub fn for_other_nr(self) -> Planes {
+-        Planes { key: 0, pre_nr: self.pre_nr, log_l: None, texture: None, ..self }
++        Planes { key: 0, pre_nr: self.pre_nr, log_l: None, texture: None, sharpen: None, ..self }
+     }
+ }
+ 
+@@ -503,7 +504,7 @@
+     let clarity = (s.effects.clarity != 0.0 || local_any(|a| a.clarity)).then(|| (0.012 * ppl).max(1.0));
+     // local Noise and Defringe read the fine detail band too
+     let texture = (s.effects.texture != 0.0
+-        || s.detail.sharpen_amount != 0.0
++        || (s.detail.sharpen_amount != 0.0 && s.detail.sharpen_radius <= 0.0)
+         || local_any(|a| a.texture)
+         || local_any(|a| a.sharpness)
+         || local_any(|a| a.noise)
+@@ -524,6 +525,7 @@
+     s: &DevelopSettings,
+     frame: &Frame,
+     px_per_long: f64,
++    detail_scale: f32,
+     q: Quality,
+     planes: &mut Planes,
+     mattes: Option<&masks::Mattes>,
+@@ -573,7 +575,11 @@
+     };
+     let ev = s.light.exposure as f32;
+     let masks = timed("masks", || masks::evaluate(&s.masks, frame, img.width, img.height, &img, &log_l, ev, mattes));
+-    Prepared { img, log_l, base, clarity_blur, texture_blur, dark, chroma_blur, air, masks, px_per_long }
++    let sharpen_blur = if s.detail.sharpen_amount != 0.0 && s.detail.sharpen_radius > 0.0 {
++        let sigma = (s.detail.sharpen_radius as f32 * detail_scale).max(0.05);
++        Some(plane_at(&mut planes.sharpen, sigma.to_bits(), || gaussian(&log_l, sigma)))
++    } else { None };
++    Prepared { img, log_l, base, clarity_blur, texture_blur, sharpen_blur, dark, chroma_blur, air, masks, px_per_long }
+ }
+ 
+ /// The airlight of the whole output frame, estimated on a small render of it (`proxy_w` px wide):
+--- a/crates/pipeline/src/finish.rs
++++ b/crates/pipeline/src/finish.rs
+@@ -501,7 +501,7 @@
+                 delta += cl * 0.85 * det * (0.35 + 0.65 * mid);
+             }
+             let tx = tex + l_tex;
+-            let sp = l_sharp * 0.6 + sharpen;
++            let sp = l_sharp * 0.6 + if p.sharpen_blur.is_none() { sharpen } else { 0.0 };
+             if (tx != 0.0 || sp != 0.0)
+                 && let Some(b) = &p.texture_blur
+             {
+@@ -512,6 +512,13 @@
+                     let m = if sharpen_mask > 0.0 { smooth(sharpen_mask * 0.25, sharpen_mask * 0.25 + 0.15, det.abs()) } else { 1.0 };
+                     delta += sp * 1.3 * det.clamp(-0.8, 0.8) * m;
+                 }
++            }
++            if sharpen != 0.0 && let Some(b) = &p.sharpen_blur {
++                let det = l_pre - b.data[i];
++                let m = if sharpen_mask > 0.0 {
++                    smooth(sharpen_mask * 0.25, sharpen_mask * 0.25 + 0.15, det.abs())
++                } else { 1.0 };
++                delta += sharpen * 1.3 * det.clamp(-0.8, 0.8) * m;
+             }
+             // local Noise: smooth (or, negative, boost) small-amplitude detail, keep edges
+             if l_noise != 0.0
