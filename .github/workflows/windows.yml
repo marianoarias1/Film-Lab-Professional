@@ -45,6 +45,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
       - run: npm run test:glow
       - run: npm run test:detail
+      - run: npm run test:process
       - uses: actions/upload-artifact@v4
         with:
           name: FilmLab-Professional-Windows-x64

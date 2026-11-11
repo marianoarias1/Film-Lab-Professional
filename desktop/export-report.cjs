@@ -2,7 +2,7 @@ const os = require('node:os');
 const {atomicWrite} = require('./project-store.cjs');
 function makeReport({name,kind,result,status='completed',error=null,openMs=0,wallMs=0,redact=[]}) {
   const report = {
-    schemaVersion:1, appVersion:'0.4.0', createdAt:new Date().toISOString(),
+    schemaVersion:1, appVersion:require('../package.json').version, createdAt:new Date().toISOString(),
     fileName:name,kind,status,error,
     host:{platform:process.platform,arch:process.arch,cpu:os.cpus()[0]?.model||'unknown',logicalProcessors:os.availableParallelism(),ramBytes:os.totalmem()},
     timings:{openMs,desktopWallMs:wallMs},

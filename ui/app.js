@@ -14,6 +14,7 @@ import {progressView} from "./export-progress.js";
 let cancelPending = false;
 import {
   defaults,
+  restoreSettings,
   installCatalog,
   settingValue,
   setSettingValue,
@@ -494,6 +495,15 @@ function drawControls() {
   $("effectsPanel").hidden = tab !== "effects";
   $("panelTitle").textContent = { edit: "A tu manera.", effects: "Laboratorio.", masks: "Máscaras." }[tab];
   $("detailIntro").hidden = group !== "precision";
+  const processSelect = $("photoProcess");
+  processSelect.value = String(f?.settings.processVersion ?? 1);
+  processSelect.disabled = !f || busy || f.kind === "video";
+  processSelect.onchange = () => {
+    if (!f || busy || f.kind === "video") return;
+    const before = structuredClone(f.settings);
+    f.settings.processVersion = Number(processSelect.value);
+    if (commitEdit(f, before)) edited();
+  };
   $("sliders").replaceChildren(
     ...(definitions[group] || []).map((def) => slider(def)),
   );
@@ -964,7 +974,7 @@ async function restore(p) {
   state.name = p.name;
   state.files = p.files.map((f) => ({
     ...newFile(f),
-    settings: { ...defaults(f), ...f.settings },
+    settings: restoreSettings(f, f.settings),
     recipe: f.recipe,
     selected: f.selected !== false,
   }));
