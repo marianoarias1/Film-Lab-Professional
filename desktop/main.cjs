@@ -307,6 +307,23 @@ app.whenReady().then(async () => {
       await fs.rm(output, { force: true }).catch(() => {});
     }
   }));
+  ipcMain.handle("detail-release", (_, { id } = {}) => serial(() => engine.request("detail-release", { key: id })));
+  ipcMain.handle("detail-preview", (_, m) => serial(async () => {
+    const file = await activate(m.id);
+    const output = path.join(cache, crypto.randomUUID() + ".png");
+    const beforeOutput = path.join(cache, crypto.randomUUID() + ".png");
+    try {
+      const result = await engine.request("detail-preview", {
+        key: file.id, path: file.path, settings: m.settings, time: m.time || 0,
+        x: m.x, y: m.y, width: m.width, height: m.height, output, beforeOutput,
+      });
+      const [after, before] = await Promise.all([fs.readFile(output), fs.readFile(beforeOutput)]);
+      return { ...result, url: "data:image/png;base64," + after.toString("base64"),
+        beforeUrl: "data:image/png;base64," + before.toString("base64") };
+    } finally {
+      await Promise.all([output, beforeOutput].map(file => fs.rm(file, { force: true }).catch(() => {})));
+    }
+  }));
   ipcMain.handle("preview-metrics", (_, message) => previewMetrics.acknowledge(message));
   ipcMain.handle("save-preview-diagnostics", async () => {
     if(!previewMetrics.samples.length) throw new Error("Cargá una foto o video y probá algunos ajustes primero.");

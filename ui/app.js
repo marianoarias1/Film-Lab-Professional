@@ -1,3 +1,4 @@
+import { mountDetailInspector } from "./detail-inspector.js";
 import { mountEditVersions } from "./edit-versions.js";
 import { mountLibrary } from "./library.js";
 import { mountRecipePreviews } from "./recipe-previews.js";
@@ -100,9 +101,16 @@ const definitions = {
     ["dehaze", "Borrar neblina"],
     ["grain", "Grano", 0, 100],
     ["grainSize", "Tamaño del grano", 0, 100],
-    ["sharpness", "Nitidez", 0, 100],
-    ["denoise", "Reducir ruido", 0, 100],
+
     ["vignette", "Viñeta", 0, 100],
+  ],
+  precision: [
+    ["sharpness", "Cantidad de nitidez", 0, 100],
+    ["sharpenRadius", "Radio", 0, 3, 0.1, " px"],
+    ["sharpenMasking", "Máscara de nitidez", 0, 100],
+    ["denoise", "Ruido de luminancia", 0, 100],
+    ["denoiseDetail", "Conservar detalle", 0, 100],
+    ["denoiseColor", "Ruido de color", 0, 100],
   ],
   lab: [
     ["lightLeak", "Fuga de luz", 0, 100],
@@ -282,6 +290,7 @@ function updateButtons() {
       el.disabled = !enabled;
     });
   editVersions.draw();
+  detailInspector.draw();
   for (const id of ["undo", "redo"])
     $(id).disabled =
       !enabled || !(id === "undo" ? f?.history.length : f?.future.length);
@@ -386,7 +395,7 @@ function drawRecipes() {
     button.onclick = () => {
       const f = current();
       const old = structuredClone(f.settings);
-      f.settings = { ...defaults(), ...structuredClone(r.settings), masks: structuredClone(f.settings.masks || []), labEffects: structuredClone(f.settings.labEffects || defaults().labEffects) };
+      f.settings = { ...defaults(f), ...structuredClone(r.settings), masks: structuredClone(f.settings.masks || []), labEffects: structuredClone(f.settings.labEffects || defaults().labEffects) };
       f.recipe = r.id;
       commitEdit(f, old);
       drawControls();
@@ -468,7 +477,7 @@ function slider(def, scope = "") {
     const f = current();
     if (!f) return;
     const old = structuredClone(f.settings);
-    setSettingValue(f.settings,key,settingValue(defaults(),key));
+    setSettingValue(f.settings,key,settingValue(defaults(f),key));
     commitEdit(f, old);
     drawControls();
     edited();
@@ -482,6 +491,7 @@ function drawControls() {
   $("maskPanel").hidden = tab !== "masks";
   $("effectsPanel").hidden = tab !== "effects";
   $("panelTitle").textContent = { edit: "A tu manera.", effects: "Laboratorio.", masks: "Máscaras." }[tab];
+  $("detailIntro").hidden = group !== "precision";
   $("sliders").replaceChildren(
     ...(definitions[group] || []).map((def) => slider(def)),
   );
@@ -611,6 +621,7 @@ $("resetCurve").onclick = () => {
 };
 function activate(id) {
   if (busy) return;
+  detailInspector.close();
   if (id !== state.activeId && syncSelecting) resetSyncSelection();
   endMask(true);
   maskPicker=null;hoverMask=null;
@@ -709,6 +720,7 @@ function syncRecipeContext() {
     : null);
 }
 function schedulePreview(draft = false) {
+  detailInspector.update();
   recipePreviews.pause();
   clearTimeout(renderTimer);
   const file = current();
@@ -746,6 +758,7 @@ $("catalogCount").textContent = String(webCatalog.visibleCount);
 function selectWorkspaceTab(next) {
   if (libraryOpen()) showEditor();
   if (tab === next) return;
+  detailInspector.close();
   endMask(true);
   pendingMask=null;toolOperation="new";$("maskType").value="";
   tab = next;
@@ -783,7 +796,7 @@ $("redo").onclick = () => stepEditorHistory("redo");
 $("reset").onclick = () => {
   const f = current(),
     old = structuredClone(f.settings);
-  f.settings = defaults();
+  f.settings = defaults(f);
   f.recipe = null;
   commitEdit(f, old);
   drawControls();
@@ -949,7 +962,7 @@ async function restore(p) {
   state.name = p.name;
   state.files = p.files.map((f) => ({
     ...newFile(f),
-    settings: { ...defaults(), ...f.settings },
+    settings: { ...defaults(f), ...f.settings },
     recipe: f.recipe,
     selected: f.selected !== false,
   }));
@@ -1011,6 +1024,7 @@ $("filmstrip").ondblclick = async (e) => {
   }
 };
 function clearEditor() {
+  detailInspector.close();
   maskPicker=null;hoverMask=null;
   resetZoom();
   endMask(true);
@@ -1669,6 +1683,7 @@ for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files'],['navF
 const libraryOpen = () => !$("library").hidden;
 function showLibrary() {
   if (busy) return;
+  detailInspector.close();
   endMask(true);
   endBefore();
   stopPlayback();
@@ -1726,6 +1741,11 @@ const editVersions = mountEditVersions({
   saved: saveSoon,
   restored: refreshSyncedFiles,
   notify: toast,
+});
+const detailInspector = mountDetailInspector({
+  $, current, api, time: () => Number($("scrub").value), isBusy: () => busy,
+  available: () => tab === "edit" && !libraryOpen(),
+  prepare() { stopPlayback(); endMask(true); pendingMask = null; toolOperation = "new"; $("maskType").value = ""; },
 });
 drawWorkspace();
 // Install tools before boot draws their initial state.

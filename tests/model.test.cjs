@@ -188,3 +188,32 @@ test("Exportar elegidas usa las fotos disponibles del proyecto y conserva el lot
   assert.deepEqual(m.exportBatch(files, "manual").items.map(f => f.id), ["b", "c", "d", "e"]);
   assert.deepEqual(files, before);
 });
+
+test("Los controles de detalle viajan por versión, sincronización y proyecto sin afectar la otra foto", async () => {
+  const m = await model(), a = m.newFile({id:"a"}), b = m.newFile({id:"b"});
+  Object.assign(a.settings, {sharpness:70, sharpenRadius:1.5, sharpenMasking:60, denoise:30, denoiseDetail:65, denoiseColor:25});
+  m.saveEditVersion(a, "Detalle", "detail");
+  const patch = m.copyAdjustments(a.settings, ["detail"]);
+  m.applyAdjustments([b],patch,a);
+  assert.equal(b.settings.sharpenRadius,1.5);
+  assert.equal(b.settings.denoiseColor,25);
+  m.undo(a);
+  assert.equal(b.settings.sharpenRadius,0);
+  assert.equal(b.settings.denoiseDetail,50);
+  a.settings.sharpenRadius = 2;
+  m.restoreEditVersion(a,"detail");
+  assert.equal(a.settings.sharpenRadius,1.5);
+  assert.equal(m.projectSnapshot({files:[a,b],activeId:"a"}).files[0].versions[0].settings.sharpenMasking,60);
+});
+
+test("El ruido de color conserva los valores iniciales RAW y JPEG al abrir proyectos anteriores",async()=>{
+ const m=await model();
+ assert.equal(m.newFile({name:"DSC123.ARW",kind:"photo"}).settings.denoiseColor,25);
+ assert.equal(m.newFile({name:"foto.jpg",kind:"photo"}).settings.denoiseColor,0);
+ const raw=m.newFile({name:"foto.dng",kind:"photo"});
+ raw.versions=[{id:"old",settings:{sharpness:10},recipe:null}];
+ raw.settings.denoiseColor=80;
+ m.restoreEditVersion(raw,"old");
+ assert.equal(raw.settings.denoiseColor,25);
+ assert.equal(raw.settings.sharpenRadius,0);
+});

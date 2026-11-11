@@ -1,0 +1,2 @@
+# Unified diff context lines may contain one structural space.
+third-party/patches/*.patch -whitespace

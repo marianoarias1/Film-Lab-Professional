@@ -1,4 +1,5 @@
 mod delivery;
+mod detail;
 mod export_diagnostics;
 mod lab_effects;
 use filmcraft_frame::{AudioBuffer, VideoFrame};
@@ -24,7 +25,7 @@ use std::{
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.8-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.9-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -48,6 +49,10 @@ struct Settings {
     hsl: [[f64; 3]; 8],
     sharpness: f64,
     denoise: f64,
+    sharpen_radius: f64,
+    sharpen_masking: f64,
+    denoise_detail: f64,
+    denoise_color: Option<f64>,
     vignette: f64,
     mono: bool,
     curve: Vec<[f64; 2]>,
@@ -84,6 +89,10 @@ impl Default for Settings {
             hsl: [[0.; 3]; 8],
             sharpness: 0.,
             denoise: 0.,
+            sharpen_radius: 0.,
+            sharpen_masking: 0.,
+            denoise_detail: 50.,
+            denoise_color: None,
             vignette: 0.,
             mono: false,
             curve: vec![],
@@ -216,11 +225,14 @@ impl Settings {
             if let Some(n) = v.as_f64() {
                 let (min, max) = match k.as_str() {
                     "exposure" => (-5., 5.),
+                    "sharpenRadius" => (0., 3.),
                     "leakX" | "leakY" => (0., 1.),
                     "leakSize" => (0.05, 1.),
                     "shadowHue" | "highlightHue" => (0., 360.),
-                    "grain" | "sharpness" | "denoise" | "lightLeak" | "shadowAmount"
-                    | "highlightAmount" => (0., 100.),
+                    "grain" | "sharpness" | "denoise" | "sharpenMasking" | "denoiseDetail"
+                    | "denoiseColor" | "lightLeak" | "shadowAmount" | "highlightAmount" => {
+                        (0., 100.)
+                    }
                     _ => (-100., 100.),
                 };
                 if !n.is_finite() || n < min || n > max {
@@ -292,6 +304,12 @@ impl Settings {
         };
         d.detail.sharpen_amount = self.sharpness;
         d.detail.nr_luminance = self.denoise;
+        d.detail.sharpen_radius = self.sharpen_radius;
+        d.detail.sharpen_masking = self.sharpen_masking;
+        d.detail.nr_detail = self.denoise_detail;
+        if let Some(amount) = self.denoise_color {
+            d.detail.nr_color = amount;
+        }
         d.vignette.amount = -self.vignette;
         if self.mono {
             d.treatment = Treatment::Bw;
@@ -341,6 +359,7 @@ enum Source {
 struct State {
     sources: HashMap<String, Source>,
     video_previews: Vec<VideoPreviewInput>,
+    detail: Option<detail::Input>,
 }
 fn resize(img: Rgb32f, edge: usize) -> Rgb32f {
     let long = img.width.max(img.height);
@@ -455,7 +474,10 @@ fn photo(path: &str, edge: usize) -> Result<Photo> {
         let (w, h) = (img.width, img.height);
         Ok(Photo {
             pixels: Arc::new(resize(img, edge)),
-            info: SourceInfo::default(),
+            info: SourceInfo {
+                native_long: Some(w.max(h)),
+                ..Default::default()
+            },
             cache: StageCache::default(),
             draft_cache: StageCache::default(),
             width: w,
@@ -932,7 +954,14 @@ fn run(
             json!({"engine":ENGINE,"lightcraft":"d999e382bafbb5d5c54482fdb1d11f6a63bfdf69","filmcraft":"6c3948a36c80e4996d924766ba7157eec4fca85e","precision":"float32","gpu":false}),
         );
     }
+    if op == "detail-release" {
+        if state.detail.as_ref().is_some_and(|input| input.key == key) {
+            state.detail = None;
+        }
+        return Ok(json!({"ok":true}));
+    }
     if op == "release" {
+        state.detail = None;
         state.sources.remove(key);
         state.video_previews.retain(|entry| entry.key != key);
         return Ok(json!({"ok":true}));
@@ -940,6 +969,7 @@ fn run(
     let path = r["path"].as_str().unwrap_or("");
     if op == "open" {
         let video = r["kind"] == "video";
+        state.detail = None;
         state.sources.clear();
         state.video_previews.clear();
         let source = if video {
@@ -962,6 +992,61 @@ fn run(
     let settings: Settings =
         serde_json::from_value(r["settings"].clone()).map_err(|e| e.to_string())?;
     settings.validate()?;
+    if op == "detail-preview" {
+        let time = r["time"].as_f64().unwrap_or(0.);
+        if !time.is_finite() || time < 0. {
+            return Err("Tiempo de detalle inválido".into());
+        }
+        let source = state.sources.get(key).ok_or("Archivo no abierto")?;
+        let source_time = if matches!(source, Source::Photo(_)) {
+            0.
+        } else {
+            time
+        };
+        if state
+            .detail
+            .as_ref()
+            .is_none_or(|input| input.key != key || input.time_bits != source_time.to_bits())
+        {
+            state.detail = None;
+            let (pixels, info) = match source {
+                Source::Photo(_) => {
+                    let full = photo(path, usize::MAX)?;
+                    (full.pixels, full.info)
+                }
+                Source::Video(video) => {
+                    let edge = video
+                        .info()
+                        .video
+                        .as_ref()
+                        .map(|v| v.width.max(v.height) as usize)
+                        .ok_or("Video sin imagen")?;
+                    let frame = video_rgb_timed(video, time, edge, None)?;
+                    let native_long = Some(frame.width.max(frame.height));
+                    (
+                        Arc::new(frame),
+                        SourceInfo {
+                            native_long,
+                            ..Default::default()
+                        },
+                    )
+                }
+            };
+            state.detail = Some(detail::Input {
+                key: key.to_string(),
+                time_bits: source_time.to_bits(),
+                pixels,
+                info,
+                cache: StageCache::default(),
+                before_cache: StageCache::default(),
+            });
+        }
+        return detail::render(
+            state.detail.as_ref().ok_or("Sin fuente de detalle")?,
+            &settings,
+            r,
+        );
+    }
     if op == "preview" {
         let edge = r["edge"].as_u64().unwrap_or(1400).clamp(64, 1800) as usize;
         let draft = r["draft"].as_bool().unwrap_or(false);

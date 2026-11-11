@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld(
     boot: () => ipcRenderer.invoke("boot"),
     saveDiagnostics: () => ipcRenderer.invoke("save-diagnostics"),
     importFiles: () => ipcRenderer.invoke("import"),
+    releaseDetail: payload => ipcRenderer.invoke("detail-release", payload),
+    detailPreview: payload => ipcRenderer.invoke("detail-preview", payload),
     libraryPreview: payload => ipcRenderer.invoke("library-preview", payload),
     recipePreview: payload => ipcRenderer.invoke("recipe-preview", payload),
     preview: (payload) => ipcRenderer.invoke("preview", payload),

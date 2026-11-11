@@ -8,8 +8,8 @@ export function normalizeEffects(value){
  const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
  return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
 }
-export const ENGINE = "filmlab-pro-0.8-lc-d999e382-fc-6c3948a3";
-export const defaults = () => ({
+export const ENGINE = "filmlab-pro-0.9-lc-d999e382-fc-6c3948a3";
+export const defaults = (file = {}) => ({
   masks: [],
   labEffects: effectDefaults(),
   exposure: 0,
@@ -30,6 +30,10 @@ export const defaults = () => ({
   hsl: Array.from({length:8},()=>[0,0,0]),
   sharpness: 0,
   denoise: 0,
+  sharpenRadius: 0,
+  sharpenMasking: 0,
+  denoiseDetail: 50,
+  denoiseColor: file.raw || /\.(arw|dng|nef|cr2|cr3|raf|rw2|orf)$/i.test(file.name || file.path || "") ? 25 : 0,
   vignette: 0,
   mono: false,
   curve: [],
@@ -138,7 +142,7 @@ export function setSettingValue(settings,key,value) {
 export function newFile(f) {
   return {
     ...f,
-    settings: defaults(),
+    settings: defaults(f),
     recipe: null,
     selected: true,
     review: normalizeReview(f.review),
@@ -151,7 +155,7 @@ export const adjustmentGroups = [
   { id: "light", label: "Luz", keys: ["exposure", "contrast", "highlights", "shadows", "whites", "blacks"] },
   { id: "color", label: "Color", keys: ["temperature", "tint", "saturation", "vibrance", "hsl", "mono"] },
   { id: "curve", label: "Curva", keys: ["curve"] },
-  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "sharpness", "denoise", "vignette"] },
+  { id: "detail", label: "Textura y detalle", keys: ["texture", "clarity", "dehaze", "sharpness", "denoise", "sharpenRadius", "sharpenMasking", "denoiseDetail", "denoiseColor", "vignette"] },
   { id: "grain", label: "Grano", keys: ["grain", "grainSize"] },
 ];
 
@@ -328,7 +332,7 @@ export function saveEditVersion(file, name, id, savedAt = new Date().toISOString
 export function restoreEditVersion(file, id) {
   const version = file.versions?.find(item => item.id === id);
   if (!version) throw new Error("No se encontró esa versión en este archivo.");
-  const after = { ...defaults(), ...structuredClone(version.settings) };
+  const after = { ...defaults(file), ...structuredClone(version.settings) };
   const recipe = version.recipe ?? null;
   if (JSON.stringify(file.settings) === JSON.stringify(after) && file.recipe === recipe) return false;
   const change = {

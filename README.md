@@ -87,7 +87,7 @@ Es una prueba técnica integrada, no un reemplazo listo para producción de Ligh
 
 ## Versionado y compatibilidad
 
-Los proyectos nuevos guardan `engineVersion: filmlab-pro-0.8-lc-d999e382-fc-6c3948a3`. Se abren proyectos 0.1–0.7 conservando sus ajustes y se migran al guardar. Las versiones anteriores rechazan los proyectos nuevos para evitar perder parámetros que sus motores no admiten. Se rechazan motores desconocidos.
+Los proyectos nuevos guardan `engineVersion: filmlab-pro-0.9-lc-d999e382-fc-6c3948a3`. Se abren proyectos 0.1–0.8 conservando sus ajustes y se migran al guardar. Las versiones anteriores rechazan los proyectos nuevos para evitar perder parámetros que sus motores no admiten. Se rechazan motores desconocidos.
 
 ## Desarrollar desde el código fuente
 

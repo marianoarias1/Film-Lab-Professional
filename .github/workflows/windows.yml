@@ -43,6 +43,7 @@ jobs:
       - run: npm run build:win
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - run: npm run test:detail
       - uses: actions/upload-artifact@v4
         with:
           name: FilmLab-Professional-Windows-x64
