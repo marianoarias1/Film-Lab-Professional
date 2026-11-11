@@ -11,6 +11,7 @@ pub struct Glow {
     pub range: f64,
     pub spread: f64,
     pub angle: f64,
+    pub softness: f64,
     pub temperature: f64,
     pub mask_id: Option<u32>,
 }
@@ -23,6 +24,7 @@ impl Default for Glow {
             range: 35.,
             spread: 35.,
             angle: 0.,
+            softness: 50.,
             temperature: 0.,
             mask_id: None,
         }
@@ -30,8 +32,8 @@ impl Default for Glow {
 }
 impl Glow {
     pub fn validate(&self) -> Result<(), String> {
-        if !["soft", "directional"].contains(&self.style.as_str())
-            || [self.amount, self.range, self.spread]
+        if !["soft", "directional", "motion", "streak"].contains(&self.style.as_str())
+            || [self.amount, self.range, self.spread, self.softness]
                 .iter()
                 .any(|v| !v.is_finite() || !(0. ..=100.).contains(v))
             || !self.angle.is_finite()
@@ -60,6 +62,62 @@ fn sample(img: &Rgb32f, x: f32, y: f32) -> [f32; 3] {
         (a[k] * (1. - fx) + b[k] * fx) * (1. - fy) + (c[k] * (1. - fx) + d[k] * fx) * fy
     })
 }
+// An exponential directional convolution, evaluated by advecting the previous
+// major-axis row/column. O(pixels), not sparse taps: long trails stay continuous.
+// Positive angle points in image coordinates: right at 0°, down at 90°.
+fn trail(source: &Rgb32f, angle: f32, length: f32) -> Rgb32f {
+    let mut out = Rgb32f::new(source.width, source.height);
+    let (dx, dy) = (angle.cos(), angle.sin());
+    let horizontal = dx.abs() >= dy.abs();
+    let major = if horizontal { dx } else { dy };
+    let minor = if horizontal { dy } else { dx };
+    let sign = if major >= 0. { 1. } else { -1. };
+    let tangent = minor / major.abs().max(1e-6);
+    let decay = (-1. / (length * major.abs()).max(0.25)).exp();
+    let outer = if horizontal {
+        source.width
+    } else {
+        source.height
+    };
+    let inner = if horizontal {
+        source.height
+    } else {
+        source.width
+    };
+    for step in 0..outer {
+        let u = if sign > 0. { step } else { outer - 1 - step };
+        for v in 0..inner {
+            let (x, y) = if horizontal { (u, v) } else { (v, u) };
+            let (px, py) = if horizontal {
+                (x as f32 - sign, y as f32 - tangent)
+            } else {
+                (x as f32 - tangent, y as f32 - sign)
+            };
+            let previous = sample(&out, px, py);
+            let current = source.get(x, y);
+            out.data[y * source.width + x] =
+                std::array::from_fn(|k| current[k] * (1. - decay) + previous[k] * decay);
+        }
+    }
+    out
+}
+fn directional_halo(highlights: &Rgb32f, s: &Glow) -> Rgb32f {
+    let spread = s.spread as f32 / 100.;
+    let long = highlights.width.max(highlights.height) as f32;
+    let streak = s.style == "streak";
+    let length = (0.002 + if streak { 0.14 } else { 0.075 } * spread.powi(2)) * long;
+    let sigma = 0.35 + length * 0.12 * (s.softness as f32 / 100.).powi(2);
+    let base = gaussian(highlights, sigma);
+    let forward = trail(&base, s.angle.to_radians() as f32, length);
+    if !streak {
+        return forward;
+    }
+    let backward = trail(&base, (s.angle + 180.).to_radians() as f32, length);
+    Rgb32f::from_fn(base.width, base.height, |x, y| {
+        let (a, b) = (forward.get(x, y), backward.get(x, y));
+        std::array::from_fn(|k| (a[k] + b[k]) * 0.5)
+    })
+}
 pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mask, &Frame)>) {
     if !s.enabled || s.amount <= 0. {
         return;
@@ -77,20 +135,28 @@ pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mas
         ((oh as f32 * scale).round() as usize).max(1),
     );
     // Area averaging captures tiny bright reflections without aliasing at export size.
+    let threshold = 0.85 - 0.7 * s.range as f32 / 100.;
+    let mut highlights = Rgb32f::new(w, h);
     let mut source = Rgb32f::new(w, h);
     let mut counts = vec![0u32; w * h];
     for y in 0..oh {
         for x in 0..ow {
             let i = (y * h / oh) * w + x * w / ow;
             counts[i] += 1;
+            let rgb = &v[(y * ow + x) * 3..(y * ow + x) * 3 + 3];
+            let l = rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+            let t = ((l - threshold) / (0.2 + threshold * 0.2)).clamp(0., 1.);
+            let a = t * t * (3. - 2. * t);
             for k in 0..3 {
-                source.data[i][k] += v[(y * ow + x) * 3 + k];
+                source.data[i][k] += rgb[k];
+                highlights.data[i][k] += rgb[k].max(0.) * a;
             }
         }
     }
-    for (p, n) in source.data.iter_mut().zip(counts) {
-        for c in p {
-            *c /= n.max(1) as f32;
+    for ((p, highlight), n) in source.data.iter_mut().zip(&mut highlights.data).zip(counts) {
+        for k in 0..3 {
+            p[k] /= n.max(1) as f32;
+            highlight[k] /= n.max(1) as f32;
         }
     }
 
@@ -109,16 +175,21 @@ pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mas
     if s.mask_id.is_some() && coverage.is_none() {
         return;
     }
-    let threshold = 0.85 - 0.7 * s.range as f32 / 100.;
-    let highlights = Rgb32f::from_fn(w, h, |x, y| {
-        let p = source.get(x, y);
-        let l = p[0] * 0.2126 + p[1] * 0.7152 + p[2] * 0.0722;
-        let t = ((l - threshold) / (0.2 + threshold * 0.2)).clamp(0., 1.);
-        let a = t * t * (3. - 2. * t);
-        p.map(|c| c.max(0.) * a)
-    });
+    // Preserve the exact threshold/downsampling behavior of existing styles.
+    if !["motion", "streak"].contains(&s.style.as_str()) {
+        highlights = Rgb32f::from_fn(w, h, |x, y| {
+            let p = source.get(x, y);
+            let l = p[0] * 0.2126 + p[1] * 0.7152 + p[2] * 0.0722;
+            let t = ((l - threshold) / (0.2 + threshold * 0.2)).clamp(0., 1.);
+            p.map(|c| c.max(0.) * t * t * (3. - 2. * t))
+        });
+    }
     let radius = (0.003 + 0.065 * (s.spread as f32 / 100.).powi(2)) * w.max(h) as f32;
-    let mut halo = gaussian(&highlights, radius.max(0.6));
+    let mut halo = if ["motion", "streak"].contains(&s.style.as_str()) {
+        directional_halo(&highlights, s)
+    } else {
+        gaussian(&highlights, radius.max(0.6))
+    };
     if s.style == "directional" {
         let base = gaussian(&highlights, (radius * 0.12).max(0.6));
         let angle = s.angle.to_radians() as f32;
@@ -140,7 +211,8 @@ pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mas
     }
     let tint = s.temperature as f32 / 100.;
     let color = [1. + 0.25 * tint, 1., 1. - 0.25 * tint];
-    let amount = s.amount as f32 / 100. * 1.5;
+    let directional = ["motion", "streak"].contains(&s.style.as_str());
+    let amount = s.amount as f32 / 100. * if directional { 3. } else { 1.5 };
     for y in 0..oh {
         for x in 0..ow {
             let gx = ((x as f32 + 0.5) * w as f32 / ow as f32 - 0.5).clamp(0., (w - 1) as f32);
@@ -157,7 +229,14 @@ pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mas
             for k in 0..3 {
                 let i = (y * ow + x) * 3 + k;
                 let base = v[i];
-                v[i] = base + p[k] * color[k] * amount * a * (1. - base.clamp(0., 1.));
+                let headroom = 1. - base.clamp(0., 1.);
+                let contribution = p[k] * color[k] * amount * a;
+                v[i] = if directional {
+                    // Gentler highlight protection than legacy bloom, bounded at white.
+                    (base + contribution * headroom.sqrt()).min(base.max(1.))
+                } else {
+                    base + contribution * headroom
+                };
             }
         }
     }
@@ -220,6 +299,94 @@ mod tests {
         };
         assert!(a[(48 * 97 + 55) * 3] > a[(55 * 97 + 48) * 3] * 2.);
         assert!((a[(48 * 97 + 55) * 3] - b[(55 * 97 + 48) * 3]).abs() < 1e-5);
+    }
+    #[test]
+    fn motion_is_one_sided_and_angle_reverses_it() {
+        let mut source = Rgb32f::new(97, 97);
+        source.data[48 * 97 + 48] = [1.; 3];
+        let a = trail(&source, 0., 10.);
+        let b = trail(&source, std::f32::consts::PI, 10.);
+        assert!(a.get(55, 48)[0] > 0.03);
+        assert_eq!(a.get(41, 48)[0], 0.);
+        assert!((a.get(55, 48)[0] - b.get(41, 48)[0]).abs() < 1e-5);
+        for x in 49..80 {
+            assert!(a.get(x, 48)[0] > a.get(x + 1, 48)[0]);
+        }
+        let energy: f32 = a.data.iter().map(|p| p[0]).sum();
+        assert!(energy > 0.98 && energy <= 1.001);
+    }
+    #[test]
+    fn streak_is_two_sided_and_softness_widens_it() {
+        let mut source = Rgb32f::new(97, 97);
+        source.data[48 * 97 + 48] = [1.; 3];
+        let settings = Glow {
+            style: "streak".into(),
+            spread: 90.,
+            softness: 0.,
+            ..Default::default()
+        };
+        let crisp = directional_halo(&source, &settings);
+        assert!((crisp.get(40, 48)[0] - crisp.get(56, 48)[0]).abs() < 1e-5);
+        assert!(crisp.get(40, 48)[0] > 0.);
+        let soft = directional_halo(
+            &source,
+            &Glow {
+                softness: 100.,
+                ..settings
+            },
+        );
+        assert!(soft.get(56, 51)[0] > crisp.get(56, 51)[0]);
+        assert!(soft.get(48, 48)[0] < crisp.get(48, 48)[0]);
+    }
+    #[test]
+    fn motion_dark_image_is_unchanged_and_zero_amount_is_identity() {
+        let mut image = image();
+        let DeepSamples::F32(p) = &mut image.samples else {
+            panic!()
+        };
+        p.fill(0.);
+        apply(
+            &mut image,
+            &Glow {
+                enabled: true,
+                style: "motion".into(),
+                amount: 100.,
+                ..Default::default()
+            },
+            None,
+        );
+        let DeepSamples::F32(p) = &image.samples else {
+            panic!()
+        };
+        assert!(p.iter().all(|v| *v == 0.));
+        let mut image = super::tests::image();
+        let before = image.clone();
+        apply(
+            &mut image,
+            &Glow {
+                enabled: true,
+                style: "streak".into(),
+                amount: 0.,
+                ..Default::default()
+            },
+            None,
+        );
+        assert_eq!(image, before);
+    }
+    #[test]
+    fn old_glow_without_softness_keeps_legacy_style() {
+        let old: Glow = serde_json::from_str(r#"{"enabled":true,"style":"directional"}"#).unwrap();
+        assert_eq!(old.style, "directional");
+        assert_eq!(old.softness, 50.);
+        assert!(old.validate().is_ok());
+        assert!(
+            Glow {
+                softness: 101.,
+                ..old
+            }
+            .validate()
+            .is_err()
+        );
     }
     #[test]
     fn invalid_rejected() {

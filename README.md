@@ -141,3 +141,19 @@ Laboratorio → Efectos → Resplandor añade un halo de altas luces **Suave** o
 Se conserva por archivo, en proyectos y versiones, con deshacer/rehacer y exportación de fotos/RAW/video. Copiar el grupo Resplandor lleva sus valores, pero no la referencia a la máscara de otro archivo. La lupa de Detalle conserva su función técnica y no incluye este efecto creativo; revisalo en la preview principal. El motor trabaja en RGB lineal con una grilla auxiliar de hasta 768 px y reescala el halo al tamaño de salida; no pretende reproducir exactamente el algoritmo de Adobe ni requiere IA.
 
 Requiere el ejecutable nuevo **0.10** o reconstruir con `npm run setup` y `npm run build:engine`. Los proyectos anteriores siguen abriendo, con Resplandor desactivado por defecto. Pruebas: `npm test`, `npm run test:native` y `npm run test:glow` (esta última requiere el motor compilado).
+
+
+## Resplandor: Movimiento y Estelas · 0.11
+
+En Laboratorio → Efectos → Resplandor hay ahora **Suave**, **Movimiento** y **Estelas**:
+
+- Movimiento genera una caída continua hacia un lado de cada luz; girar la Dirección 180° invierte el rastro.
+- Estelas extiende los reflejos hacia ambos lados, con mayor alcance.
+- Suavidad controla el ancho y la difusión independientemente de Extensión. Solo aparece en los dos modos nuevos. Con valores bajos las estelas quedan más definidas.
+- Dirección 0° apunta a la derecha y 90° hacia abajo. Rango de luces mayor incluye tonos menos brillantes.
+
+Los dos modos nuevos extraen las altas luces antes de reducir la grilla auxiliar, para conservar mejor reflejos pequeños; usan una convolución direccional continua sin muestreo espaciado y una protección de luces menos restrictiva que el modo anterior. Siguen siendo cálculos locales, sin IA ni servicios externos. No garantizan igualdad numérica o visual con el algoritmo de Adobe.
+
+Las ediciones que ya usaban Direccional conservan su modo **Direccional · anterior** al abrirse. Suave y el direccional anterior mantienen su comportamiento previo. Los proyectos 0.10 se pueden abrir; Suavidad faltante usa 50. Se mantiene el alcance de las máscaras y la lupa técnica de Detalle sigue omitiendo efectos creativos.
+
+Requiere el ejecutable **0.11** o recompilar el motor. Para comenzar una prueba con reflejos marcados: Movimiento, Intensidad 60, Rango 40, Extensión 60, Suavidad 20 y Dirección 0°; son valores iniciales, no una equivalencia con Lightroom. Ajustá Rango a la luz de la toma antes de subir Intensidad.

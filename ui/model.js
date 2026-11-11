@@ -8,10 +8,10 @@ export function normalizeEffects(value){
  const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
  return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
 }
-export const ENGINE = "filmlab-pro-0.10-lc-d999e382-fc-6c3948a3";
+export const ENGINE = "filmlab-pro-0.11-lc-d999e382-fc-6c3948a3";
 export const defaults = (file = {}) => ({
   masks: [],
-  glow: {enabled:false,style:"soft",amount:35,range:35,spread:35,angle:0,temperature:0,maskId:null},
+  glow: {enabled:false,style:"soft",amount:35,range:35,spread:35,angle:0,softness:50,temperature:0,maskId:null},
   labEffects: effectDefaults(),
   exposure: 0,
   contrast: 0,

@@ -66,3 +66,9 @@ test("Migra proyectos 0.8 a la versión actual sin alterar el radio automático 
   assert.equal(read.engineVersion,ENGINE);
   assert.deepEqual(read.files,before);
 });
+
+test("Abre proyectos 0.10 conservando el resplandor direccional anterior",()=>{
+ const p=doc("/source/photo.jpg");p.engineVersion="filmlab-pro-0.10-lc-d999e382-fc-6c3948a3";
+ p.files[0].settings.glow={enabled:true,style:"directional",amount:47};
+ validateProject(p);assert.equal(p.files[0].settings.glow.style,"directional");assert.equal(p.files[0].settings.glow.amount,47);
+});
