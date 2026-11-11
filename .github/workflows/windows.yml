@@ -37,6 +37,8 @@ jobs:
           restore-keys: windows-native-${{ runner.arch }}-
       - run: npm ci
       - run: npm run setup
+      - name: Verify setup is repeatable
+        run: npm run setup
       - run: npm run check
       - run: npm test
       - run: npm run test:native

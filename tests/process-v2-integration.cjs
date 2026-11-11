@@ -28,7 +28,7 @@ function chart(){
   const preview=async(version,suffix,draft=false)=>{
    const output=path.join(out,'process-'+suffix+'.png');
    const r=await e.request('preview',{key:'v2',settings:{...common,...(version?{processVersion:version}:{})},edge:384,draft,output});
-   assert.equal(r.previewDiagnostics.processVersion,2);return fs.readFile(output);
+   assert.equal(r.previewDiagnostics.processVersion,2);assert.equal(r.previewDiagnostics.photoDetailRevision,1);return fs.readFile(output);
   };
   for(const draft of [false,true]){
    const legacy=await preview(null,'legacy-'+draft,draft),v1=await preview(1,'v1-'+draft,draft),v2=await preview(2,'v2-'+draft,draft);
@@ -40,7 +40,7 @@ function chart(){
    await e.request('open',{key:'v2',kind:'photo',path:source});
    const output=path.join(out,'process-v'+version+'-export.png');
    const r=await e.request('export',{key:'v2',path:source,settings:{...common,processVersion:version},output});
-   assert.equal(r.diagnostics.processVersion,2);assert.equal(r.diagnostics.settings.processVersion,2);
+   assert.equal(r.diagnostics.processVersion,2);assert.equal(r.diagnostics.photoDetailRevision,1);assert.equal(r.diagnostics.settings.processVersion,2);
    const bytes=await fs.readFile(output);assert.equal(bytes[24],16);assert(bytes.includes(Buffer.from('iCCP')));
    await e.request('open',{key:'reopen',kind:'photo',path:output});
    await e.request('preview',{key:'reopen',settings:{},edge:384,output:path.join(out,'process-reopened-'+version+'.png')});
