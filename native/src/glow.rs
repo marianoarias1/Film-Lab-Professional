@@ -1,0 +1,258 @@
+//! Highlight bloom in output-linear RGB. Bounded working grid, deterministic for video.
+use lightcraft_pipeline::{DeepImage, DeepSamples, geometry::Frame};
+use lightcraft_raster::{Plane, Rgb32f, blur::gaussian};
+use serde::{Deserialize, Serialize};
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(default, rename_all = "camelCase")]
+pub struct Glow {
+    pub enabled: bool,
+    pub style: String,
+    pub amount: f64,
+    pub range: f64,
+    pub spread: f64,
+    pub angle: f64,
+    pub temperature: f64,
+    pub mask_id: Option<u32>,
+}
+impl Default for Glow {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            style: "soft".into(),
+            amount: 35.,
+            range: 35.,
+            spread: 35.,
+            angle: 0.,
+            temperature: 0.,
+            mask_id: None,
+        }
+    }
+}
+impl Glow {
+    pub fn validate(&self) -> Result<(), String> {
+        if !["soft", "directional"].contains(&self.style.as_str())
+            || [self.amount, self.range, self.spread]
+                .iter()
+                .any(|v| !v.is_finite() || !(0. ..=100.).contains(v))
+            || !self.angle.is_finite()
+            || !(-180. ..=180.).contains(&self.angle)
+            || !self.temperature.is_finite()
+            || !(-100. ..=100.).contains(&self.temperature)
+        {
+            return Err("Resplandor: parámetros fuera de rango".into());
+        }
+        Ok(())
+    }
+}
+fn sample(img: &Rgb32f, x: f32, y: f32) -> [f32; 3] {
+    if x < 0. || y < 0. || x > (img.width - 1) as f32 || y > (img.height - 1) as f32 {
+        return [0.; 3];
+    }
+    let ix = x.floor() as usize;
+    let iy = y.floor() as usize;
+    let fx = x - ix as f32;
+    let fy = y - iy as f32;
+    let a = img.get(ix, iy);
+    let b = img.get((ix + 1).min(img.width - 1), iy);
+    let c = img.get(ix, (iy + 1).min(img.height - 1));
+    let d = img.get((ix + 1).min(img.width - 1), (iy + 1).min(img.height - 1));
+    std::array::from_fn(|k| {
+        (a[k] * (1. - fx) + b[k] * fx) * (1. - fy) + (c[k] * (1. - fx) + d[k] * fx) * fy
+    })
+}
+pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mask, &Frame)>) {
+    if !s.enabled || s.amount <= 0. {
+        return;
+    }
+    let DeepSamples::F32(v) = &mut d.samples else {
+        return;
+    };
+    let (ow, oh) = (d.width, d.height);
+    if ow == 0 || oh == 0 {
+        return;
+    }
+    let scale = (768. / ow.max(oh) as f32).min(1.);
+    let (w, h) = (
+        ((ow as f32 * scale).round() as usize).max(1),
+        ((oh as f32 * scale).round() as usize).max(1),
+    );
+    // Area averaging captures tiny bright reflections without aliasing at export size.
+    let mut source = Rgb32f::new(w, h);
+    let mut counts = vec![0u32; w * h];
+    for y in 0..oh {
+        for x in 0..ow {
+            let i = (y * h / oh) * w + x * w / ow;
+            counts[i] += 1;
+            for k in 0..3 {
+                source.data[i][k] += v[(y * ow + x) * 3 + k];
+            }
+        }
+    }
+    for (p, n) in source.data.iter_mut().zip(counts) {
+        for c in p {
+            *c /= n.max(1) as f32;
+        }
+    }
+
+    let coverage = mask.map(|(mask, frame)| {
+        let log = Plane::from_fn(w, h, |x, y| {
+            let p = source.get(x, y);
+            (p[0] * 0.2126 + p[1] * 0.7152 + p[2] * 0.0722)
+                .max(1e-6)
+                .log2()
+        });
+        let mut region = mask.clone();
+        region.adjust.amount = 100.;
+        lightcraft_pipeline::masks::evaluate_one(&region, frame, w, h, &source, &log, 0., None)
+    });
+    // Deleted/hidden reference never silently falls back to the whole photo.
+    if s.mask_id.is_some() && coverage.is_none() {
+        return;
+    }
+    let threshold = 0.85 - 0.7 * s.range as f32 / 100.;
+    let highlights = Rgb32f::from_fn(w, h, |x, y| {
+        let p = source.get(x, y);
+        let l = p[0] * 0.2126 + p[1] * 0.7152 + p[2] * 0.0722;
+        let t = ((l - threshold) / (0.2 + threshold * 0.2)).clamp(0., 1.);
+        let a = t * t * (3. - 2. * t);
+        p.map(|c| c.max(0.) * a)
+    });
+    let radius = (0.003 + 0.065 * (s.spread as f32 / 100.).powi(2)) * w.max(h) as f32;
+    let mut halo = gaussian(&highlights, radius.max(0.6));
+    if s.style == "directional" {
+        let base = gaussian(&highlights, (radius * 0.12).max(0.6));
+        let angle = s.angle.to_radians() as f32;
+        let (dx, dy) = (angle.cos() * radius * 3., angle.sin() * radius * 3.);
+        halo = Rgb32f::from_fn(w, h, |x, y| {
+            let mut sum = [0.; 3];
+            let mut weights = 0.;
+            for j in -24..=24 {
+                let t = j as f32 / 24.;
+                let weight = (-3. * t * t).exp();
+                let p = sample(&base, x as f32 + t * dx, y as f32 + t * dy);
+                for k in 0..3 {
+                    sum[k] += p[k] * weight;
+                }
+                weights += weight;
+            }
+            sum.map(|c| c / weights)
+        });
+    }
+    let tint = s.temperature as f32 / 100.;
+    let color = [1. + 0.25 * tint, 1., 1. - 0.25 * tint];
+    let amount = s.amount as f32 / 100. * 1.5;
+    for y in 0..oh {
+        for x in 0..ow {
+            let gx = ((x as f32 + 0.5) * w as f32 / ow as f32 - 0.5).clamp(0., (w - 1) as f32);
+            let gy = ((y as f32 + 0.5) * h as f32 / oh as f32 - 0.5).clamp(0., (h - 1) as f32);
+            let p = sample(&halo, gx, gy);
+            let a = coverage.as_ref().map_or(1., |m| {
+                let (ix, iy) = (gx.floor() as usize, gy.floor() as usize);
+                let (fx, fy) = (gx - ix as f32, gy - iy as f32);
+                let top = m.get(ix, iy) * (1. - fx) + m.get((ix + 1).min(w - 1), iy) * fx;
+                let bottom = m.get(ix, (iy + 1).min(h - 1)) * (1. - fx)
+                    + m.get((ix + 1).min(w - 1), (iy + 1).min(h - 1)) * fx;
+                (top * (1. - fy) + bottom * fy).clamp(0., 1.)
+            });
+            for k in 0..3 {
+                let i = (y * ow + x) * 3 + k;
+                let base = v[i];
+                v[i] = base + p[k] * color[k] * amount * a * (1. - base.clamp(0., 1.));
+            }
+        }
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn image() -> DeepImage {
+        DeepImage {
+            width: 97,
+            height: 97,
+            space: Default::default(),
+            samples: DeepSamples::F32(
+                (0..97 * 97)
+                    .flat_map(|i| if i == 48 * 97 + 48 { [1.; 3] } else { [0.; 3] })
+                    .collect(),
+            ),
+        }
+    }
+    #[test]
+    fn disabled_identity() {
+        let mut d = image();
+        let before = format!("{:?}", d.samples);
+        apply(&mut d, &Glow::default(), None);
+        assert_eq!(before, format!("{:?}", d.samples));
+    }
+    #[test]
+    fn bloom_spreads() {
+        let mut d = image();
+        apply(
+            &mut d,
+            &Glow {
+                enabled: true,
+                ..Default::default()
+            },
+            None,
+        );
+        let DeepSamples::F32(p) = d.samples else {
+            panic!()
+        };
+        assert!(p[(48 * 97 + 49) * 3] > 0.);
+        assert!(p[0] < 1e-5);
+        assert_eq!(p[(48 * 97 + 48) * 3], 1.);
+        assert!(p.iter().all(|v| v.is_finite()));
+    }
+    #[test]
+    fn directional_rotation() {
+        let s = Glow {
+            enabled: true,
+            style: "directional".into(),
+            spread: 70.,
+            ..Default::default()
+        };
+        let mut a = image();
+        apply(&mut a, &s, None);
+        let mut b = image();
+        apply(&mut b, &Glow { angle: 90., ..s }, None);
+        let (DeepSamples::F32(a), DeepSamples::F32(b)) = (a.samples, b.samples) else {
+            panic!()
+        };
+        assert!(a[(48 * 97 + 55) * 3] > a[(55 * 97 + 48) * 3] * 2.);
+        assert!((a[(48 * 97 + 55) * 3] - b[(55 * 97 + 48) * 3]).abs() < 1e-5);
+    }
+    #[test]
+    fn invalid_rejected() {
+        assert!(
+            Glow {
+                amount: f64::NAN,
+                ..Default::default()
+            }
+            .validate()
+            .is_err()
+        );
+        assert!(
+            Glow {
+                style: "other".into(),
+                ..Default::default()
+            }
+            .validate()
+            .is_err()
+        );
+    }
+    #[test]
+    fn missing_mask() {
+        let mut a = image();
+        let before = format!("{:?}", a.samples);
+        apply(
+            &mut a,
+            &Glow {
+                enabled: true,
+                mask_id: Some(4),
+                ..Default::default()
+            },
+            None,
+        );
+        assert_eq!(before, format!("{:?}", a.samples));
+    }
+}

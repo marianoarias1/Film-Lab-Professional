@@ -57,7 +57,7 @@ test('Abre proyectos 0.6 con los ajustes originales al migrar a 0.7',()=>{
 });
 test('Migra proyectos 0.7 sin descartar su efecto creativo',()=>{const p=doc('/source/a.jpg');p.engineVersion='filmlab-pro-0.7-lc-d999e382-fc-6c3948a3';p.files[0].settings={labEffects:{enabled:true,mode:'tiltShift',dissolve:50}};assert.deepEqual(validateProject(p).files[0].settings,p.files[0].settings);});
 
-test("Migra proyectos 0.8 a 0.9 sin alterar el radio automático ni las versiones guardadas",()=>{
+test("Migra proyectos 0.8 a la versión actual sin alterar el radio automático ni las versiones guardadas",()=>{
   const p=doc("/source/photo.jpg");
   p.engineVersion="filmlab-pro-0.8-lc-d999e382-fc-6c3948a3";
   p.files[0].versions=[{id:"v",name:"Primera",savedAt:"2026-11-10T12:00:00Z",settings:{sharpness:50},recipe:null}];

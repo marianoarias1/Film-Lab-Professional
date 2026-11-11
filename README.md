@@ -133,3 +133,11 @@ La app Standard y su repositorio no fueron modificados.
 Capas combinables de movimiento y franja nítida; múltiples curvas con influencia local, pincel suave de nitidez y controles directos sobre las líneas. Deshacer/rehacer por archivo. Presets editables para redes en foto y video; detalle de uso, límites y validación en [docs/creative-lab.md](docs/creative-lab.md). Requiere reconstruir el motor nativo con `npm run build:engine`.
 
 La guía del [editor oscuro y sus scopes de color](docs/WORKSPACE.md) explica los paneles plegables y las lecturas RGB de la vista previa.
+
+## Resplandor · 0.10
+
+Laboratorio → Efectos → Resplandor añade un halo de altas luces **Suave** o **Direccional**. Intensidad, rango de luces, extensión, dirección (solo direccional) y temperatura son independientes. Rango mayor incluye más luces. Se puede limitar la salida a una máscara existente, incluidas sus sumas/restas/intersecciones. Las máscaras ocultas o eliminadas dejan el resplandor sin aplicar hasta elegir otra zona. Las máscaras de video son estáticas, no hacen seguimiento.
+
+Se conserva por archivo, en proyectos y versiones, con deshacer/rehacer y exportación de fotos/RAW/video. Copiar el grupo Resplandor lleva sus valores, pero no la referencia a la máscara de otro archivo. La lupa de Detalle conserva su función técnica y no incluye este efecto creativo; revisalo en la preview principal. El motor trabaja en RGB lineal con una grilla auxiliar de hasta 768 px y reescala el halo al tamaño de salida; no pretende reproducir exactamente el algoritmo de Adobe ni requiere IA.
+
+Requiere el ejecutable nuevo **0.10** o reconstruir con `npm run setup` y `npm run build:engine`. Los proyectos anteriores siguen abriendo, con Resplandor desactivado por defecto. Pruebas: `npm test`, `npm run test:native` y `npm run test:glow` (esta última requiere el motor compilado).

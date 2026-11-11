@@ -8,9 +8,10 @@ export function normalizeEffects(value){
  const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
  return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
 }
-export const ENGINE = "filmlab-pro-0.9-lc-d999e382-fc-6c3948a3";
+export const ENGINE = "filmlab-pro-0.10-lc-d999e382-fc-6c3948a3";
 export const defaults = (file = {}) => ({
   masks: [],
+  glow: {enabled:false,style:"soft",amount:35,range:35,spread:35,angle:0,temperature:0,maskId:null},
   labEffects: effectDefaults(),
   exposure: 0,
   contrast: 0,
@@ -152,6 +153,7 @@ export function newFile(f) {
   };
 }
 export const adjustmentGroups = [
+  { id: "glow", label: "Resplandor", keys: ["glow"] },
   { id: "light", label: "Luz", keys: ["exposure", "contrast", "highlights", "shadows", "whites", "blacks"] },
   { id: "color", label: "Color", keys: ["temperature", "tint", "saturation", "vibrance", "hsl", "mono"] },
   { id: "curve", label: "Curva", keys: ["curve"] },
@@ -162,7 +164,7 @@ export const adjustmentGroups = [
 export function copyAdjustments(settings, groups) {
   const fallback = defaults();
   return Object.fromEntries(adjustmentGroups.filter(g => groups.includes(g.id)).flatMap(g =>
-    g.keys.map(key => [key, structuredClone(settings[key] ?? fallback[key])])
+    g.keys.map(key => [key, key === "glow" ? {...structuredClone(settings[key] ?? fallback[key]), maskId:null} : structuredClone(settings[key] ?? fallback[key])])
   ));
 }
 

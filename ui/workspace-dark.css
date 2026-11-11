@@ -362,3 +362,10 @@ dialog::backdrop { background: #0009; }
 #detailState { font-size: 9px; color: var(--muted); }
 .detail-inspector p { font-size: 9px; margin: 2px 0 0; color: var(--muted); }
 .inspecting-detail { cursor: crosshair; }
+
+/* Resplandor preserves Laboratory typography and slider rhythm. */
+.glow-fields { border:0; padding:0; margin:12px 0 0; min-width:0; }
+.glow-fields > label { display:grid; gap:8px; margin-bottom:16px; }
+.glow-fields select { width:100%; }
+.glow-fields:disabled { opacity:.5; }
+.glow-fields select { color:var(--ink, #e8e9e3); background:#171a17; border:1px solid #363b34; border-radius:8px; padding:9px 10px; font:inherit; }
