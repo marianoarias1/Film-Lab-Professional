@@ -326,3 +326,19 @@ dialog::backdrop { background: #0009; }
 #exportBatch summary { cursor: pointer; color: var(--muted); }
 #exportBatchList { max-height: 110px; overflow: auto; margin: 8px 0 0; padding-left: 20px; overflow-wrap: anywhere; }
 #exportUnavailable { max-height: 76px; overflow: auto; overflow-wrap: anywhere; }
+
+.edit-versions { margin: 10px 0 7px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.edit-versions summary { cursor: pointer; padding: 8px 0; }
+#versionsCount { margin-left: 5px; color: var(--muted); font-size: 11px; }
+#saveVersion { width: 100%; padding: 7px 9px; margin: 6px 0 8px; font-size: 11px; }
+#versionsList { max-height: 210px; overflow: auto; }
+.edit-version-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); padding: 5px 0; }
+.edit-version-row > span { overflow-wrap: anywhere; min-width: 0; }
+.edit-version-row button { flex-shrink: 0; font-size: 11px; padding: 6px 5px; color: var(--accent); }
+.edit-versions .help { margin: 8px 0 2px; font-size: 10px; }
+#versionDialog { width: min(410px, calc(100vw - 32px)); }
+#versionFileName { color: var(--muted); overflow-wrap: anywhere; }
+#versionName { width: 100%; padding: 10px; background: var(--well); border: 1px solid var(--line); border-radius: 6px; }
+.version-error { color: #efa69e; font-size: 12px; }
+.version-dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+#versionDialog .version-dialog-actions button { width: auto; margin: 0; }

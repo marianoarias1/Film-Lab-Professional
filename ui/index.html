@@ -253,6 +253,13 @@
           Cargá un archivo para ajustar luz, color y textura.
         </p>
         <div id="editPanel">
+          <details id="versionsPanel" class="edit-versions">
+            <summary>Versiones <span id="versionsCount">0</span></summary>
+            <button id="saveVersion" type="button" class="outline" disabled>+ Guardar versión</button>
+            <div id="versionsList"></div>
+            <p id="versionsEmpty" class="help">Guardá un revelado para volver a él después.</p>
+            <p id="versionsUndoHint" class="help" hidden>Podés deshacer una restauración.</p>
+          </details>
           <section class="groups" aria-label="Ajustes de revelado">
             <button data-group="light" class="active" aria-controls="groupContent" aria-expanded="true">Luz <span>Exposición y contraste</span></button>
             <button data-group="color" aria-controls="groupContent" aria-expanded="false">Color <span>Temp · Matiz · HSL</span></button>
@@ -408,6 +415,22 @@
         <p id="progressEta"></p><p id="progressElapsed"></p><p id="progressFallback" class="help"></p>
       </div>
       <button id="cancelExport" class="outline">Cancelar</button>
+    </dialog>
+    <dialog id="versionDialog" aria-labelledby="versionDialogTitle" aria-describedby="versionFileName">
+      <form id="versionForm">
+        <div class="dialog-title">
+          <h2 id="versionDialogTitle">Guardar versión</h2>
+          <button id="cancelVersion" type="button" class="plain" aria-label="Cerrar">×</button>
+        </div>
+        <p id="versionFileName"></p>
+        <label for="versionName">Nombre de la versión</label>
+        <input id="versionName" type="text" maxlength="80" required autocomplete="off" placeholder="Por ejemplo, Color cálido" aria-describedby="versionNameError">
+        <p id="versionNameError" class="version-error" role="status" hidden></p>
+        <div class="version-dialog-actions">
+          <button id="backVersion" type="button" class="outline">Cancelar</button>
+          <button type="submit" class="dark">Guardar versión</button>
+        </div>
+      </form>
     </dialog>
     <dialog id="messageDialog">
       <h2 id="messageTitle"></h2>
