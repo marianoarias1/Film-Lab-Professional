@@ -1,5 +1,6 @@
 mod delivery;
 mod detail;
+mod glow;
 mod export_diagnostics;
 mod lab_effects;
 use filmcraft_frame::{AudioBuffer, VideoFrame};
@@ -25,7 +26,7 @@ use std::{
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.9-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.11-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -46,6 +47,7 @@ struct Settings {
     grain_size: f64,
     masks: Vec<lightcraft_develop::Mask>,
     lab_effects: lab_effects::Effects,
+    glow: glow::Glow,
     hsl: [[f64; 3]; 8],
     sharpness: f64,
     denoise: f64,
@@ -86,6 +88,7 @@ impl Default for Settings {
             grain_size: 25.,
             masks: Vec::new(),
             lab_effects: Default::default(),
+            glow: Default::default(),
             hsl: [[0.; 3]; 8],
             sharpness: 0.,
             denoise: 0.,
@@ -111,6 +114,7 @@ impl Default for Settings {
 impl Settings {
     fn validate(&self) -> Result<()> {
         self.lab_effects.validate()?;
+        self.glow.validate()?;
         if self.masks.len() > 32 {
             return Err("Máximo 32 máscaras por archivo".into());
         }
@@ -594,14 +598,20 @@ fn render_quality(
     };
     req.depth = deep;
     let mut r = lightcraft_pipeline::render_cached(pixels, info, &s.develop(info), &req, cache);
-    if s.light_leak > 0. || s.lab_effects.enabled {
+    if s.light_leak > 0. || s.lab_effects.enabled || s.glow.enabled {
         if let Some(deep) = r.deep.as_mut() {
             apply_leak(deep, s);
             lab_effects::apply(deep, &s.lab_effects);
+            apply_glow(deep, s, info);
             r.image = deep.to_rgba8();
         }
     }
     r
+}
+fn apply_glow(d: &mut lightcraft_pipeline::DeepImage, s: &Settings, info: &SourceInfo) {
+    let frame = lightcraft_pipeline::geometry::Frame::new(d.width, d.height, &s.develop(info), true);
+    let mask = s.glow.mask_id.and_then(|id| s.masks.iter().find(|m| m.id == id && m.visible));
+    glow::apply(d, &s.glow, mask.map(|m| (m, &frame)));
 }
 fn apply_leak(d: &mut lightcraft_pipeline::DeepImage, s: &Settings) {
     if s.light_leak <= 0. {
@@ -641,6 +651,7 @@ fn render_export(
             .ok_or("Sin salida de alta precisión")?;
     apply_leak(&mut deep, s);
     lab_effects::apply(&mut deep, &s.lab_effects);
+    apply_glow(&mut deep, s, info);
     Ok(deep)
 }
 

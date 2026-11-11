@@ -1,3 +1,4 @@
+import { drawGlowControls } from "./glow-controls.js";
 import { mountDetailInspector } from "./detail-inspector.js";
 import { mountEditVersions } from "./edit-versions.js";
 import { mountLibrary } from "./library.js";
@@ -485,6 +486,7 @@ function slider(def, scope = "") {
   return el;
 }
 function drawControls() {
+  drawGlowControls({current, busy, slider, commitEdit, edited, drawControls});
   const f = current();
   $("editPanel").hidden = tab !== "edit";
   $("labPanel").hidden = tab === "edit";

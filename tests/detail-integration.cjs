@@ -34,7 +34,7 @@ function chart() {
   const source=path.join(out,"detail-noise.png");await fs.writeFile(source,chart());
   const engine=new Engine(process.env.FILMLAB_ENGINE||path.resolve("native/target/release/filmlab-professional-engine"+(process.platform==="win32"?".exe":"")));
   try{
-    const hello=await engine.start();assert.match(hello.engine,/filmlab-pro-0.9/);
+    const hello=await engine.start();assert.match(hello.engine,/filmlab-pro-0.11/);
     await engine.request("open",{key:"photo",kind:"photo",path:source});
     const output=path.join(out,"detail-after.png"),beforeOutput=path.join(out,"detail-before.png");
     const inspect=settings=>engine.request("detail-preview",{key:"photo",path:source,x:.5,y:.5,width:320,height:200,settings,output,beforeOutput});
