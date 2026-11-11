@@ -495,15 +495,6 @@ function drawControls() {
   $("effectsPanel").hidden = tab !== "effects";
   $("panelTitle").textContent = { edit: "A tu manera.", effects: "Laboratorio.", masks: "Máscaras." }[tab];
   $("detailIntro").hidden = group !== "precision";
-  const processSelect = $("photoProcess");
-  processSelect.value = String(f?.settings.processVersion ?? 1);
-  processSelect.disabled = !f || busy || f.kind === "video";
-  processSelect.onchange = () => {
-    if (!f || busy || f.kind === "video") return;
-    const before = structuredClone(f.settings);
-    f.settings.processVersion = Number(processSelect.value);
-    if (commitEdit(f, before)) edited();
-  };
   $("sliders").replaceChildren(
     ...(definitions[group] || []).map((def) => slider(def)),
   );

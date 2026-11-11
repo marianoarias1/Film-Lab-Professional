@@ -28,9 +28,9 @@ fn dev(version: u8, lum: f64, col: f64) -> DevelopSettings {
 }
 
 #[test]
-fn old_settings_are_v1_and_unknown_versions_are_rejected() {
+fn missing_process_uses_v2_and_unknown_versions_are_rejected() {
     let old: Settings = serde_json::from_value(json!({"denoise":50})).unwrap();
-    assert_eq!(old.process_version, 1);
+    assert_eq!(old.process_version, 2);
     assert!(old.validate().is_ok());
     for version in [0, 3, 255] {
         assert!(
@@ -153,6 +153,7 @@ fn process_switch_does_not_reuse_another_process_cache() {
     let cache = StageCache::default();
     let info = SourceInfo::default();
     let mut s = Settings {
+        process_version: 1,
         denoise: 70.,
         denoise_color: Some(60.),
         ..Default::default()

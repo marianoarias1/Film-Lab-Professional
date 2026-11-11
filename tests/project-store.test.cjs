@@ -79,3 +79,9 @@ test('Abre proyectos 0.11 sin cambiar ajustes ni versiones antes de elegir V2',(
  const original=structuredClone(p.files);const restored=validateProject(p);
  assert.equal(restored.engineVersion,ENGINE);assert.deepEqual(restored.files,original);
 });
+
+
+test('Acepta proyectos 0.12 con el selector anterior para migrarlos al abrir',()=>{
+ const p=doc('/source/photo.jpg');p.engineVersion='filmlab-pro-0.12-lc-d999e382-fc-6c3948a3';p.files[0].settings={highlights:-35,shadows:25,processVersion:1};
+ assert.equal(validateProject(p).engineVersion,ENGINE);
+});

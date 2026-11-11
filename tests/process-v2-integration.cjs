@@ -24,15 +24,15 @@ function chart(){
  const e=new Engine(process.env.FILMLAB_ENGINE||path.resolve('native/target/release/filmlab-professional-engine'+(process.platform==='win32'?'.exe':'')));
  try{
   await e.start();await e.request('open',{key:'v2',kind:'photo',path:source});
-  const common={denoise:65,denoiseColor:85,sharpness:30,sharpenRadius:1.2,exposure:.2};
+  const common={denoise:65,denoiseColor:85,sharpness:30,sharpenRadius:1.2,exposure:.2,highlights:-35,shadows:25,saturation:25};
   const preview=async(version,suffix,draft=false)=>{
    const output=path.join(out,'process-'+suffix+'.png');
    const r=await e.request('preview',{key:'v2',settings:{...common,...(version?{processVersion:version}:{})},edge:384,draft,output});
-   assert.equal(r.previewDiagnostics.processVersion,version||1);return fs.readFile(output);
+   assert.equal(r.previewDiagnostics.processVersion,2);return fs.readFile(output);
   };
   for(const draft of [false,true]){
    const legacy=await preview(null,'legacy-'+draft,draft),v1=await preview(1,'v1-'+draft,draft),v2=await preview(2,'v2-'+draft,draft);
-   assert.deepEqual(legacy,v1);assert.notDeepEqual(v1,v2);
+   assert.deepEqual(legacy,v1);assert.deepEqual(v1,v2);
    assert.deepEqual(v1,await preview(1,'back-v1-'+draft,draft));
    assert.deepEqual(v2,await preview(2,'back-v2-'+draft,draft));
   }
@@ -40,7 +40,7 @@ function chart(){
    await e.request('open',{key:'v2',kind:'photo',path:source});
    const output=path.join(out,'process-v'+version+'-export.png');
    const r=await e.request('export',{key:'v2',path:source,settings:{...common,processVersion:version},output});
-   assert.equal(r.diagnostics.processVersion,version);assert.equal(r.diagnostics.settings.processVersion,version);
+   assert.equal(r.diagnostics.processVersion,2);assert.equal(r.diagnostics.settings.processVersion,2);
    const bytes=await fs.readFile(output);assert.equal(bytes[24],16);assert(bytes.includes(Buffer.from('iCCP')));
    await e.request('open',{key:'reopen',kind:'photo',path:output});
    await e.request('preview',{key:'reopen',settings:{},edge:384,output:path.join(out,'process-reopened-'+version+'.png')});
@@ -52,8 +52,11 @@ function chart(){
    await e.request('detail-preview',{key:'v2',path:source,x:.5,y:.5,width:192,height:128,settings:{...common,processVersion:version},output:detail,beforeOutput:before});
    details.push(await fs.readFile(detail));
   }
-  assert.notDeepEqual(details[0],details[1]);assert.deepEqual(details[0],details[2]);
+  assert.deepEqual(details[0],details[1]);assert.deepEqual(details[0],details[2]);
   await assert.rejects(()=>e.request('preview',{key:'v2',settings:{processVersion:3},edge:384,output:detail}),/proceso/);
-  console.log('V1 legacy, V2 preview/draft/export/detail, cache switches, 16-bit ICC and reopening: OK');
+  await e.request('open',{key:'video',kind:'video',path:path.resolve('tests/fixtures/clip.mp4')});
+  const vr=await e.request('preview',{key:'video',settings:{processVersion:2},time:.1,edge:160,output:path.join(out,'process-video.png')});
+  assert.equal(vr.previewDiagnostics.processVersion,1);
+  console.log('Photos always V2: missing/legacy/current markers, Full/Draft/export/detail, PNG16 ICC and reopening: OK');
  }finally{e.stop();}
 })().catch(err=>{console.error(err);process.exitCode=1;});

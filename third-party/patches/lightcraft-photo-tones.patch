@@ -1,0 +1,117 @@
+--- a/crates/pipeline/src/finish.rs
++++ b/crates/pipeline/src/finish.rs
+@@ -150,6 +150,8 @@
+ /// Everything the per-pixel stage computes once per render: the CPU loop below and the GPU kernel
+ /// (`lightcraft-gpu`) both read their parameters from here, so the two cannot drift apart.
+ pub struct FinishParams {
++    /// FilmLab photograph-only tonal/gamut path. Video keeps the existing path.
++    pub photo_v2: bool,
+     /// A LUT profile and its amount (0..2), applied to the display-encoded colour.
+     pub lut: Option<(std::sync::Arc<crate::lut::Lut3d>, f32)>,
+     pub tone: ToneMap,
+@@ -225,6 +227,7 @@
+         let calibration = s.section_enabled("calibration");
+         let peak = s.hdr.peak();
+         FinishParams {
++            photo_v2: s.detail.process_version == 2 && space == OutputSpace::Srgb && peak == 1.0,
+             peak,
+             calib: if calibration { crate::colorops::calibration_matrix(&s.calibration) } else { None },
+             shadow_tint: if calibration { (s.calibration.shadows_tint / 100.0) as f32 } else { 0.0 },
+@@ -263,6 +266,7 @@
+     /// Render into a display's primaries (sRGB curve) instead of the output space, soft proof
+     /// included (see [`crate::DisplaySpace`]).
+     pub fn for_display(&mut self, d: &crate::DisplaySpace, proof: Option<crate::Proof>) {
++        self.photo_v2 = false;
+         self.to_out = d.from_working;
+         self.out_luma = d.luma;
+         self.out_trc = OutputTrc::Srgb;
+@@ -398,6 +402,7 @@
+     let srgb = srgb_lut();
+     let peak = fp.peak;
+     let hdr = peak > 1.0;
++    let photo_v2 = fp.photo_v2 && fp.proof.is_none();
+     let mut out = vec![T::default(); w * h];
+     for_rows(&mut out, w, |y, row| {
+         for (x, px) in row.iter_mut().enumerate() {
+@@ -479,9 +484,13 @@
+             let mut delta = 0.0f32;
+             let (hh, ss) = (hl + l_hl, sh + l_sh);
+             if hh != 0.0 || ss != 0.0 {
+-                let ws = 1.0 - smooth(-4.8, 0.3, base);
+-                let wh = smooth(-1.0, 2.8, base);
+-                delta += ss * 1.7 * ws * ws.sqrt() + hh * 1.7 * wh;
++                if photo_v2 {
++                    delta += photo_tone_delta(base, hh, ss);
++                } else {
++                    let ws = 1.0 - smooth(-4.8, 0.3, base);
++                    let wh = smooth(-1.0, 2.8, base);
++                    delta += ss * 1.7 * ws * ws.sqrt() + hh * 1.7 * wh;
++                }
+             }
+             if l_wh != 0.0 {
+                 delta += l_wh * 0.8 * smooth(0.5, 3.0, l1);
+@@ -546,7 +555,7 @@
+                 d = d.map(|v| o + (v - o) * k);
+             }
+             let mx = d[0].max(d[1]).max(d[2]);
+-            if mx > peak {
++            if mx > peak && !photo_v2 {
+                 let t = ((mx - peak) / (mx - o).max(1e-6)).clamp(0.0, 1.0);
+                 d = d.map(|v| v + (o - v) * t);
+             }
+@@ -609,7 +618,11 @@
+                 }
+                 None => mul3(to_out, d),
+             };
+-            let (mapped, t) = gamut_map_to(r, *out_luma, peak);
++            let (mapped, t) = if photo_v2 {
++                photo_gamut_srgb(r)
++            } else {
++                gamut_map_to(r, *out_luma, peak)
++            };
+             if fp.proof.as_ref().is_some_and(|pp| pp.display_warning) && warn.is_none() && out_of_gamut(r, t) {
+                 warn = Some(crate::output::PROOF_DISPLAY_WARNING);
+             }
+@@ -809,3 +822,42 @@
+         assert!((encode_srgb(lut, 2.0) - 1.0).abs() < 1e-6);
+     }
+ }
++
++
++/// Smooth shadow/highlight adjustment in stops. The derivative of base+delta is
++/// >= 0.35 for every supported pair of controls: no reversal of a luminance ramp.
++/// Operates on the existing edge-aware base, not independently on RGB channels.
++pub fn photo_tone_delta(base: f32, highlights: f32, shadows: f32) -> f32 {
++    fn softplus(x: f32) -> f32 {
++        if x > 16.0 { x } else if x < -16.0 { x.exp2() / std::f32::consts::LN_2 } else { (1.0 + x.exp2()).log2() }
++    }
++    0.65 * (highlights.clamp(-1.0, 1.0) * softplus(base - 0.5)
++        + shadows.clamp(-1.0, 1.0) * softplus(-base - 1.0))
++}
++
++/// sRGB gamut projection at constant OkLab lightness and hue, reducing chroma
++/// only when necessary. Already representable colours pass through untouched.
++/// Search is bounded to 14 steps and runs only for out-of-gamut pixels.
++/// No claim is made to retain both chroma and luminance at a gamut boundary.
++pub fn photo_gamut_srgb(rgb: [f32; 3]) -> ([f32; 3], f32) {
++    use lightcraft_color::{SRGB, REC2020, Mat3};
++    use lightcraft_color::perceptual::{oklab_from_2020, oklab_to_2020};
++    use std::sync::OnceLock;
++    if rgb.iter().all(|c| (0.0..=1.0).contains(c)) { return (rgb, 1.0); }
++    if rgb.iter().any(|c| !c.is_finite()) { return ([0.0; 3], 0.0); }
++    static MATRICES: OnceLock<(Mat3, Mat3)> = OnceLock::new();
++    let (to_work, to_srgb) = MATRICES.get_or_init(|| (SRGB.to_space(&REC2020), REC2020.to_space(&SRGB)));
++    let lab = oklab_from_2020(to_work.apply_f32(rgb));
++    let light = lab[0].clamp(0.0, 1.0);
++    if light <= 1e-6 { return ([0.0; 3], 0.0); }
++    if light >= 1.0 - 1e-6 { return ([1.0; 3], 0.0); }
++    let candidate = |scale| to_srgb.apply_f32(oklab_to_2020([light, lab[1]*scale, lab[2]*scale]));
++    let (mut low, mut high) = (0.0, 1.0);
++    for _ in 0..14 {
++        let mid = (low + high) * 0.5;
++        if candidate(mid).iter().all(|c| *c >= 0.0 && *c <= 1.0) { low = mid; } else { high = mid; }
++    }
++    // This clamp addresses roundoff at the neutral endpoints, not RGB clipping
++    // as a substitute for the chroma search. A neutral is always the fallback.
++    (candidate(low).map(|c| c.clamp(0.0, 1.0)), low)
++}

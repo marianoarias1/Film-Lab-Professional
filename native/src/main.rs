@@ -1,4 +1,6 @@
 #[cfg(test)]
+mod photo_tones_tests;
+#[cfg(test)]
 mod process_v2_tests;
 mod delivery;
 mod detail;
@@ -28,7 +30,7 @@ use std::{
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.12-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.13-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -75,7 +77,7 @@ struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            process_version: 1,
+            process_version: 2,
             exposure: 0.,
             contrast: 0.,
             highlights: 0.,
@@ -1009,9 +1011,13 @@ fn run(
         state.sources.insert(key.into(), source);
         return Ok(meta);
     }
-    let settings: Settings =
+    let mut settings: Settings =
         serde_json::from_value(r["settings"].clone()).map_err(|e| e.to_string())?;
     settings.validate()?;
+    settings.process_version = match state.sources.get(key) {
+        Some(Source::Photo(_)) => 2,
+        _ => 1,
+    };
     if op == "detail-preview" {
         let time = r["time"].as_f64().unwrap_or(0.);
         if !time.is_finite() || time < 0. {
