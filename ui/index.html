@@ -225,7 +225,7 @@
         </div></section>
         </div>
         <footer>
-          <span id="saveStatus">Sesión local</span
+          <span id="saveStatus" hidden role="status"></span
           ><span class="engine-info"><span id="renderStatus" class="render-status" role="status" aria-label="Procesando ajustes" title="Procesando ajustes" hidden><span class="spinner"></span><span class="sr-only">Procesando ajustes</span></span><span id="engineStatus" hidden aria-hidden="true"></span></span>
         </footer>
       </section>
@@ -329,7 +329,7 @@
     <div id="projectMenu" class="project-menu" hidden>
       <div>
         <h3>Tu proyecto</h3>
-        <button id="closeProject" class="plain" aria-label="Cerrar">×</button>
+        <button id="closeProject" type="button" class="dialog-close" aria-label="Cerrar proyecto"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       </div>
       <label
         >Nombre<input

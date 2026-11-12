@@ -25,3 +25,10 @@ La validación visual automatizada de Chromium/Electron en este entorno se bloqu
 3. Abrir Exportar: destino y formato visibles, avanzados cerrados; cambiar destino, abrir avanzados y modificar calidad/tamaño.
 4. Cerrar con la X o Escape y comprobar que no se exportó; exportar una selección y revisar encuadre.
 5. Probar Proyecto, cerrar fuera y volver a abrir. Confirmar que la tira de fotos sigue disponible aunque Archivos ya no aparezca en la navegación superior.
+
+## Ajustes de la misma PR
+
+- La tira carga miniaturas de las fotos sin tener que activarlas. Una cola de baja prioridad hace una solicitud por vez; omite originales ausentes y descarta respuestas de archivos eliminados. Los errores no se reintentan en bucle.
+- Se ocultan los mensajes rutinarios de recuperación y los milisegundos de render. Se conserva el aviso si falla el guardado. El espacio de estado se aprovecha para miniaturas más grandes.
+- Proyecto comparte la X SVG y el área de pulsación de Exportar. Los campos avanzados tienen alturas y separaciones uniformes; la opción de ampliación ocupa una fila propia.
+- Con zoom, arrastrar con clic izquierdo mueve la vista sin cambiar el revelado. Con máscaras o efectos interactivos activos se usa Espacio + arrastrar para conservar sus gestos. El desplazamiento se limita a los bordes y vuelve a cero al cambiar de foto o restablecer zoom.

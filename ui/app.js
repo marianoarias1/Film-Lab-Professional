@@ -1,3 +1,4 @@
+import {FilmstripPreviews} from "./filmstrip-previews.js";
 import {addCurvePoint, moveCurvePoint} from "./curve-tools.js";
 import { drawGlowControls } from "./glow-controls.js";
 import { mountDetailInspector } from "./detail-inspector.js";
@@ -7,7 +8,7 @@ import { mountRecipePreviews } from "./recipe-previews.js";
 import { mountScopes } from "./scopes.js";
 import {mountEffects} from "./lab-effects.js";
 import {mountDelivery} from "./delivery.js";
-import {fittedPreview, colorTrack} from "./display-controls.js";
+import {fittedPreview, colorTrack, panPreview} from "./display-controls.js";
 import {clamp, createShape, linearGeometry, transformShape, shapeAlpha, brushAlpha, maskCoverage, maskPreview} from "./mask-geometry.js";
 import webCatalog from "./catalog/web-recipes.js";
 import {PreviewQueue} from "./preview-queue.js";
@@ -68,6 +69,12 @@ function updateThumbnail(file, image) {
     // A thumbnail is optional. It must not interrupt the editor preview.
   }
 }
+const filmstripPreviews = new FilmstripPreviews({
+  request: file => api.libraryPreview({id:file.id}),
+  has: file => thumbnails.has(file),
+  present: async (file,source) => { const image=new Image(); image.src=source; await image.decode(); updateThumbnail(file,image); },
+  canRun: () => !!api && !busy && !previewQueue.running && !previewQueue.pending,
+});
 let busy = false,
   group = "light",
   tab = "edit",
@@ -364,6 +371,7 @@ function drawFiles() {
     list.append(item);
   }
   list.scrollLeft = scrollLeft;
+  filmstripPreviews.setFiles(state.files);
   updateButtons();
 }
 function drawRecipes() {
@@ -685,7 +693,7 @@ const previewQueue = new PreviewQueue({
   render: job => api.preview(job),
   onBusy: active => {
     $("renderStatus").hidden = !active;
-    if (!active) recipePreviews.wake();
+    if (!active) { recipePreviews.wake(); filmstripPreviews.wake(); }
   },
   onError: (error, job) => {
     if (job.id !== state.activeId) return;
@@ -705,7 +713,7 @@ const previewQueue = new PreviewQueue({
     $("preview").src = before && originalUrl ? originalUrl : result.url;
     $("preview").hidden = false;
     $("emptyState").hidden = true;
-    $("renderTime").textContent = `${Math.round(result.ms)} ms${job.draft ? " · vista rápida" : ""}`;
+    $("renderTime").textContent = "";
     $("engineStatus").textContent = "CPU · float32 · preview reducida";
     const file = current();
     if (!job.draft || !thumbnails.has(file)) updateThumbnail(file, image);
@@ -907,7 +915,7 @@ $("preview").onpointerup = endLeak;
 $("preview").onpointercancel = endLeak;
 function saveSoon() {
   clearTimeout(saveTimer);
-  $("saveStatus").textContent = "Guardando recuperación…";
+  $("saveStatus").hidden = true;
   saveTimer = setTimeout(flushSave, 500);
 }
 function flushSave() {
@@ -921,11 +929,12 @@ function flushSave() {
     .then(() => api.autosave(copy))
     .then(() => {
       saveError = null;
-      $("saveStatus").textContent = "✓ Recuperación guardada en este equipo";
+      $("saveStatus").hidden = true;
     })
     .catch((e) => {
       saveError = e;
-      $("saveStatus").textContent = "⚠ No se pudo guardar la recuperación";
+      $("saveStatus").hidden = false;
+      $("saveStatus").textContent = "No se pudo guardar la sesión";
     });
   return savePromise;
 }
@@ -1670,7 +1679,7 @@ function fitPreview(){
 let viewZoom=1,viewPan={x:0,y:0};
 function applyZoom(){
   $('imageWrap').style.transform=`translate(${viewPan.x}px, ${viewPan.y}px) scale(${viewZoom})`;
-  $('zoomReset').textContent=Math.round(viewZoom*100)+'%';queueMaskPaint();
+  $('zoomReset').textContent=Math.round(viewZoom*100)+'%';$('photoArea').classList.toggle('zoomed',viewZoom>1);queueMaskPaint();
 }
 function resetZoom(){viewZoom=1;viewPan={x:0,y:0};applyZoom();}
 $('zoomReset').onclick=resetZoom;
@@ -1683,6 +1692,32 @@ $('imageWrap').parentElement.addEventListener('wheel',e=>{
   viewPan.x+=(e.clientX-(b.left+b.width/2))*(1-ratio);viewPan.y+=(e.clientY-(b.top+b.height/2))*(1-ratio);
   viewZoom=next;if(viewZoom===1)viewPan={x:0,y:0};applyZoom();
 },{passive:false});
+let photoPan=null, panSpace=false;
+const photoArea=$('photoArea');
+window.addEventListener('keydown',e=>{if(e.code==='Space'&&!e.target.closest('input,textarea,select,button,summary,dialog')){panSpace=true;if(viewZoom>1)e.preventDefault();}});
+window.addEventListener('keyup',e=>{if(e.code==='Space')panSpace=false;});
+window.addEventListener('blur',()=>{panSpace=false;photoPan=null;photoArea.classList.remove('panning');});
+photoArea.addEventListener('pointerdown',e=>{
+  if(e.button!==0||viewZoom<=1||busy||!current()||!e.target.closest('#imageWrap'))return;
+  const hasTool=tab==='masks'||effects.active()||(tab==='effects'&&current().settings.lightLeak>0);
+  if(hasTool&&!panSpace)return;
+  photoPan={id:e.pointerId,x:e.clientX,y:e.clientY,pan:{...viewPan}};
+  photoArea.setPointerCapture(e.pointerId);photoArea.classList.add('panning');
+  e.preventDefault();e.stopImmediatePropagation();
+},true);
+photoArea.addEventListener('pointermove',e=>{
+  if(!photoPan||e.pointerId!==photoPan.id)return;
+  viewPan=panPreview(photoPan.pan,e.clientX-photoPan.x,e.clientY-photoPan.y,$('preview').clientWidth,$('preview').clientHeight,viewZoom,photoArea.clientWidth,photoArea.clientHeight);
+  applyZoom();e.preventDefault();e.stopImmediatePropagation();
+},true);
+function endPhotoPan(e){
+  if(!photoPan||e.pointerId!==photoPan.id)return;
+  photoPan=null;photoArea.classList.remove('panning');
+  if(photoArea.hasPointerCapture(e.pointerId))photoArea.releasePointerCapture(e.pointerId);
+  e.stopImmediatePropagation();
+}
+for(const event of ['pointerup','pointercancel','lostpointercapture'])photoArea.addEventListener(event,endPhotoPan,true);
+$('preview').title='Ctrl + rueda: zoom. Arrastrá para mover. Con una herramienta activa, mantené Espacio.';
 let panelState={filters:true,files:true};
 try{const saved=JSON.parse(localStorage.getItem('filmlab.workspace.panels'));if(saved)panelState={filters:saved.filters===true,files:saved.files===true};}catch{}
 function drawWorkspace(){

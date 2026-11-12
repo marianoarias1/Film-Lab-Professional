@@ -428,3 +428,22 @@ header #projectButton svg { flex:none; }
 #motionPanel > summary, #motionPanel[open] > summary { padding:11px 2px; font:650 12px/1.4 var(--sans); border:0; border-radius:0; }
 #motionPanel > summary::after { width:5px; height:5px; margin:0 3px 0 5px; color:inherit; }
 .export-stats p:empty { display:none; }
+/* Use the former status row for larger, immediately available photo thumbnails. */
+.workspace footer { min-height:0; padding:0; }
+.workspace footer:has(#saveStatus[hidden]) { height:0; }
+.engine-info .render-status { position:absolute; right:12px; bottom:12px; }
+#renderTime { display:none; }
+#filesPanel .filmstrip { height:90px; min-height:90px; }
+#filesPanel .file { height:82px; width:166px; }
+#filesPanel .file-icon, #filesPanel .file-thumb { width:62px; height:48px; top:25px; }
+#filesPanel .file strong, #filesPanel .file small { left:76px; }
+#filesPanel .file strong { top:30px; }
+#filesPanel .file small { bottom:15px; }
+.project-menu #closeProject { width:36px; height:36px; padding:0; display:grid; place-items:center; }
+.delivery-grid { grid-template-columns:repeat(2,minmax(0,1fr)); align-items:start; column-gap:14px; row-gap:16px; }
+#exportAdvanced .delivery-grid > label { margin:0; gap:8px; min-width:0; }
+#exportAdvanced .delivery-grid select, #exportAdvanced .delivery-grid input:not([type=checkbox]) { height:40px; box-sizing:border-box; }
+#exportAdvanced .delivery-grid .report-option { grid-column:1 / -1; min-height:32px; }
+#jpegQualityField[hidden] { display:none !important; }
+.photo-area.zoomed #preview { cursor:grab; touch-action:none; }
+.photo-area.panning, .photo-area.panning * { cursor:grabbing !important; user-select:none; }
