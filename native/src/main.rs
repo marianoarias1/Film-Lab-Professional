@@ -32,7 +32,7 @@ use std::{
 };
 
 type Result<T> = std::result::Result<T, String>;
-const ENGINE: &str = "filmlab-pro-0.14-lc-d999e382-fc-6c3948a3";
+const ENGINE: &str = "filmlab-pro-0.15-lc-d999e382-fc-6c3948a3";
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, rename_all = "camelCase")]
 struct Settings {
@@ -624,7 +624,11 @@ fn render_quality(
 fn apply_glow(d: &mut lightcraft_pipeline::DeepImage, s: &Settings, info: &SourceInfo) {
     let frame = lightcraft_pipeline::geometry::Frame::new(d.width, d.height, &s.develop(info), true);
     let mask = s.glow.mask_id.and_then(|id| s.masks.iter().find(|m| m.id == id && m.visible));
-    glow::apply(d, &s.glow, mask.map(|m| (m, &frame)));
+    if s.process_version == 2 {
+        glow::apply_photo(d, &s.glow, mask.map(|m| (m, &frame)));
+    } else {
+        glow::apply(d, &s.glow, mask.map(|m| (m, &frame)));
+    }
 }
 fn apply_leak(d: &mut lightcraft_pipeline::DeepImage, s: &Settings) {
     if s.light_leak <= 0. {
@@ -1319,6 +1323,45 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn photo_glow_preview_matches_export_at_full_resolution() {
+        let pixels = Arc::new(Rgb32f::from_fn(1800, 96, |x, y| {
+            if (x == 800 && y == 48) || (x > 1000 && x < 1008 && y > 35 && y < 42) {
+                [1.; 3]
+            } else {
+                [0.002; 3]
+            }
+        }));
+        let info = SourceInfo::default();
+        for style in ["motion", "streak"] {
+            let mut s = Settings::default();
+            s.glow = glow::Glow {
+                enabled: true,
+                style: style.into(),
+                amount: 90.,
+                spread: 40.,
+                softness: 15.,
+                angle: 20.,
+                ..Default::default()
+            };
+            let normal = render(
+                &pixels,
+                &info,
+                &StageCache::default(),
+                &s,
+                1800,
+                OutputDepth::F32Linear,
+            )
+            .deep
+            .unwrap();
+            let direct = render_export(&pixels, &info, &StageCache::default(), &s, 1800).unwrap();
+            assert_eq!(
+                normal, direct,
+                "preview/export must share photo glow: {style}"
+            );
+        }
+    }
+
     #[test]
     fn direct_export_keeps_float_samples_with_curves_grain_and_leak() {
         let pixels = Arc::new(Rgb32f {

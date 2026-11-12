@@ -163,3 +163,7 @@ Requiere el ejecutable **0.11** o recompilar el motor. Para comenzar una prueba 
 Nitidez con protección de bordes/ruido fino y refinamiento del ruido de color, usando los controles actuales. La transformación tonal/color de V2 se conserva. Radio 0 resuelve ahora a 0.9 píxeles originales en fotografías. Hay diferencias de aspecto con nitidez o ruido de color activos y un costo adicional del filtrado cromático; no se afirma una mejora universal ni aceleración. Detalles, mediciones y guía de comparación en [docs/PHOTO-DETAIL.md](docs/PHOTO-DETAIL.md).
 
 Requiere ejecutable/motor 0.14 o recompilar. No hay nuevo selector de motor. Proyectos 0.13 compatibles; el video mantiene su ruta anterior.
+
+## Nuevo en 0.15: estelas fotográficas más definidas
+
+Movimiento y Línea usan una cuadrícula más fina para representar luces pequeñas. Extender controla la longitud sin aumentar también el grosor; Suavizado controla su difusión. La ruta sigue en CPU y requiere más trabajo cuando está activa. No cambian los controles ni los estilos de video. Ver [comportamiento, compatibilidad y pruebas](docs/GLOW-PHOTO.md).
