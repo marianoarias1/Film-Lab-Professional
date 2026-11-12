@@ -23,7 +23,7 @@ test('Picker downloads paginated selected items, renames from actual MIME, repor
  if(url.endsWith('=dv'))return new Response('video',{headers:{'content-type':'video/mp4'}});
  throw Error('Unexpected route');};
  try{const result=await importPhotos({destination:dir,signal:new AbortController().signal,onStatus:s=>status.push(s),fetcher,openExternal:async value=>{const u=new URL(value);if(u.hostname==='accounts.google.com')await fetch(u.searchParams.get('redirect_uri')+'?'+new URLSearchParams({state:u.searchParams.get('state'),code:'test'}));}});
- assert.equal(result.paths.length,2);assert.match(result.paths[0],/x\.jpg$/);assert.match(result.paths[1],/movie\.mp4$/);assert.equal(result.failures.length,1);assert.equal(deleted,true);assert.equal((await fs.readdir(dir)).some(n=>n.endsWith('.part')),false);assert.equal(status.length>0,true);
+ assert.equal(result.paths.length,1);assert.match(result.paths[0],/x\.jpg$/);assert.equal(result.failures.length,2);assert.equal(deleted,true);assert.equal((await fs.readdir(dir)).some(n=>n.endsWith('.part')),false);assert.equal(status.length>0,true);
  }finally{await fs.rm(dir,{recursive:true,force:true});}
 });
 test('OAuth cancellation releases callback listener',async()=>{

@@ -1,3 +1,4 @@
+import {addCurvePoint, moveCurvePoint} from "./curve-tools.js";
 import { drawGlowControls } from "./glow-controls.js";
 import { mountDetailInspector } from "./detail-inspector.js";
 import { mountEditVersions } from "./edit-versions.js";
@@ -275,11 +276,9 @@ function updateButtons() {
   $("fileCount").textContent = state.files.length;
   $("workspaceFileCount").textContent = state.files.length;
   $("controlsEmpty").hidden = !!f;
-  $("playProxy").disabled = busy || !f;
   $("importButton").disabled = busy;
   $("emptyImport").disabled = busy;
   $("projectButton").disabled = busy;
-  $("scrub").disabled = busy;
   drawAdjustmentActions();
   $("filmstrip").querySelectorAll(".file > input").forEach((check, index) => {
     check.disabled = busy || (syncSelecting && !syncEligible(state.files[index]));
@@ -493,7 +492,7 @@ function drawControls() {
   $("labPanel").hidden = tab === "edit";
   $("maskPanel").hidden = tab !== "masks";
   $("effectsPanel").hidden = tab !== "effects";
-  $("panelTitle").textContent = { edit: "A tu manera.", effects: "Laboratorio.", masks: "Máscaras." }[tab];
+  $("panelTitle").textContent = { edit: "Revelar.", effects: "Laboratorio.", masks: "Máscaras." }[tab];
   $("detailIntro").hidden = group !== "precision";
   $("sliders").replaceChildren(
     ...(definitions[group] || []).map((def) => slider(def)),
@@ -546,7 +545,8 @@ function drawCurve() {
     const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     c.setAttribute("cx", p[0] * 300);
     c.setAttribute("cy", (1 - p[1]) * 240);
-    c.setAttribute("r", 5);
+    c.setAttribute("r", 6);
+    c.classList.toggle("selected", i === selectedCurvePoint);
     c.dataset.index = i;
     points.append(c);
   });
@@ -583,39 +583,65 @@ function drawCurve() {
     fields.append(label);
   });
 }
+let selectedCurvePoint = null;
+function curvePosition(e) {
+  const svg = $("curveSvg"), point = svg.createSVGPoint();
+  point.x = e.clientX; point.y = e.clientY;
+  const matrix = svg.getScreenCTM();
+  if (!matrix) return null;
+  const local = point.matrixTransform(matrix.inverse());
+  return [Math.max(0, Math.min(1, local.x / 300)), Math.max(0, Math.min(1, 1 - local.y / 240))];
+}
 $("curveSvg").onpointerdown = (e) => {
-  if (!current() || busy || e.target.tagName !== "circle") return;
-  curveDrag = {
-    i: Number(e.target.dataset.index),
-    before: structuredClone(current().settings),
-  };
+  const file = current();
+  if (!file || busy || e.button !== 0) return;
+  const pos = curvePosition(e); if (!pos) return;
+  const before = structuredClone(file.settings), beforeRecipe = file.recipe, points = curveValues();
+  let i = e.target.dataset.index === undefined ? -1 : Number(e.target.dataset.index);
+  if (i < 0) {
+    const added = addCurvePoint(points, ...pos);
+    if (!added) return;
+    file.settings.curve = added.curve; file.recipe = null; i = added.index;
+  }
+  selectedCurvePoint = i;
+  curveDrag = { i, before, beforeRecipe, fileId:file.id };
+  $("curveSvg").focus();
   $("curveSvg").setPointerCapture(e.pointerId);
+  drawCurve(); schedulePreview(true);
   e.preventDefault();
 };
 $("curveSvg").onpointermove = (e) => {
-  if (!curveDrag) return;
-  const box = $("curveSvg").getBoundingClientRect(),
-    curve = structuredClone(curveValues());
-  curve[curveDrag.i][1] = Math.max(
-    0,
-    Math.min(1, 1 - (e.clientY - box.top) / box.height),
-  );
-  current().settings.curve = curve;
+  if (!curveDrag || current()?.id !== curveDrag.fileId) return;
+  const pos = curvePosition(e); if (!pos) return;
+  current().settings.curve = moveCurvePoint(curveValues(), curveDrag.i, ...pos);
   current().recipe = null;
-  drawCurve();
-  schedulePreview(true);
+  drawCurve(); schedulePreview(true);
 };
-const endCurve = () => {
+function endCurve(event) {
   if (!curveDrag) return;
-  commitEdit(current(), curveDrag.before);
-  curveDrag = null;
-  edited();
-};
+  const file = current(), gesture = curveDrag; curveDrag = null;
+  if (!file || file.id !== gesture.fileId) return;
+  if (event?.type === "pointercancel") { file.settings = gesture.before; file.recipe = gesture.beforeRecipe; }
+  else commitEdit(file, gesture.before);
+  drawCurve(); edited();
+}
 $("curveSvg").onpointerup = endCurve;
 $("curveSvg").onpointercancel = endCurve;
+$("curveSvg").onlostpointercapture = endCurve;
+$("curveSvg").onkeydown = e => {
+  if (!["Delete","Backspace"].includes(e.key) || busy || curveDrag) return;
+  const file = current(), points = curveValues();
+  if (!file || selectedCurvePoint == null || selectedCurvePoint <= 0 || selectedCurvePoint >= points.length - 1) return;
+  e.preventDefault();
+  const old = structuredClone(file.settings);
+  file.settings.curve = points.filter((_,i) => i !== selectedCurvePoint);
+  file.recipe = null; selectedCurvePoint = null;
+  commitEdit(file,old); drawCurve(); edited();
+};
 $("resetCurve").onclick = () => {
-  const f = current(),
-    old = structuredClone(f.settings);
+  const f = current();
+  if (!f || busy) return;
+  const old = structuredClone(f.settings);
   f.settings.curve = [];
   f.recipe = null;
   commitEdit(f, old);
@@ -647,9 +673,6 @@ function activate(id) {
     f.kind === "video"
       ? "VIDEO · PROCESAMIENTO POR FOTOGRAMA"
       : "FOTOGRAFÍA · REVELADO NO DESTRUCTIVO";
-  $("videoControls").hidden = f.kind !== "video";
-  $("scrub").value = 0;
-  $("timecode").textContent = "0:00";
   $("warning").hidden = true;
   drawFiles();
   drawRecipes();
@@ -688,7 +711,6 @@ const previewQueue = new PreviewQueue({
     if (!job.draft || !thumbnails.has(file)) updateThumbnail(file, image);
     Object.assign(file, {width:result.meta.width,height:result.meta.height,duration:result.meta.duration,raw:result.meta.raw});
     $("precision").textContent = file.raw ? "RAW → 32 bits lineales" : "32 bits · color lineal";
-    if (file.kind === "video") $("scrub").max = Math.max(0.01,(file.duration || 0)-0.04);
     $("warning").textContent = (result.meta.warnings || []).join(" ");
     $("warning").hidden = !$("warning").textContent;
     // Measure presentation without holding up the next native render for two frames.
@@ -719,7 +741,7 @@ const recipePreviews = mountRecipePreviews({
 function syncRecipeContext() {
   const file = current();
   recipePreviews.setContext(file && !file.missing
-    ? { id: file.id, file, time: file.kind === "video" ? Number($("scrub").value) : 0 }
+    ? { id: file.id, file, time: 0 }
     : null);
 }
 function schedulePreview(draft = false) {
@@ -730,7 +752,7 @@ function schedulePreview(draft = false) {
   if (!file || busy || libraryOpen()) return;
   const revision = ++previewRevision;
   const inputAt = performance.now();
-  const job = {id:file.id,settings:structuredClone(file.settings),time:Number($("scrub").value),revision,inputAt};
+  const job = {id:file.id,settings:structuredClone(file.settings),time:0,revision,inputAt};
   // Submit immediately: waiting for the user to pause starves continuous drags.
   previewQueue.request({...job,draft:true});
   if (!draft) renderTimer = setTimeout(() => {
@@ -805,14 +827,6 @@ $("reset").onclick = () => {
   drawControls();
   edited();
 };
-$("scrub").oninput = () => {
-  stopPlayback();
-  originalUrl = null;
-  $("timecode").textContent = timeLabel(Number($("scrub").value));
-  syncRecipeContext();
-  schedulePreview(true);
-};
-$("scrub").onchange = () => schedulePreview();
 function timeLabel(s) {
   return Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
 }
@@ -835,7 +849,7 @@ $("before").onpointerdown = async (e) => {
       id,
       settings: {},
       original: true,
-      time: Number($("scrub").value),
+      time: 0,
       draft: false,
     });
     if (token === beforeToken && id === state.activeId) {
@@ -935,9 +949,12 @@ $("selectNone").onclick = () => {
 };
 function closeProject() {
   $("projectMenu").hidden = true;
+  $("projectButton").setAttribute("aria-expanded","false");
 }
-$("projectButton").onclick = () =>
-  ($("projectMenu").hidden = !$("projectMenu").hidden);
+$("projectButton").onclick = () => {
+  $("projectMenu").hidden = !$("projectMenu").hidden;
+  $("projectButton").setAttribute("aria-expanded",String(!$("projectMenu").hidden));
+};
 $("closeProject").onclick = closeProject;
 document.addEventListener("pointerdown", (e) => {
   if (!e.target.closest("#projectMenu,#projectButton")) closeProject();
@@ -1041,9 +1058,8 @@ function clearEditor() {
   $("preview").hidden = true;
   $("preview").removeAttribute("src");
   $("emptyState").hidden = false;
-  $("fileName").textContent = "Empezá con una fotografía o un video";
+  $("fileName").textContent = "Empezá con una fotografía";
   $("fileKind").textContent = "TU ESPACIO DE TRABAJO";
-  $("videoControls").hidden = true;
   $("renderTime").textContent = "";
   $("warning").hidden = true;
   drawFiles();
@@ -1102,6 +1118,7 @@ function openExport(source) {
     ? `Vas a exportar ${items.length} ${singular ? "foto elegida" : "fotos elegidas"} del proyecto.`
     : `Vas a exportar ${items.length} ${singular ? "archivo seleccionado" : "archivos seleccionados"} manualmente.`;
   $("exportBatch").open = false;
+  $("exportAdvanced").open = false;
   $("exportBatchList").replaceChildren(...items.map(file => makeEl("li", {}, file.name)));
   const skipped = $("exportUnavailable");
   skipped.hidden = !unavailable.length;
@@ -1126,7 +1143,7 @@ $("exportDialog").addEventListener("close", () => {
 });
 $("confirmExport").onclick = () => {
   if (!$("exportDialog").open || busy) return;
-  const invalid=$("exportDialog").querySelector(":invalid"); if (invalid) {invalid.reportValidity(); return;}
+  const invalid=$("exportDialog").querySelector(":invalid"); if (invalid) {$("exportAdvanced").open=true; invalid.reportValidity(); return;}
   const d=delivery.read();
   if ((d.width===0)!==(d.height===0)) {message("Dimensiones", "Indicá ancho y alto, o dejá ambos en cero para conservar el original."); return;}
   const files = pendingExport;
@@ -1136,10 +1153,6 @@ $("confirmExport").onclick = () => {
     return;
   }
   void doExport(files);
-};
-$("playProxy").onclick = () => {
-  const file = current();
-  if (file) void doExport([file], true);
 };
 $("savePreviewDiagnostics").onclick = async () => {
   try { if(await api.savePreviewDiagnostics()) toast("Diagnóstico de respuesta guardado"); }
@@ -1188,7 +1201,7 @@ async function doExport(files, proxy = false) {
       ),
       format: $("photoFormat").value,
       delivery: proxy ? {} : delivery.read(),
-      encoding: $("videoEncoding").value,
+      encoding: "auto",
       saveReport: $("saveExportReport").checked,
       proxy,
     });
@@ -1429,8 +1442,6 @@ function drawMasks(){
   $('newMaskTools').replaceChildren();
   if(maskPicker?.op==='new')$('newMaskTools').append(maskToolPicker('new'));
   $('maskList').replaceChildren(...masks.map(m=>maskGroupCard(m)));
-  const global=makeEl('button',{className:'plain global-mask-action',disabled:!f||busy},'Película y color global');
-  global.onclick=()=>{selectWorkspaceTab('effects');maskPicker=null;hoverMask=null;pendingMask=null;toolOperation='new';activeMaskId=-1;$('labPanel').querySelector('details.global-effects').open=true;drawMasks();};$('maskList').append(global);
   const box=$('maskControls');box.replaceChildren();
   if(pendingMask){
     const help=makeEl('div',{className:'mask-tool-hint'});
@@ -1679,10 +1690,10 @@ function drawWorkspace(){
   recipePreviews.setEnabled(panelState.filters);
   $('toggleFilters').setAttribute('aria-expanded',String(panelState.filters));$('toggleFilters').title=panelState.filters?'Ocultar filtros':'Mostrar filtros';
   $('toggleFilters').setAttribute('aria-label',$('toggleFilters').title);
-  for (const id of ['toggleFiles','navFiles']) $(id).setAttribute('aria-expanded',String(panelState.files));
+  for (const id of ['toggleFiles']) $(id).setAttribute('aria-expanded',String(panelState.files));
   requestAnimationFrame(queueMaskPaint);
 }
-for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files'],['navFiles','files']])$(id).onclick=()=>{if(libraryOpen()){showEditor();if(id==='navFiles'){panelState.files=true;}else panelState[key]=!panelState[key];}else panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
+for(const [id,key]of [['toggleFilters','filters'],['toggleFiles','files']])$(id).onclick=()=>{if(libraryOpen()){showEditor();if(id==='navFiles'){panelState.files=true;}else panelState[key]=!panelState[key];}else panelState[key]=!panelState[key];drawWorkspace();try{localStorage.setItem('filmlab.workspace.panels',JSON.stringify(panelState));}catch{}};
 const libraryOpen = () => !$("library").hidden;
 function showLibrary() {
   if (busy) return;
@@ -1746,7 +1757,7 @@ const editVersions = mountEditVersions({
   notify: toast,
 });
 const detailInspector = mountDetailInspector({
-  $, current, api, time: () => Number($("scrub").value), isBusy: () => busy,
+  $, current, api, time: () => 0, isBusy: () => busy,
   available: () => tab === "edit" && !libraryOpen(),
   prepare() { stopPlayback(); endMask(true); pendingMask = null; toolOperation = "new"; $("maskType").value = ""; },
 });

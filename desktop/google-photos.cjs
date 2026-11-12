@@ -81,7 +81,7 @@ async function importPhotos({openExternal,destination,signal,onStatus=()=>{},fet
     session=await api("sessions","POST",{});
     if(!session.id) throw new Error("Google no creó una sesión de selección.");
     await openExternal(trusted(session.pickerUri,"picker"));
-    onStatus("Elegí fotos o videos en Google Fotos y presioná Listo. Después volvé a Film Lab.");
+    onStatus("Elegí fotografías en Google Fotos y presioná Listo. Después volvé a Film Lab.");
     const deadline=Date.now()+Math.min(seconds(session.pollingConfig?.timeoutIn,600000),1800000);
     while(!session.mediaItemsSet){
       if(Date.now()>deadline) throw new Error("La selección venció. Volvé a abrir Google Fotos.");
@@ -100,14 +100,13 @@ async function importPhotos({openExternal,destination,signal,onStatus=()=>{},fet
       let output;
       try{
         const media=item.mediaFile;
-        if(!media || !["PHOTO","VIDEO"].includes(item.type)) throw new Error("Formato no compatible");
-        if(item.type==="VIDEO" && media.mediaFileMetadata?.videoMetadata?.processingStatus && media.mediaFileMetadata.videoMetadata.processingStatus!=="READY") throw new Error("El video todavía está procesándose en Google Fotos");
+        if(!media || item.type!=="PHOTO") throw new Error("Formato no compatible");
         onStatus(`Descargando ${index+1} de ${items.length}: ${safeName(media.filename)}`);
-        const url=trusted(media.baseUrl,"media")+(item.type==="VIDEO"?"=dv":"=d");
+        const url=trusted(media.baseUrl,"media")+"=d";
         const r=await fetcher(url,{headers:{Authorization:`Bearer ${token}`},redirect:"error",signal:AbortSignal.any([signal,AbortSignal.timeout(1800000)])});
         if(!r.ok || !r.body) throw new Error(`Descarga HTTP ${r.status}`);
         const mime=(r.headers.get("content-type")||media.mimeType||"").split(";")[0];
-        const ext=({"image/jpeg":".jpg","image/png":".png","image/webp":".webp","image/tiff":".tif","video/mp4":".mp4","video/quicktime":".mov","video/webm":".webm"})[mime];
+        const ext=({"image/jpeg":".jpg","image/png":".png","image/webp":".webp","image/tiff":".tif"})[mime];
         if(!ext) throw new Error("Google entregó un formato no compatible: "+mime);
         const name=path.parse(safeName(media.filename)).name+ext;
         output=path.join(destination,crypto.randomUUID()+"-"+name);

@@ -9,12 +9,12 @@ test('progress never promises completion before the file is committed; unknown E
  assert.equal(progressView({fraction:1}).fraction,.99);
  assert.equal(progressView({fraction:1,committed:true}).fraction,1);
  assert.equal(progressView({fraction:NaN}).fraction,0);
- assert.match(progressView({phase:'finalizing'}).eta,/audio y contenedor/);
- assert.match(progressView({fileTotal:3,fileIndex:1}).headline,/Archivo 2 de 3/);
+ assert.equal(progressView({phase:'finalizing'}).eta,'');
+ assert.match(progressView({fileTotal:3,fileIndex:1}).headline,/Foto 2 de 3/);
  assert.equal(durationLabel(null),'Calculando…');
  assert.equal(durationLabel(Infinity),'Calculando…');
  assert.equal(durationLabel(62.2),'1 min 3 s');
- assert.match(progressView({encoder:'CPU'}).encoder,/CPU/);
+ assert.equal(progressView({encoder:'CPU'}).encoder,'');
  assert.doesNotMatch(progressView({kind:'photo'}).encoder,/NVENC/);
 });
 test('cancel targets the pending export, not a preview or another request',()=>{

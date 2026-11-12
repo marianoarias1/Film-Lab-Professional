@@ -369,3 +369,62 @@ dialog::backdrop { background: #0009; }
 .glow-fields select { width:100%; }
 .glow-fields:disabled { opacity:.5; }
 .glow-fields select { color:var(--ink, #e8e9e3); background:#171a17; border:1px solid #363b34; border-radius:8px; padding:9px 10px; font:inherit; }
+
+/* Shared compact inspector rows, across Revelar, Laboratorio and Máscaras. */
+header #projectButton { display:inline-flex; align-items:center; gap:8px; }
+header #projectButton svg { flex:none; }
+.control-section, #motionPanel, .mask-adjust-group {
+  border:0; border-bottom:1px solid var(--line); border-radius:0;
+  background:transparent; margin:0; padding:0;
+}
+.controls .control-section > summary, .controls .mask-adjust-group > summary,
+#exportAdvanced > summary {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  list-style:none; border:0; border-radius:0; padding:11px 2px;
+  font:650 12px/1.4 var(--sans); cursor:pointer;
+}
+.control-section > summary::-webkit-details-marker, .mask-adjust-group > summary::-webkit-details-marker { display:none; }
+.controls .control-section > summary span, #exportAdvanced > summary span { margin-left:auto; color:var(--muted); font-size:10px; font-weight:400; }
+.controls .control-section > summary::after, .controls .mask-adjust-group > summary::after,
+#exportAdvanced > summary::after {
+  content:""; width:5px; height:5px; flex:none; border-right:1.4px solid currentColor;
+  border-bottom:1.4px solid currentColor; transform:rotate(-45deg); margin:0 3px 0 5px;
+}
+.controls .control-section[open] > summary::after, .controls .mask-adjust-group[open] > summary::after,
+#exportAdvanced[open] > summary::after { transform:rotate(45deg); }
+.controls .control-section[open] > summary, .controls .mask-adjust-group[open] > summary { color:var(--accent); border:0; border-radius:0; }
+#motionControls { padding:4px 2px 12px; }
+#glowControls, #labSliders, .mask-adjust-group[open] { padding-bottom:10px; }
+.mask-panel { padding:0; border:0; }
+#maskControls h4 { font-size:12px; }
+.controls select, .controls input[type=text], .controls input[type=number] {
+  background:var(--well); color:var(--ink); border:1px solid var(--line); border-radius:6px; font:inherit; padding:8px;
+}
+.controls .compact-action { font:500 11px/1.4 var(--sans); padding:8px 10px; margin-top:10px; }
+#curveSvg { touch-action:none; user-select:none; cursor:crosshair; overflow:visible; }
+#curvePoints circle { cursor:grab; stroke-width:2; }
+#curvePoints circle.selected { fill:var(--accent); stroke:var(--ink); }
+.curve-inputs { gap:5px; }
+.curve-inputs input { min-height:32px; }
+.dialog-close { display:grid; place-items:center; width:36px; height:36px; padding:0; border:1px solid var(--line); border-radius:7px; flex:none; }
+#exportDialog { width:min(540px,92vw); padding:24px; }
+.export-basics { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:20px; }
+.export-basics label, .delivery-grid label { display:flex; flex-direction:column; gap:8px; font-size:12px; }
+#exportDialog select, #exportDialog input[type=number] { background:var(--well); border:1px solid var(--line); color:var(--ink); border-radius:6px; padding:10px; font:inherit; }
+#exportAdvanced { margin:20px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+#exportAdvanced > summary { padding:14px 0; }
+#exportAdvanced .delivery-grid { margin-top:8px; }
+#exportDialog .report-option { flex-direction:row; align-items:center; }
+#confirmExport { width:100%; }
+@media(max-width:600px) { .export-basics { grid-template-columns:1fr; } }
+.controls .fx-range span { font-size:12px; font-weight:500; }
+.controls .fx-range output { background:transparent; color:var(--muted); padding:0; font-size:11px; }
+.controls .fx-inspector { border:0; border-top:1px solid var(--line); border-radius:0; }
+.controls .fx-control-group { background:transparent; padding:8px 0; border-top:1px solid var(--line); border-radius:0; }
+.controls .fx-inspector-body { padding:10px 2px; }
+.controls .fx-inspector-head { padding:10px 2px; }
+.controls .fx-inspector-tabs { margin:0; }
+#motionPanel { margin:0; padding:0; background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; }
+#motionPanel > summary, #motionPanel[open] > summary { padding:11px 2px; font:650 12px/1.4 var(--sans); border:0; border-radius:0; }
+#motionPanel > summary::after { width:5px; height:5px; margin:0 3px 0 5px; color:inherit; }
+.export-stats p:empty { display:none; }
