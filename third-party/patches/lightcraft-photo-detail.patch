@@ -1,0 +1,219 @@
+--- a/crates/pipeline/src/lib.rs
++++ b/crates/pipeline/src/lib.rs
+@@ -37,6 +37,7 @@
+ pub mod optics;
+ pub mod output;
+ pub mod profiles;
++pub mod photo_detail;
+ pub mod redeye;
+ pub mod spots;
+ pub mod tone;
+@@ -209,6 +210,7 @@
+     pub clarity_blur: Option<Arc<Plane>>,
+     pub texture_blur: Option<Arc<Plane>>,
+     pub sharpen_blur: Option<Arc<Plane>>,
++    pub photo_sharpen: Option<Arc<Plane>>,
+     pub dark: Option<Arc<Plane>>,
+     /// Blurred chromaticity (`rgb / Y`) for local Moiré / Noise.
+     pub chroma_blur: Option<Arc<Rgb32f>>,
+@@ -308,6 +310,9 @@
+             let pl = &e.planes;
+             let planes = pl.log_l.iter().chain(pl.base.iter().map(|x| &x.1)).chain(pl.clarity.iter().map(|x| &x.1));
+             for p in planes.chain(pl.texture.iter().map(|x| &x.1)).chain(pl.dark.iter().map(|x| &x.1)) {
++                add(Arc::as_ptr(p) as usize, size(p));
++            }
++            for p in pl.sharpen.iter().map(|x| &x.1).chain(pl.photo_sharpen.iter().map(|x| &x.1)) {
+                 add(Arc::as_ptr(p) as usize, size(p));
+             }
+         }
+--- a/crates/pipeline/src/local.rs
++++ b/crates/pipeline/src/local.rs
+@@ -360,7 +360,8 @@
+ pub fn denoise(img: &mut Rgb32f, s: &DevelopSettings, scale: f32) {
+     let (lum, col) = nr_params(s, scale);
+     if s.detail.process_version == 2 {
+-        apply_nr_v2(img, lum, col);
++        apply_nr_v2(img, lum, None);
++        if let Some(nr) = col { crate::photo_detail::chroma(img,nr); }
+     } else {
+         apply_nr(img, lum, col);
+     }
+@@ -486,6 +487,7 @@
+     pub clarity: Option<(u32, Arc<Plane>)>,
+     pub texture: Option<(u32, Arc<Plane>)>,
+     pub sharpen: Option<(u32, Arc<Plane>)>,
++    pub photo_sharpen: Option<((u32,u32), Arc<Plane>)>,
+     /// Dark channel and its airlight.
+     pub dark: Option<(u32, Arc<Plane>, f32)>,
+     /// Blurred chromaticity (local Moiré / Noise).
+@@ -497,7 +499,7 @@
+     /// enough for a draft: the wide blurs (base, clarity, dehaze, chromaticity). Its `key` matches
+     /// no image, so only another draft takes them.
+     pub fn for_other_nr(self) -> Planes {
+-        Planes { key: 0, pre_nr: self.pre_nr, log_l: None, texture: None, sharpen: None, ..self }
++        Planes { key: 0, pre_nr: self.pre_nr, log_l: None, texture: None, sharpen: None, photo_sharpen: None, ..self }
+     }
+ }
+ 
+@@ -641,11 +643,19 @@
+     };
+     let ev = s.light.exposure as f32;
+     let masks = timed("masks", || masks::evaluate(&s.masks, frame, img.width, img.height, &img, &log_l, ev, mattes));
+-    let sharpen_blur = if s.detail.sharpen_amount != 0.0 && s.detail.sharpen_radius > 0.0 {
++    let sharpen_blur = if s.detail.process_version != 2 && s.detail.sharpen_amount != 0.0 && s.detail.sharpen_radius > 0.0 {
+         let sigma = (s.detail.sharpen_radius as f32 * detail_scale).max(0.05);
+         Some(plane_at(&mut planes.sharpen, sigma.to_bits(), || gaussian(&log_l, sigma)))
+     } else { None };
+-    Prepared { img, log_l, base, clarity_blur, texture_blur, sharpen_blur, dark, chroma_blur, air, masks, px_per_long }
++    let photo_sharpen = if s.detail.process_version == 2 &&
++        (s.detail.sharpen_amount > 0. || s.masks.iter().any(|m|m.visible && m.adjust.sharpness>0.)) {
++        let radius=if s.detail.sharpen_radius>0. {s.detail.sharpen_radius as f32}else{0.9};
++        let sigma=(radius*detail_scale).max(0.01);
++        let mask=(s.detail.sharpen_masking/100.) as f32;
++        Some(plane_at(&mut planes.photo_sharpen,(sigma.to_bits(),mask.to_bits()),
++            ||crate::photo_detail::sharpen_band(&log_l,sigma,mask)))
++    } else {None};
++    Prepared { img, log_l, base, clarity_blur, texture_blur, sharpen_blur, photo_sharpen, dark, chroma_blur, air, masks, px_per_long }
+ }
+ 
+ /// The airlight of the whole output frame, estimated on a small render of it (`proxy_w` px wide):
+--- a/crates/pipeline/src/finish.rs
++++ b/crates/pipeline/src/finish.rs
+@@ -510,7 +510,8 @@
+                 delta += cl * 0.85 * det * (0.35 + 0.65 * mid);
+             }
+             let tx = tex + l_tex;
+-            let sp = l_sharp * 0.6 + if p.sharpen_blur.is_none() { sharpen } else { 0.0 };
++            let sp = if p.photo_sharpen.is_some() { l_sharp.min(0.) * 0.6 }
++                else { l_sharp * 0.6 + if p.sharpen_blur.is_none() { sharpen } else { 0.0 } };
+             if (tx != 0.0 || sp != 0.0)
+                 && let Some(b) = &p.texture_blur
+             {
+@@ -528,6 +529,9 @@
+                     smooth(sharpen_mask * 0.25, sharpen_mask * 0.25 + 0.15, det.abs())
+                 } else { 1.0 };
+                 delta += sharpen * 1.3 * det.clamp(-0.8, 0.8) * m;
++            }
++            if let Some(band)=&p.photo_sharpen {
++                delta += (sharpen+l_sharp.max(0.)*0.6).clamp(0.,1.)*1.3*band.data[i];
+             }
+             // local Noise: smooth (or, negative, boost) small-amplitude detail, keep edges
+             if l_noise != 0.0
+--- /dev/null
++++ b/crates/pipeline/src/photo_detail.rs
+@@ -0,0 +1,115 @@
++//! FilmLab photo-detail refinement. Original implementation on permissive raster primitives.
++//! No sensor profile, segmentation or AI is inferred from these local statistics.
++use crate::{for_rows, local::NrColor};
++use lightcraft_color::luminance_2020;
++use lightcraft_raster::{Plane, Rgb32f, blur::gaussian};
++
++fn smooth(a: f32, b: f32, x: f32) -> f32 {
++    let t = ((x - a) / (b - a)).clamp(0., 1.);
++    t * t * (3. - 2. * t)
++}
++
++/// EV high-pass with edge support and a conservative local luminance envelope.
++/// The caller multiplies this plane by at most 1.3. Only this sharpening term
++/// is bounded; unrelated tone/texture/exposure adjustments are not clipped.
++pub fn sharpen_band(log: &Plane, sigma: f32, masking: f32) -> Plane {
++    let (w, h) = (log.width, log.height);
++    if w == 0 || h == 0 {
++        return Plane::new(w, h);
++    }
++    let sigma = sigma.max(0.01);
++    let made = lightcraft_raster::blur::box_sigma(sigma.max(0.6)).max(0.01);
++    let fade = (sigma / made).powi(2).min(1.);
++    let blurred = gaussian(log, sigma.max(0.6));
++    let guide = gaussian(log, 0.8);
++    let mut out = Plane::new(w, h);
++    for_rows(&mut out.data, w, |y, row| {
++        for (x, value) in row.iter_mut().enumerate() {
++            let i = y * w + x;
++            let center = log.data[i];
++            let (mut lo, mut hi, mut edge_lo, mut edge_hi) = (center, center, guide.data[i], guide.data[i]);
++            for yy in y.saturating_sub(1)..=(y + 1).min(h - 1) {
++                for xx in x.saturating_sub(1)..=(x + 1).min(w - 1) {
++                    lo = lo.min(log.data[yy * w + xx]);
++                    hi = hi.max(log.data[yy * w + xx]);
++                    edge_lo = edge_lo.min(guide.data[yy * w + xx]);
++                    edge_hi = edge_hi.max(guide.data[yy * w + xx]);
++                }
++            }
++            let det = (center - blurred.data[i]) * fade;
++            let edge = edge_hi - edge_lo;
++            // A coherent edge survives the small guide blur; isolated fine noise does not.
++            let support = edge / (edge + 0.5 * det.abs() + 0.002);
++            let mask = if masking > 0. { smooth(masking * 0.08, masking * 0.08 + 0.04, edge) } else { 1. };
++            let candidate = det.clamp(-0.8, 0.8) * support * mask;
++            *value = candidate.clamp((lo - center) / 1.3, (hi - center) / 1.3);
++        }
++    });
++    out
++}
++
++fn sample(img: &Rgb32f, x: f32, y: f32) -> [f32; 3] {
++    let x = x.clamp(0., img.width.saturating_sub(1) as f32);
++    let y = y.clamp(0., img.height.saturating_sub(1) as f32);
++    let (ix, iy) = (x.floor() as usize, y.floor() as usize);
++    let (fx, fy) = (x - ix as f32, y - iy as f32);
++    if fx == 0. && fy == 0. {
++        return img.get(ix, iy);
++    }
++    let a = img.get(ix, iy);
++    let b = img.get((ix + 1).min(img.width - 1), iy);
++    let c = img.get(ix, (iy + 1).min(img.height - 1));
++    let d = img.get((ix + 1).min(img.width - 1), (iy + 1).min(img.height - 1));
++    std::array::from_fn(|k| (a[k] * (1. - fx) + b[k] * fx) * (1. - fy) + (c[k] * (1. - fx) + d[k] * fx) * fy)
++}
++
++/// Two joint bilateral passes: a dense near neighborhood then a wider one.
++/// Fractional offsets remove the old integer-spacing jumps. Half strengths
++/// combine to the requested blend, instead of applying the full amount twice.
++pub fn chroma(img: &mut Rgb32f, nr: NrColor) {
++    if img.width == 0 || img.height == 0 || nr.t <= 0. {
++        return;
++    }
++    let blend = 1. - (1. - nr.t.clamp(0., 1.)).sqrt();
++    let variance = 0.015 + 0.20 * nr.t;
++    for step in [1., (nr.sigma * 0.5).clamp(0.5, 8.)] {
++        let source = img.clone();
++        let w = img.width;
++        let chroma = |p: [f32; 3]| {
++            let y = luminance_2020(p).max(1e-5);
++            (y, p.map(|c| c / y))
++        };
++        for_rows(&mut img.data, w, |y, row| {
++            for (x, p) in row.iter_mut().enumerate() {
++                let original = source.data[y * w + x];
++                let (yp, cp) = chroma(original);
++                let mut sum = [0.; 3];
++                let mut weights = 0.;
++                for dy in -1isize..=1 {
++                    for dx in -1isize..=1 {
++                        let q = sample(&source, x as f32 + dx as f32 * step, y as f32 + dy as f32 * step);
++                        let (yq, cq) = chroma(q);
++                        let dl = (yq / yp).log2();
++                        let dc = (0..3).map(|k| (cq[k] - cp[k]).powi(2)).sum::<f32>();
++                        let spatial = if dx == 0 && dy == 0 {
++                            1.
++                        } else if dx == 0 || dy == 0 {
++                            0.6
++                        } else {
++                            0.36
++                        };
++                        let weight = spatial * (-dl * dl / 0.125 - dc / variance).exp();
++                        for k in 0..3 {
++                            sum[k] += cq[k] * weight;
++                        }
++                        weights += weight;
++                    }
++                }
++                let yl = luminance_2020(original);
++                if yl > 1e-5 && weights > 0. {
++                    *p = std::array::from_fn(|k| (cp[k] + blend * (sum[k] / weights - cp[k])) * yl);
++                }
++            }
++        });
++    }
++}

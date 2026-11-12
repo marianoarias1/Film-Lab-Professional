@@ -157,3 +157,9 @@ Los dos modos nuevos extraen las altas luces antes de reducir la grilla auxiliar
 Las ediciones que ya usaban Direccional conservan su modo **Direccional · anterior** al abrirse. Suave y el direccional anterior mantienen su comportamiento previo. Los proyectos 0.10 se pueden abrir; Suavidad faltante usa 50. Se mantiene el alcance de las máscaras y la lupa técnica de Detalle sigue omitiendo efectos creativos.
 
 Requiere el ejecutable **0.11** o recompilar el motor. Para comenzar una prueba con reflejos marcados: Movimiento, Intensidad 60, Rango 40, Extensión 60, Suavidad 20 y Dirección 0°; son valores iniciales, no una equivalencia con Lightroom. Ajustá Rango a la luz de la toma antes de subir Intensidad.
+
+## Detalle fotográfico 0.14
+
+Nitidez con protección de bordes/ruido fino y refinamiento del ruido de color, usando los controles actuales. La transformación tonal/color de V2 se conserva. Radio 0 resuelve ahora a 0.9 píxeles originales en fotografías. Hay diferencias de aspecto con nitidez o ruido de color activos y un costo adicional del filtrado cromático; no se afirma una mejora universal ni aceleración. Detalles, mediciones y guía de comparación en [docs/PHOTO-DETAIL.md](docs/PHOTO-DETAIL.md).
+
+Requiere ejecutable/motor 0.14 o recompilar. No hay nuevo selector de motor. Proyectos 0.13 compatibles; el video mantiene su ruta anterior.

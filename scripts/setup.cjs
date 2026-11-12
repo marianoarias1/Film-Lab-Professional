@@ -26,6 +26,13 @@ for (const [repo, revision] of Object.entries(revisions)) {
   console.log(`${repo}: fuentes disponibles (${revision})`);
 }
 const lightcraft = path.join(root, "vendor", "lightcraft");
+const photoDetailPatch = path.join(root, "third-party", "patches", "lightcraft-photo-detail.patch");
+// This extension supersedes lines from the radius patch. Checking each older
+// patch in reverse against the final sources would falsely report a conflict.
+if (git(["-C", lightcraft, "apply", "--reverse", "--check", photoDetailPatch], true).status === 0) {
+  console.log("Detalle fotográfico y sus extensiones previas ya aplicados. Fuentes listas.");
+  process.exit(0);
+}
 const patch = path.join(root, "third-party", "patches", "lightcraft-deep-export.patch");
 if (git(["-C", lightcraft, "apply", "--reverse", "--check", patch], true).status === 0) {
   console.log("LightCraft: extensión de exportación ya aplicada.");
@@ -59,6 +66,14 @@ if (git(["-C", lightcraft, "apply", "--reverse", "--check", tonesPatch], true).s
     process.exit(1);
   }
   const result = git(["-C", lightcraft, "apply", tonesPatch]);
+  if (result.status !== 0) process.exit(result.status || 1);
+}
+if (git(["-C", lightcraft, "apply", "--reverse", "--check", photoDetailPatch], true).status !== 0) {
+  if (git(["-C", lightcraft, "apply", "--check", photoDetailPatch], true).status !== 0) {
+    console.error("La extensión de detalle fotográfico no coincide con las fuentes fijadas.");
+    process.exit(1);
+  }
+  const result = git(["-C", lightcraft, "apply", photoDetailPatch]);
   if (result.status !== 0) process.exit(result.status || 1);
 }
 console.log("Fuentes listas. Ejecutá npm run build:engine y después npm start.");

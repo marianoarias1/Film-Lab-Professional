@@ -85,3 +85,9 @@ test('Acepta proyectos 0.12 con el selector anterior para migrarlos al abrir',()
  const p=doc('/source/photo.jpg');p.engineVersion='filmlab-pro-0.12-lc-d999e382-fc-6c3948a3';p.files[0].settings={highlights:-35,shadows:25,processVersion:1};
  assert.equal(validateProject(p).engineVersion,ENGINE);
 });
+
+test('Abre proyectos 0.13 manteniendo ajustes de luz y detalle sin selector nuevo',()=>{
+ const p=doc('/source/photo.jpg');p.engineVersion='filmlab-pro-0.13-lc-d999e382-fc-6c3948a3';
+ p.files[0].settings={processVersion:2,shadows:45,highlights:-25,sharpness:70,sharpenRadius:1.2,sharpenMasking:35,denoiseColor:40};
+ validateProject(p);assert.equal(p.files[0].settings.shadows,45);assert.equal(p.files[0].settings.sharpenRadius,1.2);assert.equal(p.files[0].settings.processVersion,2);
+});

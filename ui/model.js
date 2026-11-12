@@ -8,7 +8,7 @@ export function normalizeEffects(value){
  const changed=Object.keys(baseline).some(k=>JSON.stringify(legacy[k])!==JSON.stringify(baseline[k]));
  return {...effectDefaults(),enabled:changed,layers:changed?[legacy]:[]};
 }
-export const ENGINE = "filmlab-pro-0.13-lc-d999e382-fc-6c3948a3";
+export const ENGINE = "filmlab-pro-0.14-lc-d999e382-fc-6c3948a3";
 export const defaults = (file = {}) => ({
   processVersion: file.kind === "video" ? 1 : 2,
   masks: [],
