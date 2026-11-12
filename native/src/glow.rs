@@ -101,12 +101,22 @@ fn trail(source: &Rgb32f, angle: f32, length: f32) -> Rgb32f {
     }
     out
 }
+#[cfg(test)]
 fn directional_halo(highlights: &Rgb32f, s: &Glow) -> Rgb32f {
+    directional_halo_quality(highlights, s, false)
+}
+fn directional_halo_quality(highlights: &Rgb32f, s: &Glow, photo: bool) -> Rgb32f {
     let spread = s.spread as f32 / 100.;
     let long = highlights.width.max(highlights.height) as f32;
     let streak = s.style == "streak";
     let length = (0.002 + if streak { 0.14 } else { 0.075 } * spread.powi(2)) * long;
-    let sigma = 0.35 + length * 0.12 * (s.softness as f32 / 100.).powi(2);
+    // For photos, width follows frame scale and softness, never trail length.
+    // Extending a crisp trail must not turn it into a broad fog bank.
+    let sigma = if photo {
+        (long * (0.00045 + 0.004 * (s.softness as f32 / 100.).powi(2))).max(0.35)
+    } else {
+        0.35 + length * 0.12 * (s.softness as f32 / 100.).powi(2)
+    };
     let base = gaussian(highlights, sigma);
     let forward = trail(&base, s.angle.to_radians() as f32, length);
     if !streak {
@@ -119,6 +129,26 @@ fn directional_halo(highlights: &Rgb32f, s: &Glow) -> Rgb32f {
     })
 }
 pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mask, &Frame)>) {
+    apply_quality(d, s, mask, false);
+}
+pub fn apply_photo(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mask, &Frame)>) {
+    apply_quality(d, s, mask, true);
+}
+// A small spread needs a finer grid to represent its thin trails; broader halos
+// can use a coarser grid. The cap bounds memory regardless of source resolution.
+fn working_edge(s: &Glow, photo: bool) -> f32 {
+    if photo && ["motion", "streak"].contains(&s.style.as_str()) {
+        2048. - 512. * (s.spread as f32 / 100.)
+    } else {
+        768.
+    }
+}
+fn apply_quality(
+    d: &mut DeepImage,
+    s: &Glow,
+    mask: Option<(&lightcraft_develop::Mask, &Frame)>,
+    photo: bool,
+) {
     if !s.enabled || s.amount <= 0. {
         return;
     }
@@ -129,7 +159,7 @@ pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mas
     if ow == 0 || oh == 0 {
         return;
     }
-    let scale = (768. / ow.max(oh) as f32).min(1.);
+    let scale = (working_edge(s, photo) / ow.max(oh) as f32).min(1.);
     let (w, h) = (
         ((ow as f32 * scale).round() as usize).max(1),
         ((oh as f32 * scale).round() as usize).max(1),
@@ -186,7 +216,7 @@ pub fn apply(d: &mut DeepImage, s: &Glow, mask: Option<(&lightcraft_develop::Mas
     }
     let radius = (0.003 + 0.065 * (s.spread as f32 / 100.).powi(2)) * w.max(h) as f32;
     let mut halo = if ["motion", "streak"].contains(&s.style.as_str()) {
-        directional_halo(&highlights, s)
+        directional_halo_quality(&highlights, s, photo)
     } else {
         gaussian(&highlights, radius.max(0.6))
     };
@@ -254,6 +284,192 @@ mod tests {
                     .flat_map(|i| if i == 48 * 97 + 48 { [1.; 3] } else { [0.; 3] })
                     .collect(),
             ),
+        }
+    }
+    fn moments(img: &Rgb32f, cx: f32, cy: f32) -> (f32, f32, f32) {
+        let mut energy = 0.;
+        let mut xx = 0.;
+        let mut yy = 0.;
+        for y in 0..img.height {
+            for x in 0..img.width {
+                let v = img.get(x, y)[0];
+                energy += v;
+                xx += v * (x as f32 - cx).powi(2);
+                yy += v * (y as f32 - cy).powi(2);
+            }
+        }
+        (energy, xx / energy.max(1e-12), yy / energy.max(1e-12))
+    }
+    #[test]
+    fn photo_spread_changes_length_without_widening_cross_section() {
+        let mut src = Rgb32f::new(513, 513);
+        src.data[256 * 513 + 256] = [1.; 3];
+        let s = Glow {
+            style: "motion".into(),
+            spread: 20.,
+            softness: 70.,
+            ..Default::default()
+        };
+        let a = moments(&directional_halo_quality(&src, &s, true), 256., 256.);
+        let b = moments(
+            &directional_halo_quality(&src, &Glow { spread: 90., ..s }, true),
+            256.,
+            256.,
+        );
+        assert!(b.1 > a.1 * 10., "spread must extend the trail");
+        assert!(
+            (a.2 - b.2).abs() < 0.02,
+            "spread must not widen it: {a:?} {b:?}"
+        );
+        assert!(a.0 > 0.99 && b.0 > 0.99 && b.0 < 1.01);
+    }
+    #[test]
+    fn photo_softness_changes_width_without_changing_direction() {
+        let mut src = Rgb32f::new(257, 257);
+        src.data[128 * 257 + 128] = [1.; 3];
+        let s = Glow {
+            style: "motion".into(),
+            spread: 70.,
+            softness: 0.,
+            ..Default::default()
+        };
+        let a = moments(&directional_halo_quality(&src, &s, true), 128., 128.);
+        let b = moments(
+            &directional_halo_quality(
+                &src,
+                &Glow {
+                    softness: 100.,
+                    ..s
+                },
+                true,
+            ),
+            128.,
+            128.,
+        );
+        assert!(b.2 > a.2 * 5.);
+        assert!((a.1 - b.1).abs() / a.1 < 0.08);
+    }
+    #[test]
+    fn photo_grid_adapts_and_legacy_grid_is_unchanged() {
+        for spread in [0., 25., 70., 100.] {
+            let s = Glow {
+                style: "motion".into(),
+                spread,
+                ..Default::default()
+            };
+            assert!((1536. ..=2048.).contains(&working_edge(&s, true)));
+            assert_eq!(working_edge(&s, false), 768.);
+            assert_eq!(
+                working_edge(
+                    &Glow {
+                        style: "soft".into(),
+                        ..s
+                    },
+                    true
+                ),
+                768.
+            );
+        }
+    }
+    #[test]
+    fn photo_dark_pixels_do_not_generate_trails() {
+        let mut d = image();
+        let DeepSamples::F32(v) = &mut d.samples else {
+            panic!()
+        };
+        v.fill(0.08);
+        let before = d.clone();
+        apply_photo(
+            &mut d,
+            &Glow {
+                enabled: true,
+                style: "motion".into(),
+                range: 0.,
+                amount: 100.,
+                ..Default::default()
+            },
+            None,
+        );
+        assert_eq!(d, before);
+    }
+    #[test]
+    fn photo_streak_is_symmetric_and_rotates() {
+        let mut src = Rgb32f::new(129, 129);
+        src.data[64 * 129 + 64] = [1.; 3];
+        let s = Glow {
+            style: "streak".into(),
+            spread: 80.,
+            softness: 20.,
+            ..Default::default()
+        };
+        let a = directional_halo_quality(&src, &s, true);
+        let b = directional_halo_quality(&src, &Glow { angle: 90., ..s }, true);
+        assert!((a.get(54, 64)[0] - a.get(74, 64)[0]).abs() < 1e-5);
+        assert!((a.get(54, 64)[0] - b.get(64, 54)[0]).abs() < 1e-5);
+    }
+    #[test]
+    fn photo_legacy_styles_and_missing_mask_are_unchanged() {
+        for style in ["soft", "directional"] {
+            let mut a = image();
+            let mut b = a.clone();
+            let s = Glow {
+                enabled: true,
+                style: style.into(),
+                amount: 70.,
+                ..Default::default()
+            };
+            apply(&mut a, &s, None);
+            apply_photo(&mut b, &s, None);
+            assert_eq!(a, b);
+        }
+        let mut a = image();
+        let before = a.clone();
+        apply_photo(
+            &mut a,
+            &Glow {
+                enabled: true,
+                style: "motion".into(),
+                mask_id: Some(9),
+                ..Default::default()
+            },
+            None,
+        );
+        assert_eq!(a, before);
+    }
+    #[test]
+    fn tiny_reflections_survive_large_photo_rendering() {
+        let w = 2400;
+        let h = 128;
+        let source = DeepImage {
+            width: w,
+            height: h,
+            space: Default::default(),
+            samples: DeepSamples::F32(
+                (0..w * h)
+                    .flat_map(|i| if i == 64 * w + 1100 { [1.; 3] } else { [0.; 3] })
+                    .collect(),
+            ),
+        };
+        for style in ["motion", "streak"] {
+            let s = Glow {
+                enabled: true,
+                style: style.into(),
+                amount: 100.,
+                spread: 40.,
+                softness: 0.,
+                ..Default::default()
+            };
+            let mut d = source.clone();
+            apply_photo(&mut d, &s, None);
+            let DeepSamples::F32(v) = d.samples else {
+                panic!()
+            };
+            assert!(
+                v[(64 * w + 1110) * 3] > 0.0001,
+                "tiny reflection must emit a trail"
+            );
+            assert!(v.iter().all(|v| v.is_finite() && *v >= 0. && *v <= 1.));
+            assert_eq!(v[0], 0.);
         }
     }
     #[test]
