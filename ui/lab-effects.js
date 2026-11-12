@@ -48,7 +48,7 @@ export function mountEffects({current,commit,preview,finished,box,isVisible,excl
  function changeView(view){inspector=view;tool=null;cursor=null;draw();}
  function draw(){
   const root=ensure();controls.replaceChildren();
-  if(!root){controls.append(hint('Abrí una foto o un video para agregar efectos.'));refresh();return;}
+  if(!root){controls.append(hint('Abrí una foto para agregar efectos.'));refresh();return;}
   const header=el('div',{className:'fx-stack-header'});
   header.append(el('span',{className:'fx-kicker'},'Capas de efecto'),el('span',{className:'fx-count'},root.layers.length+' / 6'));
   controls.append(header);

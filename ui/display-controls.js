@@ -11,3 +11,9 @@ export function colorTrack(key){
   if(match){const h=[0,30,60,120,180,240,280,320][Number(match[1])];if(h!==undefined)return `linear-gradient(90deg,hsl(${h-35} 55% 65%),hsl(${h} 55% 65%),hsl(${h+35} 55% 65%))`;}
   return null;
 }
+// Pan in display pixels, keeping the zoomed photo covering the available viewport.
+export function panPreview(origin,dx,dy,imageWidth,imageHeight,zoom,viewportWidth,viewportHeight) {
+  const maxX=Math.max(0,(imageWidth*zoom-viewportWidth)/2);
+  const maxY=Math.max(0,(imageHeight*zoom-viewportHeight)/2);
+  return {x:Math.max(-maxX,Math.min(maxX,origin.x+dx)),y:Math.max(-maxY,Math.min(maxY,origin.y+dy))};
+}

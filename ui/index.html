@@ -20,12 +20,11 @@
       >
       <nav class="workspace-nav" aria-label="Espacio de trabajo">
         <button id="navLibrary" aria-controls="library" aria-pressed="false">Biblioteca</button>
-        <button id="navFiles" aria-controls="filesPanel" aria-expanded="false">Archivos</button>
         <button data-tab="edit" class="active">Revelar</button>
         <button id="navLab" data-tab="effects">Laboratorio</button>
       </nav>
       <div class="actions">
-        <button id="projectButton" class="plain">Proyecto <span>⌄</span></button
+        <button id="projectButton" class="outline" aria-haspopup="true" aria-expanded="false">Proyecto <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m5 8 5 5 5-5"/></svg></button
         ><button id="importButton" class="outline">+ Agregar archivos</button
         ><button id="googleButton" class="outline">Google Fotos</button
         >
@@ -121,7 +120,6 @@
           </button>
         </div>
         <div class="filters-scroll" id="filtersPanel" hidden>
-        <p class="intro">Un punto de partida.<br />El resto lo decidís vos.</p>
         <label class="search"
           ><span>⌕</span
           ><input
@@ -137,20 +135,13 @@
           <span>COLECCIÓN PROFESSIONAL</span><span id="catalogCount">30</span>
         </div>
         <div id="recipeList"></div>
-        <div class="filter-note">
-          <span>✳</span>
-          <p>
-            Catálogo de Film Lab web interpretado para Professional. La apariencia puede variar entre motores.
-          </p>
-        </div>
-        <div class="local-label">◈ Procesamiento local · sin nube</div>
         </div>
       </aside>
       <section class="stage">
         <div class="stage-top" hidden aria-hidden="true">
           <div>
             <span class="eyebrow" id="fileKind">TU ESPACIO DE TRABAJO</span
-            ><strong id="fileName">Empezá con una fotografía o un video</strong>
+            ><strong id="fileName">Empezá con una fotografía</strong>
           </div>
           <span id="precision" class="badge">32 bits · color lineal</span>
         </div>
@@ -162,16 +153,16 @@
               crossorigin="anonymous"
               draggable="false"
               hidden
-            /><canvas id="maskTint" aria-hidden="true" hidden></canvas><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><svg id="fxOverlay" aria-label="Guías de desenfoque creativo" hidden></svg><video id="playback" crossorigin="anonymous" controls hidden></video>
+            /><canvas id="maskTint" aria-hidden="true" hidden></canvas><svg id="maskOverlay" aria-label="Guías de máscara" hidden></svg><svg id="fxOverlay" aria-label="Guías de desenfoque creativo" hidden></svg><video id="playback" crossorigin="anonymous" hidden></video>
             <div id="emptyState">
               <div class="empty-mark">◉</div>
               <h2>Tu próximo revelado.</h2>
               <p>
-                Abrí un JPEG, un RAW o un video.<br />Los originales permanecen
+                Abrí un JPEG, un PNG o un RAW compatible.<br />Los originales permanecen
                 en tu disco.
               </p>
               <button id="emptyImport" class="dark">+ Abrir archivos</button
-              ><small>Professional 0.9 · Windows</small>
+              ><small>Professional · Fotografía</small>
             </div>
           </div>
           <section id="detailInspector" class="detail-inspector" aria-label="Detalle al 100 %" hidden>
@@ -214,19 +205,6 @@
             </div>
           </section>
         </div>
-        <div id="videoControls" class="video-controls" hidden>
-          <button id="playProxy" class="outline">▷ Generar reproducción</button
-          ><input
-            id="scrub"
-            type="range"
-            min="0"
-            max="1"
-            step=".04"
-            value="0"
-            aria-label="Posición del video"
-          /><output id="timecode">0:00</output
-          ><span class="muted">Con audio</span>
-        </div>
         <div id="warning" class="warning" hidden></div>
         <div class="film-drawer">
         <button id="toggleFiles" class="files-tab" aria-controls="filesPanel" aria-expanded="false"><span>Archivos <b id="workspaceFileCount">0</b></span><svg class="panel-chevron" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
@@ -247,18 +225,18 @@
         </div></section>
         </div>
         <footer>
-          <span id="saveStatus">Sesión local</span
-          ><span class="engine-info"><span id="renderStatus" class="render-status" role="status" aria-label="Procesando ajustes" title="Procesando ajustes" hidden><span class="spinner"></span><span class="sr-only">Procesando ajustes</span></span><span id="engineStatus">Preparando motor…</span></span>
+          <span id="saveStatus" hidden role="status"></span
+          ><span class="engine-info"><span id="renderStatus" class="render-status" role="status" aria-label="Procesando ajustes" title="Procesando ajustes" hidden><span class="spinner"></span><span class="sr-only">Procesando ajustes</span></span><span id="engineStatus" hidden aria-hidden="true"></span></span>
         </footer>
       </section>
       <aside class="controls">
         <div class="controls-head">
-          <h2 id="panelTitle">A tu manera.</h2>
+          <h2 id="panelTitle">Revelar.</h2>
           <button id="reset" class="plain" disabled>Restablecer</button>
         </div>
         <nav class="editor-tabs" aria-label="Herramientas">
           <button data-tab="edit" class="active">Revelar</button>
-          <button data-tab="effects">Efectos</button>
+          <button data-tab="effects">Laboratorio</button>
           <button data-tab="masks">Máscaras</button>
         </nav>
         <p id="controlsEmpty" class="intro">
@@ -285,12 +263,14 @@
           </div>
           <div id="sliders"></div>
           <div id="curvePanel" hidden>
-            <p class="help">
-              Horizontal: sombras → luces.<br />Vertical: más oscuro → más
+            <p id="curveHelp" class="help">
+              Clic para agregar. Arrastrá para mover. Supr para quitar un punto.<br />Horizontal: sombras → luces.<br />Vertical: más oscuro → más
               claro.
             </p>
             <svg
               id="curveSvg"
+              tabindex="0"
+              aria-describedby="curveHelp"
               viewBox="0 0 300 240"
               role="img"
               aria-label="Curva de tonos"
@@ -318,14 +298,14 @@
               <span>Sombras</span><span>Luces</span>
             </div>
             <div class="curve-inputs" id="curveInputs"></div>
-            <button id="resetCurve" class="outline">Restablecer curva</button>
+            <button id="resetCurve" type="button" class="outline compact-action">Restablecer curva</button>
           </div>
             </div>
           </section>
         </div>
         <div id="labPanel" hidden>
           <section id="maskPanel" class="mask-panel">
-            <h3>Máscaras</h3><button id="newMaskGroup" class="outline new-mask-group">+ Nueva máscara</button><div id="newMaskTools"></div>
+            <button id="newMaskGroup" class="outline new-mask-group">+ Nueva máscara</button><div id="newMaskTools"></div>
             <select hidden tabindex="-1" id="maskType" aria-label="Tipo de máscara">
               <option value="" selected>Elegí una herramienta…</option><option value="brush">Pincel · pintar / borrar</option><option value="radial">Radial · óvalo</option><option value="linear">Degradado lineal</option><option value="shadows">Rango · sombras</option><option value="midtones">Rango · tonos medios</option><option value="lights">Rango · luces</option>
             </select>
@@ -333,13 +313,9 @@
             <label class="help"><input id="maskOutline" type="checkbox" checked> Mostrar zona y guías</label><div id="maskList"></div><div id="maskControls"></div>
           </section>
           <div id="effectsPanel" hidden>
-          <details class="global-effects" id="glowPanel"><summary>Resplandor</summary><div id="glowControls"></div></details>
-          <details id="motionPanel" class="creative-effects"><summary>Desenfoque y movimiento</summary><div id="motionControls"></div></details>
-          <details class="global-effects"><summary>Película y color global</summary>
-          <div class="lab-card">
-            <span>✳</span><strong>Película y luz</strong>
-            <p>Textura y color, sin alterar tu original.</p>
-          </div>
+          <details class="global-effects control-section" id="glowPanel"><summary>Resplandor <span>Luces y estelas</span></summary><div id="glowControls"></div></details>
+          <details id="motionPanel" class="creative-effects control-section"><summary>Desenfoque y movimiento <span>Enfoque creativo</span></summary><div id="motionControls"></div></details>
+          <details class="global-effects control-section"><summary>Película y color <span>Textura y luz</span></summary>
           <div id="labSliders"></div>
           <p class="help">
             La fuga se ubica haciendo clic o arrastrando sobre la foto. Su
@@ -348,15 +324,12 @@
           </details>
           </div>
         </div>
-        <div class="control-bottom">
-          <span>◈</span> El original siempre queda intacto.
-        </div>
       </aside>
     </main>
     <div id="projectMenu" class="project-menu" hidden>
       <div>
         <h3>Tu proyecto</h3>
-        <button id="closeProject" class="plain" aria-label="Cerrar">×</button>
+        <button id="closeProject" type="button" class="dialog-close" aria-label="Cerrar proyecto"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       </div>
       <label
         >Nombre<input
@@ -387,7 +360,7 @@
     <dialog id="exportDialog" aria-labelledby="exportTitle" aria-describedby="exportSummary">
       <div class="dialog-title">
         <h2 id="exportTitle">Exportar archivos</h2>
-        <button id="closeExport" class="plain" aria-label="Cerrar">×</button>
+        <button id="closeExport" type="button" class="dialog-close" aria-label="Cerrar exportación"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       </div>
       <p id="exportSummary"></p>
       <details id="exportBatch">
@@ -395,33 +368,25 @@
         <ul id="exportBatchList"></ul>
       </details>
       <p id="exportUnavailable" class="help" hidden></p>
-      <label>Destino<select id="deliveryPreset"><option value="original">Original · máxima flexibilidad</option><option value="reel">Reels / Stories · vertical 9:16</option><option value="portrait">Publicación vertical · 4:5</option><option value="square">Publicación cuadrada · 1:1</option><option value="youtube">Video horizontal · Full HD</option><option value="youtube4k">Video horizontal · 4K</option></select></label>
-      <div class="delivery-grid">
-        <label>Ancho · px (0 = original)<input id="delivery-width" type="number" min="0" max="7680" step="2"></label><label>Alto · px (0 = original)<input id="delivery-height" type="number" min="0" max="7680" step="2"></label>
-        <label>Encuadre<select id="delivery-fit"><option value="contain">Completa · márgenes negros</option><option value="cover">Recortar para llenar</option></select></label><label>Calidad JPEG · 1–100<input id="delivery-jpegQuality" type="number" min="1" max="100"></label>
-        <label>Encuadre horizontal · 0–1<input id="delivery-cropX" type="number" min="0" max="1" step="0.05"></label><label>Encuadre vertical · 0–1<input id="delivery-cropY" type="number" min="0" max="1" step="0.05"></label>
-        <label>FPS · 0 conserva original<input id="delivery-fps" type="number" min="0" max="120" step="0.001"></label><label>Video · Mbps<input id="delivery-bitrateMbps" type="number" min="1" max="200"></label>
-        <label>Audio AAC · kbps<input id="delivery-audioKbps" type="number" min="64" max="320"></label><label class="report-option"><input id="delivery-upscale" type="checkbox"> Permitir ampliar resolución</label>
-      </div><p id="deliveryInfo" class="help"></p>
-      <label
-        >Formato de fotografías<select id="photoFormat">
-          <option value="png">PNG · 16 bits</option>
-          <option value="jpg">JPEG · sRGB · 4:4:4</option>
-        </select></label
-      >
-      <label>Codificación de video<select id="videoEncoding">
-        <option value="auto">Automática · NVIDIA NVENC si está disponible</option>
-        <option value="cpu">CPU · software</option>
-      </select></label>
-      <p class="help">NVENC acelera la codificación. Los ajustes se procesan en CPU. Si NVIDIA no está disponible, se usa CPU automáticamente.</p>
-      <label class="report-option"><input id="saveExportReport" type="checkbox" checked> Guardar diagnóstico JSON junto a cada archivo</label>
-      <div class="export-info">
-        <span>Videos</span><b>MP4 · H.264 SDR + audio AAC</b>
+      <div class="export-basics">
+        <label>Destino<select id="deliveryPreset"><option value="original">Original · conservar tamaño</option><option value="reel">Story / Reel · 9:16</option><option value="portrait">Publicación vertical · 4:5</option><option value="square">Publicación cuadrada · 1:1</option><option value="landscape">Publicación horizontal · 16:9</option></select></label>
+        <label>Formato de fotografía<select id="photoFormat"><option value="png">PNG · 16 bits</option><option value="jpg">JPEG · sRGB</option></select></label>
       </div>
-      <p class="help">
-        Cada archivo usa sus propios ajustes. Exportación SDR; no conserva
-        metadatos EXIF en esta prueba.
-      </p>
+      <p id="deliveryInfo" class="help" role="status"></p>
+      <details id="exportAdvanced" class="control-section export-advanced">
+        <summary>Ajustes avanzados <span>Opcional</span></summary>
+        <div class="delivery-grid">
+          <label>Ancho · px (0 = original)<input id="delivery-width" type="number" min="0" max="7680" step="1"></label>
+          <label>Alto · px (0 = original)<input id="delivery-height" type="number" min="0" max="7680" step="1"></label>
+          <label>Encuadre<select id="delivery-fit"><option value="contain">Foto completa · con márgenes</option><option value="cover">Recortar para llenar</option></select></label>
+          <label id="jpegQualityField">Calidad JPEG · 1–100<input id="delivery-jpegQuality" type="number" min="1" max="100"></label>
+          <label>Posición horizontal · 0–1<input id="delivery-cropX" type="number" min="0" max="1" step="0.05"></label>
+          <label>Posición vertical · 0–1<input id="delivery-cropY" type="number" min="0" max="1" step="0.05"></label>
+          <label class="report-option"><input id="delivery-upscale" type="checkbox"> Ampliar fotos más pequeñas</label>
+        </div>
+        <label class="report-option"><input id="saveExportReport" type="checkbox"> Guardar diagnóstico JSON</label>
+        <p class="help">El diagnóstico es opcional y sirve para revisar fallos. La exportación aún no conserva metadatos EXIF.</p>
+      </details>
       <button id="confirmExport" class="dark">Elegir carpeta y exportar</button>
     </dialog>
     <dialog id="progressDialog">
@@ -458,7 +423,7 @@
     <dialog id="googleDialog">
       <h2>Importar desde Google Fotos</h2>
       <p>Elegí una carpeta local y autorizá tu cuenta en el navegador. Solo se importará lo que selecciones.</p>
-      <p class="help">Los videos se descargan en la versión que ofrece Google; puede diferir del original. Para RAW usá Agregar archivos.</p>
+      <p class="help">Para archivos RAW usá Agregar archivos.</p>
       <p id="googleStatus" role="status">Listo para conectar.</p>
       <button id="googleStart" class="dark">Conectar y elegir archivos</button>
       <button id="googleConfig" class="outline">Configurar Google (JSON local)</button>

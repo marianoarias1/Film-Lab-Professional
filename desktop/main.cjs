@@ -85,6 +85,7 @@ function mediaUrl(file) {
   return `filmlab://media/${token}`;
 }
 async function remember(p) {
+  if (p.files.some(f => f.kind !== "photo")) throw new Error("Este proyecto contiene archivos no compatibles con la edición fotográfica. El proyecto original no se modificó.");
   files.clear();
   for (const f of p.files) files.set(f.id, { ...f });
   opened = null;
@@ -132,6 +133,7 @@ function snapshot(p) {
   };
 }
 async function registerImports(paths) {
+    if (paths.some(file => !photoExt.includes(path.extname(file).slice(1).toLowerCase()))) throw new Error("Professional solo admite fotografías.");
     const added = [];
     for (const file of paths) {
       const stat = await fs.stat(file);
@@ -231,10 +233,10 @@ app.whenReady().then(async () => {
   }));
   ipcMain.handle("import", async () => {
     const result = await dialog.showOpenDialog(win, {
-      title: "Agregar fotos y videos",
+      title: "Agregar fotografías",
       properties: ["openFile", "multiSelections"],
       filters: [
-        { name: "Fotos y videos", extensions: [...photoExt, ...videoExt] },
+        { name: "Fotografías", extensions: photoExt },
       ],
     });
     if (result.canceled) return [];
@@ -326,7 +328,7 @@ app.whenReady().then(async () => {
   }));
   ipcMain.handle("preview-metrics", (_, message) => previewMetrics.acknowledge(message));
   ipcMain.handle("save-preview-diagnostics", async () => {
-    if(!previewMetrics.samples.length) throw new Error("Cargá una foto o video y probá algunos ajustes primero.");
+    if(!previewMetrics.samples.length) throw new Error("Cargá una foto y probá algunos ajustes primero.");
     const result = await dialog.showSaveDialog(win,{title:"Guardar diagnóstico de respuesta",defaultPath:"FilmLab-preview-diagnostico.json",filters:[{name:"JSON",extensions:["json"]}]});
     if(result.canceled)return false;
     await keepReport(result.filePath,previewMetrics.report());return true;
@@ -466,8 +468,9 @@ app.whenReady().then(async () => {
     });
     if (r.canceled) return null;
     const p = await store.read(r.filePaths[0]);
+    const restored = await remember(p);
     projectPath = r.filePaths[0];
-    return remember(p);
+    return restored;
   });
   ipcMain.handle("recover", async () => {
     try {

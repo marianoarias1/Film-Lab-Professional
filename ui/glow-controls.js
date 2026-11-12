@@ -2,7 +2,7 @@
 export function drawGlowControls({current,busy,slider,commitEdit,edited,drawControls}) {
  const box=document.getElementById('glowControls'),file=current();box.replaceChildren();
  const node=(tag,props={},text)=>{const n=Object.assign(document.createElement(tag),props);if(text!==undefined)n.textContent=text;return n;};
- if(!file){box.append(node('p',{className:'help'},'Abrí una foto o un video para agregar resplandor.'));return;}
+ if(!file){box.append(node('p',{className:'help'},'Abrí una foto para agregar resplandor.'));return;}
  const s=file.settings.glow;
  const change=fn=>{const old=structuredClone(file.settings);fn();file.recipe=null;commitEdit(file,old);edited();drawControls();};
  const label=node('label',{className:'help'}),toggle=node('input',{type:'checkbox',checked:s.enabled,disabled:busy});
